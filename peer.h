@@ -51,6 +51,7 @@ private:
   void do_close();
   void send(Msg_ptr msg);
   void handle_connection_error(const string& location, const bs::error_code& ec);
+
   Msg_ptr read_msg, write_msg;
   deque<Msg_ptr> msg_queue;
   mutex write_msg_mtx;
