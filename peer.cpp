@@ -1,14 +1,21 @@
 #include "peer.h"
+#include "core.h"
 
-Peer::Peer(socket_t &sock_):
-  sock(move(sock_)) {}
+Peer::Peer(socket_t &sock_, const peer_id_t& pid):
+  sock(move(sock_)), data(new Data(pid)) {
+  debug("creating peer [id:%llu]..", int64_t(pid));
+  do_read_header();
+}
 
 Peer::~Peer(){
   debug("disconnecting from peer..\n");
 }
 
+
+// ----------- network ----------
+
 void Peer::send(Msg_ptr msg) {
-  printf("sending message..\n");
+  debug("sending message..\n");
   unique_lock<mutex> lck(write_msg_mtx);
   msg_queue.push_back(msg);
   lck.unlock();
@@ -42,7 +49,7 @@ void Peer::do_write() {
 
 void Peer::handle_connection_error(const string &location, const boost::system::error_code &ec){
   cerr << location << " : " << ec.message() << "\n";
-  //TODO: remove peer from the core
+  core->data->remove_peer(data->id);
 }
 
 void Peer::do_read_header() {
@@ -86,6 +93,25 @@ void Peer::do_read_body() {
   });
 }
 
-void Peer::process_msg(const Msg_ptr& msg){
+// -------------- handlers --------------
 
+void Peer::process_msg(Msg_ptr msg){
+  debug("processing message..");
+  switch(msg->get_type()){
+  case Message::T_ECHO:
+    handle_echo(msg);
+    break;
+  default:
+    debug("unknown messape type");
+  }
 }
+
+void Peer::handle_echo(const Msg_ptr &msg){
+  string text = msg->get_string(Message::K_TEXT);
+  printf("ECHO : %s\n", text.c_str());
+}
+
+// ---------------- data ------------------
+
+Peer::Data::Data(const peer_id_t &pid):
+  id(pid){};

@@ -23,7 +23,7 @@
  * | MSG_TYPE [1] | MSG_SIZE [4] | KEY_NUM [1] |
  * +--------------+--------------+-------------+
  *
- *  ~~ PALOAD [variable size]
+ *  ~~ PAYLOAD [variable size]
  * +---------------------+----------------+-----------------------+
  * | KEY_1_TYPE [1]      | VALUE_SIZE [4] | VALUE [variable size] |
  * +---------------------+----------------+-----------------------+
@@ -64,8 +64,8 @@ public:
   Message_base(){}
   Message_base(Msg_base_ptr msg);
 
-  enum msg_types : Msg_type_t {T_NONE, T_ECHO}; // message types
-  enum msg_keys : Key_type_t {}; // header keys
+  enum msg_types : Msg_type_t {T_NONE, T_ECHO, T_VERIFY}; // message types
+  enum msg_keys : Key_type_t {K_TEXT, K_PEER_ID}; // header keys
 
 
   void print();
@@ -80,6 +80,7 @@ public:
 
   string&& get_string(const Key_type_t& key);
   time_t get_time_t(const Key_type_t& key);
+  peer_id_t get_peer_id_t(const Key_type_t& key);
 
 protected:
 
@@ -103,8 +104,10 @@ protected:
   void make_body();
 
   template<typename T>
-  string&& to_binary_base(const T& value);
-  string&& to_binary(string&& value);
+  string to_binary_base(const T& value);
+  string to_binary(const string& value);
+  string to_binary(const uint512_t& value);
+  string to_binary(const uint64_t& value);
 
   template<typename T>
   const string to_binary_container(const T& container){

@@ -90,6 +90,10 @@ time_t Message_base::get_time_t(const Key_type_t& key){
   return get<time_t>(key);
 }
 
+peer_id_t Message_base::get_peer_id_t(const Key_type_t &key){
+  return get<peer_id_t>(key);
+}
+
 // ------------- put ----------
 
 Msg_base_ptr Message_base::make_base(const Msg_type_t& type){
@@ -104,12 +108,20 @@ void Message_base::make_body(){
 }
 
 template<typename T>
-string&& Message_base::to_binary_base(const T& value){
+string Message_base::to_binary_base(const T& value){
   return string((char*)(&value),sizeof(value));
 }
 
-string&& Message_base::to_binary(string&&value){
-  return move(value);
+string Message_base::to_binary(const string&value){
+  return move(string(value));
+}
+
+string Message_base::to_binary(const uuid_t &value){
+  return to_binary_base<uuid_t>(value);
+}
+
+string Message_base::to_binary(const uint64_t &value){
+  return to_binary_base<uint64_t>(value);
 }
 
 // ----------- other -----------

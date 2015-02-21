@@ -10,6 +10,8 @@
 
 #include <memory>
 #include <thread>
+#include <vector>
+#include <sstream>
 
 #include "glob.h"
 

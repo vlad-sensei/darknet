@@ -17,7 +17,9 @@ typedef shared_ptr<Message> Msg_ptr;
 
 class Message : public Message_base {
 public:
-  static Msg_ptr echo();
+  static Msg_ptr copy_msg(Msg_ptr other);
+  static Msg_ptr echo(const string& msg = "");
+  static Msg_ptr verify(const peer_id_t& pid);
 private:
   template<typename ...Ts>
   static Msg_ptr make(Ts&&...args);

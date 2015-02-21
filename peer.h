@@ -33,14 +33,10 @@ typedef shared_ptr<Peer> Peer_ptr;
 
 class Peer {
 public:
-  Peer(socket_t& sock_);
+  Peer(socket_t& sock_, const peer_id_t& pid);
   ~Peer();
 
-  class Data{
-  public:
-  private:
-  } data;
-
+  void send(Msg_ptr msg);
 private:
   Peer();
 
@@ -49,7 +45,6 @@ private:
   void do_read_body();
   void do_write();
   void do_close();
-  void send(Msg_ptr msg);
   void handle_connection_error(const string& location, const bs::error_code& ec);
 
   Msg_ptr read_msg, write_msg;
@@ -60,9 +55,18 @@ private:
 
 
   //process messages
-  void process_msg(const Msg_ptr& msg);
+  void process_msg(Msg_ptr msg);
+  void handle_echo(const Msg_ptr& msg);
 
-  //data
+  class Data{
+  public:
+    Data(const peer_id_t& pid);
+    const peer_id_t id;
+  private:
+    Data();
+  };
+public:
+  const shared_ptr<Data> data;
 };
 
 #endif // PEER_H
