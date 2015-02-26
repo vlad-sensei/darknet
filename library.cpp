@@ -16,67 +16,124 @@ int callback(void *NotUsed, int argc, char **argv, char **azColName){
 
 
 
-bool Library::sql_exec(string command,int (*callback)(void *NotUsed, int argc, char **argv, char **azColName))
+bool Library::sql_exec_no_return(char *command)
+{
+   char *zErrMsg = 0;
+   int  rc;
+
+
+   /* Execute SQL statement */
+   rc = sqlite3_exec(metadata_db, command, NULL, 0, &zErrMsg);
+   if( rc != SQLITE_OK ){
+      sqlite3_free(zErrMsg);
+      debug("faile with: %s",command);
+      return false;
+   }else{
+      debug("execute command: %s",command);
+      return true;
+   }
+}
+
+bool Library::sql_exec(string command)
 {
    char *zErrMsg = 0;
    int  rc;
    const char *sql=command.c_str();
 
    /* Execute SQL statement */
-   rc = sqlite3_exec(metadata_db, sql, callback, 0, &zErrMsg);
+
    if( rc != SQLITE_OK ){
-   fprintf(stderr, "SQL error: %s\n", zErrMsg);
       sqlite3_free(zErrMsg);
-      debug("faile with: \n %s \n",command.c_str());
+      debug("faile with: %s",command.c_str());
       return false;
    }else{
-      debug("execute command: \n %s \n",command.c_str());
+      debug("execute command: %s",command.c_str());
       return true;
    }
 }
 
+
+void Library::search_and_get_row(string table,string sword,string cstring,string& ID,string& file_ID,string& tags){
+    string sql = "select * from "+table+" where "+sword + " = "+cstring;
+    const char* sqlc=sql.c_str();
+
+    int rc = sqlite3_prepare(metadata_db,sqlc,strlen(sqlc),&prepared,NULL);
+
+    sqlite3_step(prepared);
+    get_data_row(ID, file_ID, tags);
+
+
+    if(rc){
+        debug("fail with preperd");
+    }
+
+}
+
+void Library::get_data_row(string& ID,string& file_ID,string& tags){
+
+    ID=(const char *) sqlite3_column_text(prepared,0);
+    file_ID=(const char*)sqlite3_column_text(prepared,1);
+    tags=(const char*)sqlite3_column_text(prepared,2);
+
+}
+
+
+void Library::search_tags_and_get_rows(string table,string cstring,string& ID,string& file_ID,string& tags){
+    string sql = "select * from "+table+"where TAGS like " + "'%"+cstring+"%'";
+    const char* sqlc=sql.c_str();
+
+    int rc = sqlite3_prepare(metadata_db,sqlc,strlen(sqlc),&prepared,NULL);
+    if(rc){
+        debug("fail with preperd");
+        sqlite3_free(prepared);
+        return;
+    }
+    while(sqlite3_step(prepared)){
+        get_data_row(ID, file_ID, tags);
+    }
+
+
+}
+
+
+
 bool Library::open_db(){
   int rc;
-  string sql;
+  char * sql;
+  const char* hej;
   rc=sqlite3_open("darknet.db",&metadata_db);
-
   if(rc){
       debug("no db opend\n");
       return false;
   }else{
       debug("db opend\n");
 
-      sql = "CREATE TABLE METADATA("  \
-              "ID INT PRIMARY KEY     NOT NULL," \
-              "ID_TOFILE           TEXT    NOT NULL," \
+      sql = "CREATE TABLE IF NOT EXISTS METADATA("  \
+              "ID   TEXT    NOT NULL," \
+              "FILE_ID           TEXT    NOT NULL," \
               "TAGS            TEXT     NOT NULL)" ;
 
-      creat_table(sql,"'METADATA'");
-      sql = "CREATE TABLE LFILES("  \
-              "ID INT PRIMARY KEY     NOT NULL," \
+      sql_exec_no_return(sql);
+
+      sql = "CREATE TABLE IF NOT EXISTS LFILES("  \
+              "ID   TEXT     NOT NULL," \
               "PWD_TOFILE           TEXT    NOT NULL)";
-      creat_table(sql,"'LFILES'");
+
+      sql_exec_no_return(sql);
+
+    string ID,file_id,tags;
+    search_and_get_row("METADATA","ID","12345",ID,file_id,tags);
+
+    debug("test: %s , %s ,%s ",ID.c_str(),file_id.c_str(),tags.c_str());
+
+
+
       return true;
   }
 
 
 }
 
-void Library::creat_table(string command,string name){
-    string sql="select 1 from sqlite_master where type='table' and name="+name;
-    char ** result;
-    int row=0;
-    int colum=0;
-    char *err_msg = NULL;
-
-    sqlite3_get_table(metadata_db,sql.c_str(),&result,&row,&colum,&err_msg);
-
-    if(row==0){
-        sql_exec(command,NULL);
-    }
-    sqlite3_free_table(result);
-    sqlite3_free(err_msg);
-}
 
 Library::Library(){
     debug("creating library..\n");

@@ -28,15 +28,29 @@ typedef unique_ptr<Library> Library_ptr;
 class Library {
 
   bool open_db();
-  bool sql_exec(string command,int (*callback)(void *NotUsed, int argc, char **argv, char **azColName));
-  int creat(void *NotUsed, int argc, char **argv, char **azColName);
-  void creat_table(string command, string name);
 
-  sqlite3 *metadata_db;
+  bool sql_exec_no_return(char * command);
+  bool sql_exec(string command);
+
+
+  void search_and_get_row(string table,string sword,string cstring,string& ID,string& file_ID,string& tags);
+
+  void get_data_row(string& ID,string& file_ID,string& tags);
+  void search_tags_and_get_rows(string table,string cstring,string& ID,string& file_ID,string& tags);
+
+  int creat(void *NotUsed, int argc, char **argv, char **azColName);
+
+
+
   void close_db(){
       sqlite3_close(metadata_db);
   };
+  bool prepared_done;
+  bool prepared_reset;
 
+  sqlite3_stmt* prepared;
+
+  sqlite3 *metadata_db;
 public:
   Library();
   ~Library();
