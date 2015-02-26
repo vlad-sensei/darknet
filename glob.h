@@ -61,8 +61,11 @@ void debug(const std::string& fmt, const Ts&...args){
 typedef std::unique_ptr<unsigned char[]> hash_t;
 /* Hash function that uses SHA-3, implemented using libcrypto++.
  * The function allocates a 64 byte on the heap using unique_ptr
- * the result is moved into the return value
+ * the result is moved into the return value.
 */
 hash_t hash512(const string& value);
+
+/* Prints a hash_t using the debug function.*/
+void debug_hash512(const hash_t&);
 
 #endif // GLOB_H
