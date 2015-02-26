@@ -8,6 +8,7 @@ QMAKE_CXXFLAGS += -std=c++14
 LIBS += -lboost_system
 LIBS += -lboost_thread
 LIBS += -lpthread
+LIBS += -lcryptopp
 
 SOURCES += main.cpp \
     message_base.cpp \
@@ -15,7 +16,8 @@ SOURCES += main.cpp \
     core.cpp \
     peer.cpp \
     ui.cpp \
-    library.cpp
+    library.cpp \
+    glob.cpp
 
 HEADERS += \
     glob.h \
