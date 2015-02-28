@@ -40,7 +40,7 @@ public:
 private:
   Peer();
 
-  //network -- make its own namespace?
+  //TODO:  make Peer_network class
   void do_read_header();
   void do_read_body();
   void do_write();
@@ -58,15 +58,12 @@ private:
   void process_msg(Msg_ptr msg);
   void handle_echo(const Msg_ptr& msg);
 
-  class Data{
-  public:
-    Data(const peer_id_t& pid);
-    const peer_id_t id;
+  struct Data{
+    Data(const peer_id_t& pid_):pid(pid_){}
+    const peer_id_t pid;
   private:
     Data();
-  };
-public:
-  const shared_ptr<Data> data;
+  } data;
 };
 
 #endif // PEER_H

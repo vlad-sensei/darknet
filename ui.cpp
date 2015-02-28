@@ -40,6 +40,7 @@ void UI::process_raw_input(string raw_input){
     if(!(ss>>peer)) return;
     uint16_t port = LISTEN_PORT;
     ss >> port;
+    core->connect(peer,port);
     return;
   }
 }

@@ -8,7 +8,7 @@
  */
 
 template<typename ...Ts>
-Msg_ptr Message::make(Ts&&...args){
+Msg_ptr Message::make(const Ts&...args){
   return static_pointer_cast<Message>(make_base(args...));
 }
 

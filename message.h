@@ -22,7 +22,7 @@ public:
   static Msg_ptr verify(const peer_id_t& pid);
 private:
   template<typename ...Ts>
-  static Msg_ptr make(Ts&&...args);
+  static Msg_ptr make(const Ts&...args);
 };
 
 #endif // MESSAGE_H

@@ -11,19 +11,12 @@
  * queries.
  */
 
-#include <memory>
-
 #include "glob.h"
+#include "database.h"
 
-class Library;
-typedef unique_ptr<Library> Library_ptr;
-
-class Library {
+class Library: public Database {
 public:
-  Library();
-
   void upload_file(const string& filename);
-
 };
 
 #endif // LIBRARY_H

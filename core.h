@@ -43,13 +43,17 @@ typedef shared_ptr<tcp::acceptor> acceptor_ptr;
 
 extern Core_ptr core;
 
-class Core
-{
+class Core {
 public:
   Core(ba::io_service& io_service,tcp::endpoint& endpoint);
   // user interaction
   void connect(const string& addr, const uint16_t& port);
   void broadcast_echo(const string& msg);
+
+  void spawn_peer(tcp::socket& socket,const peer_id_t& pid);
+  void remove_peer(const peer_id_t& pid);
+  void broadcast(Msg_ptr msg);
+  peer_id_t get_pid();
 
 private:
   Core();
@@ -64,27 +68,19 @@ private:
   tcp::socket socket_;
   tcp::resolver resolver_;
 
-  //public methods must be threadsafe!
-  class Data{
-  public:
-    Data();
-    peer_id_t get_id();
-    void spawn_peer(tcp::socket& socket,const peer_id_t& pid);
-    void remove_peer(const peer_id_t& pid);
-    //TODO: make only accessible from core
-    void broadcast(Msg_ptr msg);
-  private:
-    bool has_peer_u(const peer_id_t& pid);
-    peer_id_t id = 0;
-    unordered_map<peer_id_t,Peer_ptr> peers;
-    shared_timed_mutex peers_mtx;
-  };
 
+  //all data&methods in data must be synchronized
+  struct {
+    peer_id_t get_id();
+    //TODO: introduce id system propely
+    peer_id_t pid = 0;
+    unordered_map<peer_id_t,Peer_ptr> peers;
+    shared_timed_mutex peers_mtx, pid_mtx;
+
+    bool peer_exists(const peer_id_t& pid) {return peers.find(pid)!=peers.end();}
+  } data;
 
   UI_ptr ui;
-  Library_ptr lib;
-public:
-  const shared_ptr<Data> data;
 
 };
 

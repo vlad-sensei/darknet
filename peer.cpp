@@ -2,7 +2,7 @@
 #include "core.h"
 
 Peer::Peer(socket_t &sock_, const peer_id_t& pid):
-  sock(move(sock_)), data(new Data(pid)) {
+  sock(move(sock_)), data(pid) {
   debug("creating peer [id:%llu]..", int64_t(pid));
   do_read_header();
 }
@@ -49,7 +49,7 @@ void Peer::do_write() {
 
 void Peer::handle_connection_error(const string &location, const boost::system::error_code &ec){
   cerr << location << " : " << ec.message() << "\n";
-  core->data->remove_peer(data->id);
+  core->remove_peer(data.pid);
 }
 
 void Peer::do_read_header() {
@@ -75,14 +75,14 @@ void Peer::do_read_body() {
   ba::async_read(sock, read_msg->get_raw(),
                  [this](const boost::system::error_code& ec, const size_t& bytes_read) {
     if(ec) return 0UL;
-    return read_msg->get_payload_size()-bytes_read;
+    return read_msg->get_body_size()-bytes_read;
   },
   [this](const bs::error_code& ec, const size_t&) {
     if(ec) {
       handle_connection_error("do_read_msg", ec);
       return;
     }
-    read_msg->decode_msg();
+    read_msg->decode_body();
 
     Msg_ptr msg = read_msg;
 
@@ -110,8 +110,3 @@ void Peer::handle_echo(const Msg_ptr &msg){
   string text = msg->get_string(Message::K_TEXT);
   printf("ECHO : %s\n", text.c_str());
 }
-
-// ---------------- data ------------------
-
-Peer::Data::Data(const peer_id_t &pid):
-  id(pid){};
