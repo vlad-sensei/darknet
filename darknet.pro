@@ -19,7 +19,7 @@ SOURCES += main.cpp \
     ui.cpp \
     library.cpp \
     sqlite3_base.cpp \
-    database.cpp
+    database.cpp \
     glob.cpp
 
 HEADERS += \
