@@ -1,7 +1,6 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
-#include <stdbool.h>
 #include <iostream>
 //#include <type_traits>
 
@@ -23,7 +22,6 @@ protected:
 class Connect: public Command{
 public:
     Connect(vector<string>* cmd_args){args=cmd_args;}
-//    Connect(vector<string>* cmd_args): Command(cmd_args){}
     bool verify_args();
     bool execute();
     string help_text();
@@ -53,6 +51,14 @@ public:
     string help_text();
 };
 
+class Metalist: public Command{
+public:
+    Metalist(vector<string>* cmd_args){args=cmd_args;}
+    bool verify_args();
+    bool execute();
+    string help_text();
+};
+
 
 class Encrypt: public Command{
 public:
@@ -70,6 +76,7 @@ public:
     string help_text();
 };
 
+// Use Help as "man" command? How?
 class Help: public Command{
 public:
     Help(vector<string>* cmd_args){args=cmd_args;}

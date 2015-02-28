@@ -15,6 +15,8 @@
 
 #include "glob.h"
 
+#include "command.h"
+
 class UI;
 typedef unique_ptr<UI> UI_ptr;
 

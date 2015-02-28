@@ -57,7 +57,7 @@ void Peer::do_read_header() {
   read_msg.reset(new Message);
   ba::async_read(sock,read_msg->get_raw(),
                  [this](const bs::error_code& ec, size_t bytes) {
-    if(ec) return 0UL;
+    if(ec) return (size_t)0;
     return Message::HEADER_SIZE-bytes;
   },
   [this](const boost::system::error_code& ec, size_t) {
@@ -74,7 +74,7 @@ void Peer::do_read_header() {
 void Peer::do_read_body() {
   ba::async_read(sock, read_msg->get_raw(),
                  [this](const boost::system::error_code& ec, const size_t& bytes_read) {
-    if(ec) return 0UL;
+    if(ec) return (size_t)0;
     return read_msg->get_body_size()-bytes_read;
   },
   [this](const bs::error_code& ec, const size_t&) {

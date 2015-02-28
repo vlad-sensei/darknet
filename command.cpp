@@ -1,4 +1,5 @@
 #include "command.h"
+#include "misc.h"
 
 /*
  *      Connect
@@ -7,7 +8,7 @@
  */
 bool Connect::verify_args(){
     // TODO: Better check
-    if(args->size()==2){
+    if(args->size()==2 || args->size()==3){
         return true;
     }
     debug("Invalid command: Wrong argument count");
@@ -16,8 +17,11 @@ bool Connect::verify_args(){
 
 bool Connect::execute(){
     if(verify_args()){
-//        uint16_t port = args[2];
+
         uint16_t port = LISTEN_PORT;
+        if(args->size() == 3){
+            port = str_to_dec((*args).at(2),port);
+        }
         string peer = (*args).at(1);
         core->connect(peer,port);
         return true;
@@ -76,7 +80,6 @@ bool Broadcast::verify_args(){
 bool Broadcast::execute(){
     if(verify_args()){
         core->broadcast_echo((*args).at(1));
-//        debug(help_text().c_str());
         return true;
     }else{
         return false;
@@ -116,6 +119,30 @@ string Fetch::help_text(){
     return "Help to fetch";
 }
 // END Fetch
+
+/*
+ *      Metalist
+ *
+ * Displays metafiles.
+ */
+bool Metalist::verify_args(){
+    return true;
+}
+
+bool Metalist::execute(){
+    if(verify_args()){
+        debug(help_text().c_str());
+        return true;
+    }else{
+        return false;
+    }
+}
+
+string Metalist::help_text(){
+    return "Help to metalist";
+}
+// END Metalist
+
 
 /*
  *      Encrypt
@@ -179,12 +206,12 @@ string Decrypt::help_text(){
  * Show available commands and other useful info.
  */
 bool Help::execute(){
-    debug(help_text().c_str());
+    cout << help_text() << endl;
     return true;
 }
 
 string Help::help_text(){
-    // Have help text as variable/constant? Or how?
+    //TODO: Have help text as variable/constant? Or how?
     return "Available commands:\n connect\n disconnect\n broadcast\n fetch\n encrypt\n decrypt\n help";
 }
 //END Help

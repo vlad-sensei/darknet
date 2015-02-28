@@ -65,12 +65,12 @@ void Core::do_verify_peer(tcp::socket socket){
     thread read_thread([&](){
       Msg_ptr read_msg(new Message);
       ba::read(socket, read_msg->get_raw(), [](const bs::error_code& ec, const size_t& bytes){
-        if(ec) return 0UL;
+        if(ec) return (size_t)0;
         return Message::HEADER_SIZE-bytes;
       });
       read_msg->decode_header();
       ba::read(socket, read_msg->get_raw(),[&read_msg](const bs::error_code& ec, const size_t& bytes){
-        if(ec) return 0UL;
+        if(ec) return (size_t)0;
         return read_msg->get_body_size()-bytes;
       });
       read_msg->decode_body();
