@@ -9,6 +9,7 @@ LIBS += -lboost_system
 LIBS += -lboost_thread
 LIBS += -lpthread
 LIBS += -lsqlite3
+LIBS += -lcryptopp
 
 SOURCES += main.cpp \
     message_base.cpp \
@@ -19,6 +20,7 @@ SOURCES += main.cpp \
     library.cpp \
     sqlite3_base.cpp \
     database.cpp
+    glob.cpp
 
 HEADERS += \
     glob.h \
