@@ -13,19 +13,17 @@
 
 #include "glob.h"
 #include "database.h"
-
-class Library: public Database {
-public:
-=======
-#include <sqlite3.h>
-
+#include<memory>
+//#include <sqlite3.h>
 
 
 
 class Library;
 typedef unique_ptr<Library> Library_ptr;
 
-class Library {
+
+class Library: public Database {
+public:
 
   bool open_db();
 

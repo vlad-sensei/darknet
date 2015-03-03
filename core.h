@@ -81,6 +81,7 @@ private:
   } data;
 
   UI_ptr ui;
+  Library_ptr lib;
 
 };
 

@@ -16,14 +16,14 @@ void Database::init_db(){
   if(SQLITE_OK!=sqlite3_initialize())
     debug(" *** could not initialize database");
   //create tables
-  //exec_s(s_create_table);
+  exec_s(s_create_table);
 }
 
 void Database::shutdown_db(){
   sqlite3_shutdown();
 }
 
-/*
+
 void Database::get_data(const uint64_t &ref_id, vector<uint64_t> &id, vector<string> &value1, vector<uint64_t> &value2){
   Result_ptr res = exec_q(q_items,ref_id);
   while(res->next()) {
@@ -32,4 +32,4 @@ void Database::get_data(const uint64_t &ref_id, vector<uint64_t> &id, vector<str
     value2.emplace_back(res->get_uint64_t(2));
   }
 }
-*/
+

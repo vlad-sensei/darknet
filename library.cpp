@@ -137,7 +137,11 @@ bool Library::open_db(){
 
 Library::Library(){
     debug("creating library..\n");
-    open_db();
+
+
+
+
+
 }
 Library::~Library(){
     close_db();
