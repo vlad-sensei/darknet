@@ -23,6 +23,7 @@ protected:
     inline bool next(){return sqlite3_step(stmt_)==SQLITE_ROW;}
 
     string get_string(const unsigned& pos);
+    hash_t get_hash(const unsigned& pos);
     uint64_t get_uint64_t(const unsigned& pos);
 
   private:

@@ -31,20 +31,12 @@ using namespace std;
 
 //  return 0;
 //}
-
-#include "database.h"
-#include<memory>
+#include "library.h"
 
 
 int main(int argc, char* argv[]){
-    unique_ptr<Database> db(new Database);
-    for(uint64_t i = 0; i<10UL; i++)
-        db->add_data(i,"it works",i);
-    vector<uint64_t> id,value2;
-    vector<string> value1;
-    db->get_data(6,id,value1,value2);
-    db.reset();
-    for(unsigned i=0; i<value2.size(); i++)
-        printf("[id:%lu][value1:%s][value2:%lu]\n",id[i],value1[i].c_str(),value2[i]);
+    Library_ptr lib;
+    lib.reset(new Library());
+
 
 }

@@ -52,15 +52,18 @@ private:
   const string
 
   //statements (misc)
-  s_create_table = "CREATE TABLE IF NOT EXISTS items (id UNSEGNED BIGINT PRIMARY KEY, value1 TEXT, value2 UNSIGNED BIGINT);",
-
+  //s_create_table = "CREATE TABLE IF NOT EXISTS items (id UNSEGNED BIGINT PRIMARY KEY, value1 TEXT, value2 UNSIGNED BIGINT);",
+  s_create_table = "CREATE TABLE IF NOT EXISTS items (id TEXT, Size UNSIGNED BIGINT, Tags TEXT,Hash_vl TEXT);",
   //insert statement
-  i_items_2 = "INSERT INTO items (value1, value2) VALUES (?,?);",
-  i_items_3 = "INSERT INTO items (id,value1, value2) VALUES (?,?,?);",
+  //i_items_2 = "INSERT INTO items (value1, value2) VALUES (?,?);",
+  i_items = "INSERT INTO items (id,Size, Tags,Hash_vl) VALUES (?,?,?,?);",
 
 
   //queries (select)
-  q_items = "SELECT id,value1,value2 FROM items WHERE id<?;",
+  //q_items = "SELECT id,value1,value2 FROM items WHERE id<?;",
+  q_items = "SELECT * FROM items WHERE Tags like %?%;",
+
+
 
   //dummy, for the last ";" basicall;
   EMPTY_STRING ="";
@@ -70,10 +73,10 @@ protected:
   void shutdown_db();
 public:
   //write
-  void add_data(const uint64_t& id,const string& value1, const uint64_t& value2) {exec_s(i_items_3,id,value1,value2);}
+  void add_data(const hash_t& Id,const uint64_t& Size,const string& Tags, const uint64_t& Hash_vl) {exec_s(i_items,Id,Size,Tags,Hash_vl);}
 
   //read
-  void get_data(const uint64_t& ref_id, vector<uint64_t>& id, vector<string>& value1, vector<uint64_t>& value2);
+  void get_data(const string& Tag_ref, vector<const string>& Id, vector<uint64_t>& Size, vector<string>& Tags, vector<hash_t> &Hash_vl);
 
 };
 
