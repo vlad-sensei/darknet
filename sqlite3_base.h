@@ -1,6 +1,8 @@
 #ifndef SQLITE3_BASE_H
 #define SQLITE3_BASE_H
 
+#define SQLITE3_MAX_SLEEP_MS 2000
+
 #include <memory>
 
 #include <sqlite3.h>
@@ -54,7 +56,7 @@ private:
     return Result_ptr(new Result(db,stmt));
   }
 
-  protected:
+protected:
 
   template<typename Tr, typename ...Ts>
   inline Tr exec_sql(const string& sql, const Ts&...args){
@@ -63,6 +65,7 @@ private:
     sqlite3_stmt * stmt;
     sqlite3_prepare_v2(db,sql.c_str(),sql.size(),&stmt,NULL);
     bind_args<sizeof...(args)>(db,stmt,args...);
+    sqlite3_busy_timeout(db,SQLITE3_MAX_SLEEP_MS);
     return return_sql(db,stmt, (Tr*)nullptr);
   }
 #define exec_s exec_sql<void>

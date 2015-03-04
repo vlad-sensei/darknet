@@ -10,6 +10,7 @@ LIBS += -lboost_thread
 LIBS += -lpthread
 LIBS += -lsqlite3
 LIBS += -lcryptopp
+LIBS += -lreadline
 
 SOURCES += main.cpp \
     message_base.cpp \
@@ -33,6 +34,5 @@ HEADERS += \
     library.h \
     sqlite3_base.h \
     database.h \
-    command.h \
-    misc.h
+    command.h
 

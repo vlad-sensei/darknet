@@ -10,12 +10,9 @@
 
 #include <memory>
 #include <thread>
-#include <vector>
 #include <sstream>
 
 #include "glob.h"
-
-#include "command.h"
 
 class UI;
 typedef unique_ptr<UI> UI_ptr;
@@ -23,9 +20,11 @@ typedef unique_ptr<UI> UI_ptr;
 class UI{
 public:
   UI();
-private:
+private:  
   void get_raw_input();
   void process_raw_input(string raw_input);
+
+
 };
 
 #endif // UI_H

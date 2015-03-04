@@ -36,7 +36,7 @@ void Core::do_accept(){
   acceptor_.async_accept(socket_,
                          [this](const bs::error_code& ec){
     if(!ec){
-        do_verify_peer(move(socket_));
+      do_verify_peer(move(socket_));
     }
     do_accept();
   });
