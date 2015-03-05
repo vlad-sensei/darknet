@@ -32,14 +32,19 @@ using namespace std;
 //  return 0;
 //}
 #include "library.h"
-
+#include "message.h"
 
 int main(int argc, char* argv[]){
     Library_ptr lib;
     lib.reset(new Library());
+    Msg_ptr tmp1=Message::echo("tjena");
+    Msg_ptr tmp2=Message::metadata("hej",5,"tjena","nice");
 
-    lib->upload_file("/home/andno037/code/build-darknet-Desktop_Qt_5_3_0_GCC_64bit-Debug/hej1","hej1");
-    lib->upload_file("/home/andno037/code/build-darknet-Desktop_Qt_5_3_0_GCC_64bit-Debug/hej1","hej2");
-    lib->upload_file("/home/andno037/code/build-darknet-Desktop_Qt_5_3_0_GCC_64bit-Debug/hej1","hej3");
-    lib->upload_file("/home/andno037/code/build-darknet-Desktop_Qt_5_3_0_GCC_64bit-Debug/hej1","hej4");
+    tmp1->print();
+    tmp2->print();
+    //debug("%s",tmp2->get_string(Message_base::msg_keys::K_TEXT).c_str());
+    //lib->upload_file("/home/andno037/code/build-darknet-Desktop_Qt_5_3_0_GCC_64bit-Debug/hej1","hej1");
+    //lib->upload_file("/home/andno037/code/build-darknet-Desktop_Qt_5_3_0_GCC_64bit-Debug/hej1","hej2");
+    //lib->upload_file("/home/andno037/code/build-darknet-Desktop_Qt_5_3_0_GCC_64bit-Debug/hej1","hej3");
+    //lib->upload_file("/home/andno037/code/build-darknet-Desktop_Qt_5_3_0_GCC_64bit-Debug/hej1","hej4");
 }

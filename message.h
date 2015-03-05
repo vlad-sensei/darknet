@@ -19,6 +19,7 @@ class Message : public Message_base {
 public:
   static Msg_ptr copy_msg(Msg_ptr other);
   static Msg_ptr echo(const string& msg = "");
+  static Msg_ptr metadata(hash_t& Id,const uint64_t& Size,const string& Tags,hash_t& Hash_vl);
   static Msg_ptr verify(const peer_id_t& pid);
 private:
   template<typename ...Ts>
