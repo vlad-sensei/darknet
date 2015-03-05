@@ -23,8 +23,8 @@ void Database::shutdown_db(){
   sqlite3_shutdown();
 }
 
-void Database::get_data(const string& Tag_ref, vector<string>& Id, vector<uint64_t>& Size,vector<string>& Tags, vector<string>& Hash_vl){
-  Result_ptr res = exec_q(q_items,Tag_ref);
+void Database::get_data_on_tag(const string& Tag_ref, vector<string>& Id, vector<uint64_t>& Size,vector<string>& Tags, vector<string>& Hash_vl){
+  Result_ptr res = exec_q(q_items_Tag,Tag_ref);
   while(res->next()) {
     Id.emplace_back(res->get_string(0));
     Size.emplace_back(res->get_uint64_t(1));
@@ -33,3 +33,13 @@ void Database::get_data(const string& Tag_ref, vector<string>& Id, vector<uint64
   }
 }
 
+
+void Database::get_data_on_metadata(const string& Id_ref, vector<string>& Id, vector<uint64_t>& Size,vector<string>& Tags, vector<string>& Hash_vl){
+  Result_ptr res = exec_q(q_items_Id,Id_ref);
+  while(res->next()) {
+    Id.emplace_back(res->get_string(0));
+    Size.emplace_back(res->get_uint64_t(1));
+    Tags.emplace_back(res->get_string(2));
+    Hash_vl.emplace_back(res->get_string(3));
+  }
+}

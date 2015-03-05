@@ -28,5 +28,17 @@ void Library::upload_file(const string& filepath,const string& Tags){
 
     db->add_data(Id,Size,Tags,Hash_vl);
 
+    vector<string> Id_v,Hash_vl_v,Tags_v;
+    vector<uint64_t> Size_v;
+
+    db->get_data_on_metadata(Id,Id_v,Size_v,Tags_v,Hash_vl_v);
+
+    //debug("test");
+    for(unsigned i=0; i<Id_v.size(); i++)
+        debug("[Id:%s][Size:%lu][Tags:%s][Hash:%s]\n",Id_v[i].c_str() ,Size_v[i],Tags_v[i].c_str(),Hash_vl_v[i].c_str());
+
+
+
+
 }
 

@@ -61,8 +61,9 @@ private:
 
   //queries (select)
   //q_items = "SELECT id,value1,value2 FROM items WHERE id<?;",
-  q_items = "SELECT * FROM items WHERE Tags like %?%;",
+  q_items_Tag = "SELECT * FROM items WHERE Tags like %?%;",
 
+  q_items_Id = "SELECT * FROM items WHERE Id =?;",
 
 
   //dummy, for the last ";" basicall;
@@ -73,10 +74,12 @@ protected:
   void shutdown_db();
 public:
   //write
-  void add_data(const hash_t& Id,const uint64_t& Size,const string& Tags, const hash_t& Hash_vl) {exec_s(i_items,Id,Size,Tags,Hash_vl);}
+  void add_data(hash_t& Id,const uint64_t& Size,const string& Tags,hash_t& Hash_vl) {exec_s(i_items,Id,Size,Tags,Hash_vl);}
 
   //read
-  void get_data(const string& Tag_ref, vector<string>& Id, vector<uint64_t>& Size, vector<string>& Tags, vector<string> &Hash_vl);
+  void get_data_on_tag(const string& Tag_ref, vector<string>& Id, vector<uint64_t>& Size, vector<string>& Tags, vector<string> &Hash_vl);
+
+  void get_data_on_metadata(const string& Tag_ref, vector<string>& Id, vector<uint64_t>& Size, vector<string>& Tags, vector<string> &Hash_vl);
 
 };
 
