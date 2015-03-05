@@ -30,6 +30,7 @@ public:
   ~Library();
 
   void upload_file(const string& filepath,const string& Tags);
+  void search(const string& Tag);
 };
 
 #endif // LIBRARY_H

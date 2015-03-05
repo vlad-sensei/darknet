@@ -73,10 +73,10 @@ protected:
   void shutdown_db();
 public:
   //write
-  void add_data(const hash_t& Id,const uint64_t& Size,const string& Tags, const uint64_t& Hash_vl) {exec_s(i_items,Id,Size,Tags,Hash_vl);}
+  void add_data(const hash_t& Id,const uint64_t& Size,const string& Tags, const hash_t& Hash_vl) {exec_s(i_items,Id,Size,Tags,Hash_vl);}
 
   //read
-  void get_data(const string& Tag_ref, vector<const string>& Id, vector<uint64_t>& Size, vector<string>& Tags, vector<hash_t> &Hash_vl);
+  void get_data(const string& Tag_ref, vector<string>& Id, vector<uint64_t>& Size, vector<string>& Tags, vector<string> &Hash_vl);
 
 };
 

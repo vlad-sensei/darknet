@@ -38,5 +38,11 @@ int main(int argc, char* argv[]){
     Library_ptr lib;
     lib.reset(new Library());
 
+    //lib->upload_file("/home/andno037/code/build-darknet-Desktop_Qt_5_3_0_GCC_64bit-Debug/hej1","hej1");
+    //lib->upload_file("/home/andno037/code/build-darknet-Desktop_Qt_5_3_0_GCC_64bit-Debug/hej1","hej2");
+    //lib->upload_file("/home/andno037/code/build-darknet-Desktop_Qt_5_3_0_GCC_64bit-Debug/hej1","hej3");
+    //lib->upload_file("/home/andno037/code/build-darknet-Desktop_Qt_5_3_0_GCC_64bit-Debug/hej1","hej4");
+
+
 
 }

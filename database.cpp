@@ -23,14 +23,13 @@ void Database::shutdown_db(){
   sqlite3_shutdown();
 }
 
-void Database::get_data(const string& Tag_ref, vector<const string>& Id, vector<uint64_t>& Size,vector<string>& Tags, vector<hash_t>& Hash_vl){
+void Database::get_data(const string& Tag_ref, vector<string>& Id, vector<uint64_t>& Size,vector<string>& Tags, vector<string>& Hash_vl){
   Result_ptr res = exec_q(q_items,Tag_ref);
-
   while(res->next()) {
     Id.emplace_back(res->get_string(0));
     Size.emplace_back(res->get_uint64_t(1));
     Tags.emplace_back(res->get_string(2));
-    //Hash_vl.emplace_back(res->get_string(3));
+    Hash_vl.emplace_back(res->get_string(3));
   }
 }
 
