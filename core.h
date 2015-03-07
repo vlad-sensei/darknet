@@ -43,7 +43,7 @@ typedef shared_ptr<tcp::acceptor> acceptor_ptr;
 
 extern Core_ptr core;
 
-class Core {
+class Core : public Library, public UI {
 public:
   Core(ba::io_service& io_service,tcp::endpoint& endpoint);
   // user interaction
@@ -79,8 +79,6 @@ private:
 
     bool peer_exists(const peer_id_t& pid) {return peers.find(pid)!=peers.end();}
   } data;
-
-  UI_ptr ui;
 
 };
 

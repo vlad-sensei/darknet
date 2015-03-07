@@ -12,8 +12,6 @@ Core::Core(boost::asio::io_service &io_service, tcp::endpoint &endpoint):
   srand(time(0));
   data.pid = rand();
   debug("curret pid : %llu",uint64_t(get_pid()));
-
-  ui.reset(new UI);
   do_accept();
 }
 
