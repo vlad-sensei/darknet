@@ -20,7 +20,9 @@ SOURCES += main.cpp \
     library.cpp \
     sqlite3_base.cpp \
     database.cpp \
-    glob.cpp
+    glob.cpp \
+    core_network.cpp \
+    peer_network.cpp
 
 HEADERS += \
     glob.h \
@@ -31,5 +33,7 @@ HEADERS += \
     ui.h \
     library.h \
     sqlite3_base.h \
-    database.h
+    database.h \
+    core_network.h \
+    peer_network.h
 

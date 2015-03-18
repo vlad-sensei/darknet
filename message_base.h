@@ -39,8 +39,8 @@
 
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 
-#include <unordered_map>
 #include <boost/asio.hpp>
 
 namespace ba = boost::asio;
@@ -62,10 +62,6 @@ public:
   static const size_t HEADER_SIZE = sizeof(Msg_type_t) + sizeof(Msg_size_t) + sizeof(Key_num_t);
 
   Message_base(Msg_base_ptr msg);
-
-  enum msg_types : Msg_type_t {T_NONE, T_ECHO, T_VERIFY}; // message types
-  enum msg_keys : Key_type_t {K_TEXT, K_PEER_ID}; // header keys
-
 
   void print();
   void decode_header();
@@ -108,7 +104,7 @@ protected:
   void handle_troll_input();
 
   // data
-  Msg_type_t type = T_NONE;
+  Msg_type_t type = 0;
   Msg_size_t body_size = 0;
   Key_num_t key_num = 0;
   ba::streambuf raw;
@@ -136,10 +132,24 @@ private:
     return res;
   }
 
+  template<typename T>
+  unordered_set<T> get_unordered_set(const Key_type_t& key){
+    const string& bin = h[key];
+    size_t size  = bin.size()/sizeof(T);
+    unordered_set<T> res;
+    T buff;
+    for(size_t i=0; i<size; i++){
+      memcpy((char*)&buff,&bin[0]+i*sizeof(T), sizeof(T));
+      res.emplace(buff);
+    }
+    return res;
+  }
+
+
 
 public:
-  inline string&& get_string(const Key_type_t& key){return move(h[key]);}
-  inline time_t get_time_t(const Key_type_t& key){return get<time_t>(key);}
+  inline string get_string(const Key_type_t& key){return move(h[key]);}
+  inline time_t get_ts_t(const Key_type_t& key){return get<ts_t>(key);}
   inline unsigned get_unsigned(const Key_num_t& key){return get<unsigned>(key);}
   inline bool get_bool(const Key_num_t& key){return get<bool>(key);}
   inline peer_id_t get_peer_id_t(const Key_type_t &key){return get<peer_id_t>(key);}
