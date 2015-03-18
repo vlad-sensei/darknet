@@ -1,4 +1,4 @@
-#include "glob.h"
+#include "common.h"
 #include "cryptopp/sha.h"
 #include "cryptopp/hex.h"
 
