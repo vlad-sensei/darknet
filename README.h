@@ -1,25 +1,5 @@
 # darknet
 
-#if __cplusplus < 201300L
-// pre c++14
-#include <boost/thread.hpp>
-typedef boost::shared_mutex rw_mutex;
-typedef boost::shared_lock<boost::shared_mutex> r_lock;
-typedef boost::unique_lock<boost::shared_mutex> w_lock;
-#else
-// c++14
-#include <shared_mutex>
-typedef std::shared_timed_mutex rw_mutex;
-typedef std::shared_lock<std::shared_timed_mutex> r_lock;
-typedef std::unique_lock<std::shared_timed_mutex> w_lock;
-#endif // end of c++14 check
-
-
-class UI {
-  
-}
-
-
 class Peer {
   //synch with peer
   // ~~~~~~~~~~~~~~~~~~~~~~~~ Vidar Herman ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -187,28 +167,3 @@ private:
   rw_mutex chuck_mtx; //mutex
 
 }
-
-
-//magnet link 
-struct Metahead {
-  Id mid, bid;
-  size_t file_size;
-  string tags;
-}
-
-//.torrent
-struct Metabody {
-  Id bid, bid_next = 0; //hash of the body and next
-  vector<Id> chunks; //hash of chunks
-  bool append_from_chunk(const Chunk& chunk); //returns false once last chunk
-  vector<Chunk> to_chunks();
-}
-
-struct Chunck {
-  Id cid;
-  string data;
-  Chunk(string& data_):data(move(data_)), cid(hash512(data_)){}
-  inline bool verify(const Id& cid_){ return cid_ ==cid;}
-  inline size_t size(){return data.size();}
-}
-
