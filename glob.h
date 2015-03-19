@@ -13,6 +13,7 @@ typedef int64_t ts_t; //time_t, different on different platforms
 typedef uint64_t peer_id_t;
 
 #define LISTEN_PORT 8453
+#define ID_SIZE 64
 
 #define DEFAULT_DATABASE_PATH "test.db"
 

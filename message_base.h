@@ -112,7 +112,7 @@ protected:
 
 private:
   template<typename T>
-  T get(const Key_type_t& key){
+  inline T get(const Key_type_t& key){
     T res = T();
     if(!has_key(key)||h[key].size()!=sizeof(T)){
       handle_troll_input();
@@ -122,8 +122,13 @@ private:
     return res;
   }
 
+  //TODO: more trollchecks
   template<typename T>
-  vector<T> get_vector(const Key_type_t& key){
+  inline vector<T> get_vector(const Key_type_t& key){
+    if(!has_key(key)){
+      handle_troll_input();
+      return vector<T>();
+    }
     const string& bin = h[key];
     size_t size = bin.size()/sizeof(T);
     vector<T> res(size);
@@ -133,7 +138,11 @@ private:
   }
 
   template<typename T>
-  unordered_set<T> get_unordered_set(const Key_type_t& key){
+  inline unordered_set<T> get_unordered_set(const Key_type_t& key){
+    if(!has_key(key)){
+      handle_troll_input();
+      return unordered_set<T>();
+    }
     const string& bin = h[key];
     size_t size  = bin.size()/sizeof(T);
     unordered_set<T> res;
@@ -145,6 +154,32 @@ private:
     return res;
   }
 
+  /*
+  inline vector<string> get_vector_string(const Key_type_t& key){
+    if(!has_key(key)){
+      handle_troll_input();
+      return vector<string>();
+    }
+    const string& bin = h[key];
+    vector<string> res;
+    size_t offs=0;
+    const uint64_t size = 0;
+    while(offs<bin.size()){
+      if(offs+sizeof(uint64_t)>=bin.size()){
+        handle_troll_input();
+        return vector<string>();
+      }
+      memcpy((char*)&size, &bin[offs], sizeof(size));
+      offs+=sizeof(size);
+      if(offs+size>=bin.size()){
+        handle_troll_input();
+        return vector<string>();
+      }
+      res.emplace_back(string(size,'\0'));
+      memcpy((char*)&res.back()[0],&bin[offs], size);
+      offs+=size;
+    }
+  }*/
 
 
 public:
@@ -152,9 +187,36 @@ public:
   inline time_t get_ts_t(const Key_type_t& key){return get<ts_t>(key);}
   inline unsigned get_unsigned(const Key_num_t& key){return get<unsigned>(key);}
   inline bool get_bool(const Key_num_t& key){return get<bool>(key);}
-  inline peer_id_t get_peer_id_t(const Key_type_t &key){return get<peer_id_t>(key);}
+  inline peer_id_t get_peer_id(const Key_type_t &key){return get<peer_id_t>(key);}
+  inline vector<Id> get_vector_id(const Key_type_t& key){
+    if(!has_key(key)||h[key].size()%ID_SIZE){
+      handle_troll_input();
+      return vector<Id>();
+    }
+    const string& bin = h[key];
+    vector<Id> res;
+    for(size_t i=0; i<bin.size(); i+=ID_SIZE){
+      res.push_back(string(ID_SIZE,'\0'));
+      memcpy(&res.back()[0],&bin[i],ID_SIZE);
+    }
+    return res;
+  }
 
 protected:
+  /*//no need for "univesal" template yet
+  template< template<class = string, class = std::allocator<string> > class T>
+  const string to_binary_string_container(const T<string, std::allocator<string> >& container){
+    string res;
+    size_t offs = 0;
+    for(const string& e:container){
+      size_t size = e.size();
+      res.resize((offs=res.size()) + size + sizeof(uint64_t));
+      memcpy(&res[offs], (char*)&size, sizeof(uint64_t));
+      memcpy(&res[offs+sizeof(uint64_t)], &e[0], e.size());
+    }
+    return res;
+  }*/
+
   template<typename T>
   const string to_binary_container(const T& container){
     string res(container.size()*sizeof(typename T::value_type),0);
@@ -163,7 +225,7 @@ protected:
       memcpy(&res[0]+offset, &e, sizeof(e));
       offset+=sizeof(e);
     }
-    return move(res);
+    return res;
   }
 
   template<typename T>
@@ -172,6 +234,12 @@ protected:
   inline string to_binary(const time_t& value){return to_binary_base<time_t>(value);}
   inline string to_binary(const bool& value){return to_binary_base<bool>(value);}
   inline string to_binary(const peer_id_t& value){return to_binary_base<peer_id_t>(value);}
+  //inline string to_binary(const vector<string>& value){return to_binary_string_container<vector>(value);}
+  inline string to_binary(const vector<Id>& value){
+    string res;
+    for(const Id& id: value) res+=id;
+    return res;
+  }
 
 };
 

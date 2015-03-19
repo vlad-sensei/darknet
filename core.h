@@ -30,28 +30,23 @@
 class Core;
 typedef unique_ptr<Core> Core_ptr;
 
-typedef shared_ptr<ba::io_service> io_service_ptr;
-typedef shared_ptr<tcp::socket> socket_ptr;
-typedef shared_ptr<tcp::acceptor> acceptor_ptr;
-
 extern Core_ptr core;
 
 class Core : public Core_network, public Library, public UI {
 public:
   Core(){}
   void run();
-  // user interaction
+  bool remove_peer(const peer_id_t& pid);
+
+  // user interaction (UI)
   void connect(const string& addr, const uint16_t& port);
   void broadcast_echo(const string& msg);
 
-  void spawn_peer(tcp::socket& socket);
-  bool remove_peer(const peer_id_t& pid);
-  void broadcast(Msg_ptr msg);
-  peer_id_t get_pid();
-
 private:
-  void verify_new_connection(tcp::socket socket);
+  void req_chunks(const Id& bid, const unordered_set<Id>& cids);
 
+  void spawn_peer(tcp::socket& socket);
+  void verify_new_connection(tcp::socket socket);
 
   //all data&methods in data must be synchronized
   struct {
@@ -60,7 +55,6 @@ private:
     inline bool peer_exists(const peer_id_t& pid) {return peers.find(pid)!=peers.end();}
   } data;
   rw_mutex peers_mtx, pid_mtx;
-
 };
 
 #endif // CORE_H

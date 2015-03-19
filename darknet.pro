@@ -22,7 +22,8 @@ SOURCES += main.cpp \
     database.cpp \
     core_network.cpp \
     peer_network.cpp \
-    common.cpp
+    common.cpp \
+    inventory.cpp
 
 HEADERS += \
     glob.h \
@@ -36,5 +37,6 @@ HEADERS += \
     database.h \
     core_network.h \
     peer_network.h \
-    common.h
+    common.h \
+    inventory.h
 

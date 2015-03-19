@@ -29,6 +29,16 @@ void Core::verify_new_connection(tcp::socket socket){
   spawn_peer(socket);
 }
 
+void Core::req_chunks(const Id &bid, const unordered_set<Id> &cids){
+  r_lock l(peers_mtx);
+  for(const auto& it:data.peers){
+    const Peer_ptr& peer = it.second;
+    //TODO: peer->req_chunks(bid, cids);
+    (void)bid; (void)cids;
+  }
+}
+
+
 // ----------- Data -----------
 void Core::spawn_peer(tcp::socket &socket){
   w_lock l(peers_mtx);

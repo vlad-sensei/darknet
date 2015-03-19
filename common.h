@@ -20,6 +20,8 @@ struct Chunk {
   Chunk(string& data_):data(move(data_)), cid(hash512(data)){}
   inline bool verify(const Id& cid_){ return cid_ ==cid;}
   inline size_t size(){return data.size();}
+private:
+  Chunk();
 };
 
 //.torrent
