@@ -5,10 +5,38 @@
 using namespace std;
 
 #include <string>
+#include <cstring>
 #include <cinttypes>
+#include <iostream>
+#include "cryptopp/sha.h"
 
-typedef string hash_t;
-typedef hash_t Id;
+/* Example usage:
+  Id id1(""), id2("The quick brown fox jumps over the lazy dog"), id3("The quick brown fox jumps over the lazy dog."), id4("");
+  debug("Ids: \n%s\n%s\n%s\n%s\n",id1,id2,id3,id4);
+  debug("id2==id3 : %s; id1==id4 : %s", id2==id3 ? "true" : "false", id1==id4 ? "true" : "false");
+  */
+
+//TODO: actually make glob.cpp to not include cryptopp?
+struct hash512_t{
+  inline hash512_t(){}
+  inline hash512_t(const string& value){CryptoPP::SHA512().CalculateDigest((byte*)data, (byte*)value.data(), value.size());}
+  inline bool operator== (const hash512_t& other)const {return  !memcmp(data, other.data, sizeof(data));}
+  inline size_t std_hash() const {return data[0]^data[1]^data[2]^data[3]^data[4]^data[5]^data[6]^data[7];}
+  friend void operator << (ostream& os, const hash512_t& h);
+private:
+  uint64_t data[8];
+};
+
+inline void operator << (ostream& os, const hash512_t& h){ os << std::hex << h.data[0] << h.data[1] << h.data[2] << h.data[3] << h.data[4] << h.data[5] << h.data[6] << h.data[7] << std::dec;}
+
+namespace std {
+template<> struct hash<hash512_t>{
+  inline size_t operator()(const hash512_t& value) const{ return value.std_hash();}
+};
+}
+
+//typedef string hash_t;
+typedef hash512_t Id;
 typedef int64_t ts_t; //time_t, different on different platforms
 typedef uint64_t peer_id_t;
 
@@ -17,19 +45,11 @@ typedef uint64_t peer_id_t;
 
 #define DEFAULT_DATABASE_PATH "test.db"
 
-#if __cplusplus < 201300L
-// pre c++14
-#include <boost/thread.hpp>
-typedef boost::shared_mutex rw_mutex;
-typedef boost::shared_lock<boost::shared_mutex> r_lock;
-typedef boost::unique_lock<boost::shared_mutex> w_lock;
-#else
 // c++14
 #include <shared_mutex>
 typedef std::shared_timed_mutex rw_mutex;
 typedef std::shared_lock<std::shared_timed_mutex> r_lock;
 typedef std::unique_lock<std::shared_timed_mutex> w_lock;
-#endif // end of c++14 check
 
 // ~~~~~~~~~~~~~~~~~ functions ~~~~~~~~~~~~~~~~~
 

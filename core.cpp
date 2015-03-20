@@ -38,7 +38,6 @@ void Core::req_chunks(const Id &bid, const unordered_set<Id> &cids){
   }
 }
 
-
 // ----------- Data -----------
 void Core::spawn_peer(tcp::socket &socket){
   w_lock l(peers_mtx);
