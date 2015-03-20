@@ -34,6 +34,7 @@ void Core::req_chunks(const Id &bid, const unordered_set<Id> &cids){
   for(const auto& it:data.peers){
     const Peer_ptr& peer = it.second;
     //TODO: peer->req_chunks(bid, cids);
+    //done
     (void)bid; (void)cids;
   }
 }

@@ -31,6 +31,9 @@ void Peer::process_msg(const Msg_ptr& msg){
   case Message::T_ECHO:
     handle_echo(msg);
     break;
+  case Message::T_CHUNK_REQ:
+      handle_chunk_req(msg);
+      break;
   default:
     debug("unknown messape type");
   }
@@ -39,4 +42,9 @@ void Peer::process_msg(const Msg_ptr& msg){
 void Peer::handle_echo(const Msg_ptr &msg){
   string text = msg->get_string(Message::K_TEXT);
   printf("ECHO : %s\n", text.c_str());
+}
+
+void Peer::handle_chunk_req(const Msg_ptr &msg){
+    //Do something with msg?
+
 }

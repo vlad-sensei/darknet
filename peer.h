@@ -47,6 +47,7 @@ private:
   //process messages
   void process_msg(const Msg_ptr& msg);
   void handle_echo(const Msg_ptr& msg);
+  void handle_chunk_req(const Msg_ptr& msg);
 
   struct Data{
     Data(const peer_id_t& pid_):pid(pid_){}

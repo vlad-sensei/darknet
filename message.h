@@ -25,7 +25,8 @@ public:
   enum msg_types : Msg_type_t {
     T_NONE,
     T_ECHO,
-    T_VERIFY
+    T_VERIFY,
+    T_CHUNK_REQ
   }; // message types
   enum msg_keys : Key_type_t {
     K_TEXT,
@@ -36,6 +37,7 @@ public:
   //static Msg_ptr copy_msg(Msg_ptr other);
   static Msg_ptr echo(const string& msg = "");
   static Msg_ptr verify(const peer_id_t& pid);
+  static Msg_ptr chunk_req(const peer_id_t& pid);
 };
 
 #endif // MESSAGE_H
