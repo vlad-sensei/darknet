@@ -6,6 +6,7 @@ using namespace std;
 
 #include <string>
 #include <cinttypes>
+#include <cstdint>
 
 typedef string hash_t;
 typedef hash_t Id;
@@ -30,6 +31,30 @@ typedef std::shared_timed_mutex rw_mutex;
 typedef std::shared_lock<std::shared_timed_mutex> r_lock;
 typedef std::unique_lock<std::shared_timed_mutex> w_lock;
 #endif // end of c++14 check
+
+struct Id_{
+private:
+        uint64_t data[8];
+public:
+        inline bool operator== (const Id_& other){
+            for (int i = 0; i < 8; i++){
+                if(data[i] != other.data[i]){
+                    return false;
+                }
+            }
+            return true;
+        }
+        inline uint64_t std_hash() const {return data[0]^data[1]^data[2]^data[3]^data[4]^data[5]^data[6]^data[7];}
+};
+
+namespace std {
+    template<>
+    struct hash<Id_>{
+        std::size_t operator()(const Id_& value) const{
+            return value.std_hash(); //What should this return??
+        }
+    };
+}
 
 // ~~~~~~~~~~~~~~~~~ functions ~~~~~~~~~~~~~~~~~
 
