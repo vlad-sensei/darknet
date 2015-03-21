@@ -32,7 +32,7 @@ private:
 
 //maybe a bit overkill, but best to keep it standard
   struct Data {
-    uint16_t port = LISTEN_PORT;
+    uint16_t port = DEFAULT_LISTEN_PORT;
   } data;
   rw_mutex port_mtx;
 

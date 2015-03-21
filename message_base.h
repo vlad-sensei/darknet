@@ -161,6 +161,8 @@ public:
   inline bool get_bool(const Key_num_t& key){return get<bool>(key);}
   inline peer_id_t get_peer_id(const Key_type_t &key){return get<peer_id_t>(key);}
   inline vector<Id> get_vector_id(const Key_type_t& key){return get_vector<Id>(key);}
+  inline unordered_set<Id> get_unordered_set_id(const Key_type_t& key){return get_unordered_set<Id>(key);}
+  inline Id get_id(const Key_type_t& key){return get<Id>(key);}
 
 protected:
 
@@ -181,7 +183,9 @@ protected:
   inline string to_binary(const time_t& value){return to_binary_base<time_t>(value);}
   inline string to_binary(const bool& value){return to_binary_base<bool>(value);}
   inline string to_binary(const peer_id_t& value){return to_binary_base<peer_id_t>(value);}
+  inline string to_binary(const Id& value){return to_binary_base<Id>(value);}
   inline string to_binary(const vector<Id>& value){return to_binary_container<vector<Id> >(value);}
+  inline string to_binary(const unordered_set<Id>& value){return to_binary_container<unordered_set<Id> >(value);}
 
 };
 

@@ -19,9 +19,9 @@ Msg_ptr Message::copy_msg(Msg_ptr other){
 */
 
 Msg_ptr Message::echo(const string& msg){
-  return make(T_ECHO, K_TEXT, msg);
+  return make(T_ECHO, K_BODY, msg);
 }
 
-Msg_ptr Message::verify(const peer_id_t &pid){
-  return make(T_VERIFY, K_PEER_ID, pid);
+Msg_ptr Message::chuhk_req(const Id &bid, const unordered_set<Id> &cids){
+  return make(T_CHUNK_REQ, K_BID, bid, K_CIDS, cids);
 }

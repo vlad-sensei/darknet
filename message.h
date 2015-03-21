@@ -25,17 +25,18 @@ public:
   enum msg_types : Msg_type_t {
     T_NONE,
     T_ECHO,
-    T_VERIFY
+    T_CHUNK_REQ
   }; // message types
   enum msg_keys : Key_type_t {
-    K_TEXT,
-    K_PEER_ID
+    K_BODY,
+    K_BID,
+    K_CIDS
   }; // header keys
 
   static Msg_ptr empty();
   //static Msg_ptr copy_msg(Msg_ptr other);
   static Msg_ptr echo(const string& msg = "");
-  static Msg_ptr verify(const peer_id_t& pid);
+  static Msg_ptr chuhk_req(const Id& bid, const unordered_set<Id>& cids);
 };
 
 #endif // MESSAGE_H

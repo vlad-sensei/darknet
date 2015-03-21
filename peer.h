@@ -37,7 +37,8 @@ public:
   Peer(socket_t& sock_, const peer_id_t& pid);
   ~Peer();
   void init();
-  void echo(const string& echo_msg = "echo_msg");
+  inline void echo(const string& echo_msg = "echo_msg") {send(Message::echo(echo_msg));}
+  inline void req_chunks(const Id& bid, const unordered_set<Id>& cids) {send(Message::chuhk_req(bid,cids));}
 
 private:
   Peer();
@@ -47,6 +48,7 @@ private:
   //process messages
   void process_msg(const Msg_ptr& msg);
   void handle_echo(const Msg_ptr& msg);
+  void handle_chunk_req(const Msg_ptr& msg);
 
   struct Data{
     Data(const peer_id_t& pid_):pid(pid_){}

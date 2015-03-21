@@ -10,7 +10,7 @@ bool process_args(int argc, char* argv[], uint16_t& port){
     printf("./darknet [PORT]\n");
     return false;
   }
-  port = LISTEN_PORT;
+  port = DEFAULT_LISTEN_PORT;
   if(argc==2) {
     istringstream ss(argv[1]);
     if(!(ss >> port)){
@@ -23,7 +23,7 @@ bool process_args(int argc, char* argv[], uint16_t& port){
 
 int main(int argc, char* argv[]){
   try{
-    uint16_t port = LISTEN_PORT;
+    uint16_t port = DEFAULT_LISTEN_PORT;
     if(!process_args(argc, argv,port)) return 0;
     debug("listening at port %u", port);
     core.reset(new Core);

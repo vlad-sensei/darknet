@@ -24,7 +24,7 @@ void Core::broadcast_echo(const string &msg){
 
 void Core::verify_new_connection(tcp::socket socket){
   debug("new peer..");
-  //TODO:check if we are already connected by MAC/ip parameters
+  //TODO:check if we are already connected by MAC/IP parameters
   //maybe cache those in the future
   spawn_peer(socket);
 }
@@ -33,8 +33,7 @@ void Core::req_chunks(const Id &bid, const unordered_set<Id> &cids){
   r_lock l(peers_mtx);
   for(const auto& it:data.peers){
     const Peer_ptr& peer = it.second;
-    //TODO: peer->req_chunks(bid, cids);
-    (void)bid; (void)cids;
+    peer->req_chunks(bid, cids);
   }
 }
 
