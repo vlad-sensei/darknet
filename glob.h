@@ -23,7 +23,7 @@ struct hash512_t{
   inline bool operator== (const hash512_t& other)const {return  !memcmp(data, other.data, sizeof(data));}
   inline size_t std_hash() const {return data[0]^data[1]^data[2]^data[3]^data[4]^data[5]^data[6]^data[7];}
   friend void operator << (ostream& os, const hash512_t& h);
-private:
+
   uint64_t data[8];
 };
 

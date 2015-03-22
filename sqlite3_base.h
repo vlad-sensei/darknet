@@ -40,6 +40,9 @@ protected:
   typedef unique_ptr<Result> Result_ptr;
 
 private:
+  //TODO add set_prep_var for Id
+  inline void set_prep_var(sqlite3_stmt* stmt, const int& pos,const Id& var){sqlite3_bind_blob(stmt,pos,var.data,sizeof(var.data),SQLITE_STATIC);}
+
   inline void set_prep_var(sqlite3_stmt* stmt, const int& pos, const string& var){sqlite3_bind_blob(stmt,pos,var.data(),var.size(),SQLITE_STATIC);}
   inline void set_prep_var(sqlite3_stmt* stmt, const int& pos, const uint64_t& var){sqlite3_bind_int64(stmt,pos,var);}
 

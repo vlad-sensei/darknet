@@ -14,8 +14,19 @@ void Database::init_db(){
   remove_db(); // for clear for testing
 
   //create tables
-  //exec_s(C_SESSION);
+  //creat table for mids
+  exec_s(C_MIDS);
 }
+
+
+void Database::get_mids(const string& ref_pattern, vector<Id>& id){
+    Result_ptr res = exec_q(Q_TAGS,ref_pattern);
+    while(res->next()) {
+    id.emplace_back(res->get_string(0));
+    }
+}
+
+
 
 /*
  * EXAMPLE
