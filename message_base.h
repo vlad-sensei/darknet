@@ -39,8 +39,8 @@
 
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 
-#include <unordered_map>
 #include <boost/asio.hpp>
 
 namespace ba = boost::asio;
@@ -62,10 +62,6 @@ public:
   static const size_t HEADER_SIZE = sizeof(Msg_type_t) + sizeof(Msg_size_t) + sizeof(Key_num_t);
 
   Message_base(Msg_base_ptr msg);
-
-  enum msg_types : Msg_type_t {T_NONE, T_ECHO, T_VERIFY}; // message types
-  enum msg_keys : Key_type_t {K_TEXT, K_PEER_ID}; // header keys
-
 
   void print();
   void decode_header();
@@ -108,7 +104,7 @@ protected:
   void handle_troll_input();
 
   // data
-  Msg_type_t type = T_NONE;
+  Msg_type_t type = 0;
   Msg_size_t body_size = 0;
   Key_num_t key_num = 0;
   ba::streambuf raw;
@@ -116,7 +112,7 @@ protected:
 
 private:
   template<typename T>
-  T get(const Key_type_t& key){
+  inline T get(const Key_type_t& key){
     T res = T();
     if(!has_key(key)||h[key].size()!=sizeof(T)){
       handle_troll_input();
@@ -126,8 +122,13 @@ private:
     return res;
   }
 
+  //TODO: more trollchecks
   template<typename T>
-  vector<T> get_vector(const Key_type_t& key){
+  inline vector<T> get_vector(const Key_type_t& key){
+    if(!has_key(key)){
+      handle_troll_input();
+      return vector<T>();
+    }
     const string& bin = h[key];
     size_t size = bin.size()/sizeof(T);
     vector<T> res(size);
@@ -136,15 +137,35 @@ private:
     return res;
   }
 
+  template<typename T>
+  inline unordered_set<T> get_unordered_set(const Key_type_t& key){
+    if(!has_key(key)){
+      handle_troll_input();
+      return unordered_set<T>();
+    }
+    const string& bin = h[key];
+    size_t size  = bin.size()/sizeof(T);
+    unordered_set<T> res;
+    T buff;
+    for(size_t i=0; i<size; i++){
+      memcpy((char*)&buff,&bin[0]+i*sizeof(T), sizeof(T));
+      res.emplace(buff);
+    }
+    return res;
+  }
 
 public:
-  inline string&& get_string(const Key_type_t& key){return move(h[key]);}
-  inline time_t get_time_t(const Key_type_t& key){return get<time_t>(key);}
+  inline string get_string(const Key_type_t& key){return move(h[key]);}
+  inline time_t get_ts_t(const Key_type_t& key){return get<ts_t>(key);}
   inline unsigned get_unsigned(const Key_num_t& key){return get<unsigned>(key);}
   inline bool get_bool(const Key_num_t& key){return get<bool>(key);}
-  inline peer_id_t get_peer_id_t(const Key_type_t &key){return get<peer_id_t>(key);}
+  inline peer_id_t get_peer_id(const Key_type_t &key){return get<peer_id_t>(key);}
+  inline vector<Id> get_vector_id(const Key_type_t& key){return get_vector<Id>(key);}
+  inline unordered_set<Id> get_unordered_set_id(const Key_type_t& key){return get_unordered_set<Id>(key);}
+  inline Id get_id(const Key_type_t& key){return get<Id>(key);}
 
 protected:
+
   template<typename T>
   const string to_binary_container(const T& container){
     string res(container.size()*sizeof(typename T::value_type),0);
@@ -153,15 +174,18 @@ protected:
       memcpy(&res[0]+offset, &e, sizeof(e));
       offset+=sizeof(e);
     }
-    return move(res);
+    return res;
   }
 
   template<typename T>
   inline string to_binary_base(const T& value){return string((char*)&value,sizeof(T));}
-  inline string to_binary(const string& value) {return move(value);}
+  inline string to_binary(const string& value) {return value;}
   inline string to_binary(const time_t& value){return to_binary_base<time_t>(value);}
   inline string to_binary(const bool& value){return to_binary_base<bool>(value);}
   inline string to_binary(const peer_id_t& value){return to_binary_base<peer_id_t>(value);}
+  inline string to_binary(const Id& value){return to_binary_base<Id>(value);}
+  inline string to_binary(const vector<Id>& value){return to_binary_container<vector<Id> >(value);}
+  inline string to_binary(const unordered_set<Id>& value){return to_binary_container<unordered_set<Id> >(value);}
 
 };
 

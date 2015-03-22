@@ -16,13 +16,27 @@ class Message;
 typedef shared_ptr<Message> Msg_ptr;
 
 class Message : public Message_base {
-public:
-  static Msg_ptr copy_msg(Msg_ptr other);
-  static Msg_ptr echo(const string& msg = "");
-  static Msg_ptr verify(const peer_id_t& pid);
-private:
+  Message(){}
   template<typename ...Ts>
-  static Msg_ptr make(const Ts&...args);
+  inline static Msg_ptr make(const Ts&...args){
+    return static_pointer_cast<Message>(make_base(args...));
+  }
+public:
+  enum msg_types : Msg_type_t {
+    T_NONE,
+    T_ECHO,
+    T_CHUNK_REQ
+  }; // message types
+  enum msg_keys : Key_type_t {
+    K_BODY,
+    K_BID,
+    K_CIDS
+  }; // header keys
+
+  static Msg_ptr empty();
+  //static Msg_ptr copy_msg(Msg_ptr other);
+  static Msg_ptr echo(const string& msg = "");
+  static Msg_ptr chuhk_req(const Id& bid, const unordered_set<Id>& cids);
 };
 
 #endif // MESSAGE_H

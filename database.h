@@ -7,28 +7,13 @@
  * NOTE: not all types are emplemented,
  * implement them in sqlite3_base.h on demand
  *
- * example usage:
- * #include "glob.h"
- * #include "database.h"
- *
- * #include<memory>
- *
- * int main() {
- *   unique_ptr<Database> db(new Database);
- *   for(uint64_t i = 0; i<10UL; i++)
- *     db->add_data("it works",i);
- *   vector<uint64_t> id,value2;
- *  vector<string> value1;
- *   db->get_data(6,id,value1,value2);
- *   db.reset();
- *   for(unsigned i=0; i<id.size(); i++)
- *     printf("[id:%lu][value1:%s][value2:%lu]\n",id[i],value1[i].c_str(),value2[i]);
- *   return 0;
- * }
+ * uses :
+ * exec_s(prepared_statement, args...);
+ * Result_ptr res = exec_q(prepared_statement, args...);
+ * while(res->next()){ some_var = res->get_some_var_type(column_index);}
  *
  */
 
-#define DEFAULT_DATABASE_PATH "test.db"
 
 #include "glob.h"
 #include "sqlite3_base.h"
@@ -39,33 +24,41 @@ public:
   ~Database();
 
 private:
-  const string DATABASE_PATH = DEFAULT_DATABASE_PATH;
-  virtual const string& get_database_path() const {return DATABASE_PATH;}
   /*
    * all sql squeries go here
    * format:
-   * s_<statement>
-   * i_<insert statement>
-   * u_<update statement>
-   * q_<(select) query>
+   * C_<statement>
+   * I_<insert statement>
+   * U_<update statement>
+   * Q_<(select) query>
    */
   const string
 
-  //statements (misc)
-  //s_create_table = "CREATE TABLE IF NOT EXISTS items (id UNSEGNED BIGINT PRIMARY KEY, value1 TEXT, value2 UNSIGNED BIGINT);",
+  /*
+   * remove once there is some code avaible
+   * EXAMPLES:
+  //create statements
+  C_SESSION = "CREATE TABLE session (uid UNSIGNED BIGINT PRIMARY KEY, auth_token BLOB NOT NULL, users_mod_at BIGINT DEFAULT NULL, posts_mod_at BIGINT DEFAULT NULL, rooms_mod_at BIGINT DEFAULT NULL)",
+
+  IDX_CHAT_MESSAGES_RID = "CREATE INDEX chat_messages_rid_index ON chat_messages (rid)",
 
   //insert statement
-  //i_items = "INSERT INTO items (value1, value2) VALUES (?,?);",
+  I_SESSION = "INSERT INTO session (uid, auth_token) VALUES (?,?);",
+
+  //update
+  U_USER = "UPDATE users SET name = ?,mod_at=? WHERE uid=?",
 
   //queries (select)
-  //q_items = "SELECT id,value1,value2 FROM items WHERE id<?;",
-
-  //dummy, for the last ";" basicall;
+  Q_SESSION = "SELECT uid, auth_token FROM session;",
+  */
   EMPTY_STRING ="";
 
 protected:
   void init_db();
-  void shutdown_db();
+
+  //  inline void add_session(const Id& uid, const string& auth_token){exec_s(I_SESSION,uid,auth_token);}
+
+
 public:
   //write
   //void add_data(const string& value1, const uint64_t& value2) {exec_s(i_items,value1,value2);}

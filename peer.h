@@ -24,6 +24,7 @@
 
 #include "glob.h"
 #include "message.h"
+#include "peer_network.h"
 
 namespace bs = boost::system;
 typedef boost::asio::ip::tcp::socket socket_t;
@@ -31,32 +32,23 @@ typedef boost::asio::ip::tcp::socket socket_t;
 class Peer;
 typedef shared_ptr<Peer> Peer_ptr;
 
-class Peer {
+class Peer: public enable_shared_from_this<Peer>, Peer_network {
 public:
   Peer(socket_t& sock_, const peer_id_t& pid);
   ~Peer();
+  void init();
+  inline void echo(const string& echo_msg = "echo_msg") {send(Message::echo(echo_msg));}
+  inline void req_chunks(const Id& bid, const unordered_set<Id>& cids) {send(Message::chuhk_req(bid,cids));}
 
-  void send(Msg_ptr msg);
 private:
   Peer();
-
-  //TODO:  make Peer_network class
-  void do_read_header();
-  void do_read_body();
-  void do_write();
-  void do_close();
-  void handle_connection_error(const string& location, const bs::error_code& ec);
-
-  Msg_ptr read_msg, write_msg;
-  deque<Msg_ptr> msg_queue;
-  mutex write_msg_mtx;
-  bool msg_is_writing = false;
-  socket_t sock;
-
+  void terminate();
+  inline Peer_ptr shared_from_this(){return enable_shared_from_this<Peer>::shared_from_this();}
 
   //process messages
-  void process_msg(Msg_ptr msg);
+  void process_msg(const Msg_ptr& msg);
   void handle_echo(const Msg_ptr& msg);
+  void handle_chunk_req(const Msg_ptr& msg);
 
   struct Data{
     Data(const peer_id_t& pid_):pid(pid_){}

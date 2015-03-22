@@ -11,12 +11,38 @@
  * queries.
  */
 
-#include "glob.h"
-#include "database.h"
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
 
-class Library: public Database {
+#include "glob.h"
+#include "common.h"
+#include "inventory.h"
+
+class Library: public Inventory {
 public:
-  void upload_file(const string& filename);
+
+  void search(const string& pattern, vector<Id>& mids);
+  void upload_file(const string& filename, const string& tags = "");
+  bool req_file(const Id& mid);
+
+  void handle_chunk(const Id& bid, const Chunk& chunk);
+
+
+private:
+  virtual void req_chunks(const Id& bid, const unordered_set<Id>& cids) = 0; //request chunks
+  bool get_metahead(const Id& mid, Metahead& metahead);
+
+  struct {
+    unordered_map<Id, unordered_set<Id> > chunk_reqs; // chunk_req_map[mid] == set of chunks we are waiting for for that file
+    unordered_set<Id> has_metabody_; //rename?
+
+    inline bool file_req_exists(const Id& bid){ return chunk_reqs.find(bid) != chunk_reqs.end();}
+    inline bool chunk_req_exists(const Id& bid,const Id& cid){ return (file_req_exists(bid) && chunk_reqs[bid].find(cid) != chunk_reqs[bid].end() );}
+    inline bool has_metabody(const Id& bid){return has_metabody_.find(bid) !=has_metabody_.end();}
+  } data;
+  rw_mutex chunk_reqs_mtx;
+
 };
 
 #endif // LIBRARY_H
