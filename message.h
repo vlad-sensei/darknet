@@ -25,12 +25,14 @@ public:
   enum msg_types : Msg_type_t {
     T_NONE,
     T_ECHO,
-    T_CHUNK_REQ
+    T_CHUNK_REQ,
+    T_META_REQ, //sent by a client requesting meta heads
+    T_META_LIST, //message contains a list of metaheads
   }; // message types
   enum msg_keys : Key_type_t {
     K_BODY,
     K_BID,
-    K_CIDS
+    K_CIDS,
   }; // header keys
 
   static Msg_ptr empty();
