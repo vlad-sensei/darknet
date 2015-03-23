@@ -39,7 +39,7 @@ public:
   void init();
   inline void echo(const string& echo_msg = "echo_msg") {send(Message::echo(echo_msg));}
   inline void req_chunks(const Id& bid, const unordered_set<Id>& cids) {send(Message::chuhk_req(bid,cids));}
-
+  inline void sync();
 private:
   Peer();
   void terminate();
@@ -49,6 +49,8 @@ private:
   void process_msg(const Msg_ptr& msg);
   void handle_echo(const Msg_ptr& msg);
   void handle_chunk_req(const Msg_ptr& msg);
+  void handle_meta_req(const Msg_ptr& msg);
+  void handle_meta_list(const Msg_ptr& msg);
 
   struct Data{
     Data(const peer_id_t& pid_):pid(pid_){}
