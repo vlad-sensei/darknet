@@ -28,7 +28,7 @@ public:
     T_CHUNK_REQ,
     T_UI_TEXT_COMMAND
     T_META_REQ, //sent by a client requesting meta heads
-    T_META_LIST, //message contains a list of metaheads
+    T_META_LIST //message contains a list of metaheads
   }; // message types
   enum msg_keys : Key_type_t {
     K_BODY,
