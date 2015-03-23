@@ -62,7 +62,8 @@ private:
   //Q_SESSION = "SELECT uid, auth_token FROM session;",
 
   Q_TAGS = "SELECT mid FROM mids WHERE tags LIKE '%' || ? || '%';",
-
+  Q_ALL = "SELECT * FROM mids;",
+  Q_MID = "SELECT * FROM mids WHERE mid=?;",
   EMPTY_STRING ="";
 
 protected:
@@ -79,6 +80,10 @@ public:
 
   //read
   //void get_data(const uint64_t& ref_id, vector<uint64_t>& id, vector<string>& value1, vector<uint64_t>& value2);
+  void get_all(vector<Id>& mid,vector<uint64_t>& size,vector<string>& tags,vector<Id>& bid);
+
+  bool get_mid(const Id& ref,Id& mid,uint64_t& size,string& tags,Id& bid);
+
   void get_mids(const string& ref_pettern, vector<Id>& id);
 
 };

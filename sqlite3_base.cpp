@@ -30,7 +30,8 @@ string Sqlite3_base::Result::get_string(const unsigned &pos){
 }
 
 Id Sqlite3_base::Result::get_id(const unsigned& pos){
-  return get_string(pos);
+  Id ret;
+  return ret.set(get_string(pos));
 }
 
 ts_t Sqlite3_base::Result::get_ts_t(const unsigned &pos){

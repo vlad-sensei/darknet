@@ -19,11 +19,15 @@ using namespace std;
 //TODO: actually make glob.cpp to not include cryptopp?
 struct hash512_t{
   inline hash512_t(){}
-  inline hash512_t(const string& value){CryptoPP::SHA512().CalculateDigest((byte*)data, (byte*)value.data(), value.size());}
+  explicit inline hash512_t(const string& value){CryptoPP::SHA512().CalculateDigest((byte*)data, (byte*)value.data(), value.size());}
   inline bool operator== (const hash512_t& other)const {return  !memcmp(data, other.data, sizeof(data));}
   inline size_t std_hash() const {return data[0]^data[1]^data[2]^data[3]^data[4]^data[5]^data[6]^data[7];}
   friend void operator << (ostream& os, const hash512_t& h);
-
+  string get_string()const {return string((char*) data,sizeof(uint64_t)*8);}
+  hash512_t& set(const string& blob){
+      memcpy(data,blob.data(),sizeof(uint64_t)*8);
+      return *this;
+  }
   uint64_t data[8];
 };
 

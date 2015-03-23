@@ -10,9 +10,17 @@ Library::Library()
 //upload_file("/home/andno037/code/build-darknet-Desktop_Qt_5_3_0_GCC_64bit-Debug/hej4","hej4:tja4");
 //upload_file("/home/andno037/code/build-darknet-Desktop_Qt_5_3_0_GCC_64bit-Debug/hej4","hej5tja");
 // vector<Id>mids;
+// vector<uint64_t>size;
+// vector<string>tags;
+// vector<Id>bids;
 // search("hej",mids);
-// for(unsigned i=0; i<mids.size(); i++)
-//    debug("[Id:%s]\n",mids[i] );
+// get_all(mids,size,tags,bids);
+// for(unsigned i=0; i<mids.size(); i++){
+//       debug("[Id:%s]\n",mids[i] );
+     //debug("[Id:%s][Size:%lu][Tags:%s][Hash:%s]\n",mids[i],size[i],tags[i],bids[i]);
+// }
+// Metahead mid_;
+// if (get_metahead(mids[1],mid_)) debug("found [Id:%s][Size:%lu][Tags:%s][Hash:%s]\n",mid_.mid,mid_.file_size,mid_.tags,mid_.bid);
 
 }
 
@@ -24,7 +32,6 @@ void Library::upload_file(const string& filename, const string& tags)
     //TODO movie this to tags
     ifstream in(filename, std::ifstream::ate | std::ifstream::binary);
     int size=in.tellg();
-
 
     Metahead mid_;
     //TODO call upload file from invetory
@@ -39,4 +46,8 @@ void Library::upload_file(const string& filename, const string& tags)
 
 void Library::search(const string& pattern, vector<Id>& mids){
     get_mids(pattern,mids);
+}
+
+bool Library::get_metahead(const Id& mid, Metahead& metahead){
+    return get_mid(mid,metahead.mid,metahead.file_size,metahead.tags,metahead.bid);
 }
