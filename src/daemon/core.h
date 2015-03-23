@@ -47,6 +47,8 @@ public:
 
 private:
   void req_chunks(const Id& bid, const unordered_set<Id>& cids);
+  //syncing should be done at regular intervalls
+  void sync_all();
 
   void spawn_peer(tcp::socket& socket);
   void handle_new_connection(tcp::socket socket);
