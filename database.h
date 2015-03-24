@@ -16,7 +16,7 @@
 
 #include <vector>
 
-#include "glob.h"
+#include "common.h"
 #include "sqlite3_base.h"
 
 
@@ -51,7 +51,7 @@ private:
   //insert statement
 
   //I_SESSION = "INSERT INTO session (uid, auth_token) VALUES (?,?);",
-  I_METAHEAD = "INSERT INTO mids (mid,tags,bid) VALUES (?,?,?,?);",
+  I_METAHEAD = "INSERT INTO metaheads (mid,tags,bid) VALUES (?,?,?);",
 
   //update
 
@@ -63,7 +63,8 @@ private:
 
   Q_MIDS_BY_TAG_PATTERN = "SELECT mid FROM metaheads WHERE tags LIKE '%' || ? || '%';",
   Q_ALL_METAHEADS = "SELECT mid,tags,bid FROM metaheads;",
-  Q_METAHEAD = "SELECT tags,bid FROM mids WHERE mid=?;",
+
+  Q_METAHEAD = "SELECT mid,tags,bid FROM metaheads WHERE mid=?;",
   EMPTY_STRING ="";
 
 protected:
@@ -76,14 +77,14 @@ public:
   //write
   //void add_data(const string& value1, const uint64_t& value2) {exec_s(i_items,value1,value2);}
 
-  void add_metahead(const Metahead& metahead) {exec_s(I_MID,metahead.mid,metahead.tags,metahead.bid);}
+  void add_metahead(const Metahead & metahead) {exec_s(I_METAHEAD,metahead.mid,metahead.tags,metahead.bid);}
 
   //read
   //void get_data(const uint64_t& ref_id, vector<uint64_t>& id, vector<string>& value1, vector<uint64_t>& value2);
   void get_all_metaheads(vector<Metahead>& metaheads);
 
-  bool get_metahead(const Id& mid,Metahead& metahead);
-  void get_mids(const string& ref_pettern, vector<Id>& id);
+  bool get_metahead_from_db(const Id &mid, vector<Metahead> &metahead);
+  void get_metaheads(const string& ref_pettern, vector<Id>& id);
 
 };
 
