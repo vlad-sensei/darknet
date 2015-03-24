@@ -34,9 +34,12 @@ struct Metabody {
 
 //magnet link
 struct Metahead {
-  Id mid, bid;
-  size_t file_size;
-  string tags;
+  const Id mid, bid;
+  const string tags;
+  Metahead(const Id& bid_,const string& tags):
+    mid(string((char*)&bid, sizeof(bid_))+tags), bid(bid_), tags(tags_){}
+private:
+  Metahead();
 };
 
 

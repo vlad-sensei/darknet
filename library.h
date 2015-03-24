@@ -28,8 +28,6 @@ public:
   void search(const string& pattern, vector<Id>& mids);
   void upload_file(const string& filename, const string& tags = "");
 
-
-
   bool req_file(const Id& mid);
 
   void handle_chunk(const Id& bid, const Chunk& chunk);

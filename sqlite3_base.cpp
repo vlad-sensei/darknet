@@ -30,8 +30,9 @@ string Sqlite3_base::Result::get_string(const unsigned &pos){
 }
 
 Id Sqlite3_base::Result::get_id(const unsigned& pos){
-  Id ret;
-  return ret.set(get_string(pos));
+  Id res;
+  memcpy((char*)&res,(char*)sqlite3_column_blob(stmt_,pos),sqlite3_column_bytes(stmt_,pos));
+  return res;
 }
 
 ts_t Sqlite3_base::Result::get_ts_t(const unsigned &pos){
