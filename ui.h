@@ -24,6 +24,7 @@ public:
   UI();
 private:
   void init_commands();
+  void init_readline();
   void get_text_input();
   void process_text_input(string text_input);
 

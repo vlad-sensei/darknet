@@ -10,6 +10,7 @@ LIBS += -lboost_thread
 LIBS += -lpthread
 LIBS += -lsqlite3
 LIBS += -lcryptopp
+LIBS += -lreadline
 
 SOURCES += main.cpp \
     message_base.cpp \

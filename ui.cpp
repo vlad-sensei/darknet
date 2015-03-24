@@ -1,16 +1,50 @@
+//TODO: !!!!!! deprecate readline with something more c++:ish
+
 #include "ui.h"
 #include <sstream>
 #include <iostream>
 #include <fstream>
 #include <iterator>
+#include <readline/readline.h>
+#include <readline/history.h>
+
+static char** my_completion(const char*, int ,int);
+char* my_generator(const char*,int);
+char* dupstr (char*);
+void* xmalloc (int);
+
+char** cmd_list;
+
 
 UI::UI() {
   init_commands();
+  init_readline();
   printf(" ~~~ welcome to darknet ~~~\n");
   thread([this](){get_text_input();}).detach();
 }
 
 void UI::get_text_input(){
+
+  while(1){
+    /*
+     * Uncomment the line below and 'rl_bind_key' line in
+     * 'my_completion' to disable 'ls' behavior of auto-complete.
+     * 'ls'-behavior is shown when there is a space to the left in cmd-line.
+     */
+    //    rl_bind_key('\t',rl_complete);
+
+    char* line = readline("> ");
+
+    if(!line) break;
+    if(*line) add_history(line);
+
+    string input(line);
+
+    process_text_input(input);
+
+    free(line);
+  }
+  /*
   string text_input;
   while(getline(cin,text_input)){
     thread([this,text_input](){
@@ -19,6 +53,7 @@ void UI::get_text_input(){
     safe_printf(">");
     cout.flush();
   }
+*/
 }
 
 void UI::process_text_input(string text_input){
@@ -76,5 +111,106 @@ void UI::init_commands(){
   },
   "connect PEER_IP [PORT]",
   2,3);
+
+  init_command({"br", "broadcast"},
+               [this](const vector<string>& args){
+    string msg;
+    try{
+      msg = args[1];
+    } catch(exception& e){
+      handle_invalid_args(e);
+      return;
+    }
+    broadcast_echo(msg);
+  },
+  "broadcast MESSAGE",
+  2,2);
+
+  init_command({"exit", "quit"},
+               [this](const vector<string>& args){
+    (void)args;
+    safe_printf("Exiting darknet...");
+    exit(0);
+  },
+  "'exit' or 'quit'",
+  1,1);
+
 }
 
+vector<char*> command_keys;
+
+void UI::init_readline(){
+  r_lock(commands_mtx);
+  for(auto key : data.commands) {
+    string str = key.first;
+    char* a = new char[str.size()+1];
+    a[str.size()] = '\0';
+    memcpy(a,str.c_str(),str.size());
+    command_keys.push_back(a);
+  }
+  //Might be better way to build 'cmd_list'
+  cmd_list = &command_keys[0];
+  // Used for custom auto-complete with 'readline'
+  rl_attempted_completion_function = my_completion;
+  rl_bind_key('\t',rl_complete);
+}
+
+static char** my_completion( const char * text , int start,  int end)
+{
+  (void)end;
+  char** matches;
+
+  matches = (char**)NULL;
+
+  if (start == 0){
+    matches = rl_completion_matches ((char*)text, &my_generator);
+  }else{
+    //        rl_bind_key('\t',rl_insert); //Disables 'ls'-behavior
+  }
+
+  return (matches);
+
+}
+
+char* my_generator(const char* text, int state)
+{
+  static int list_index, len;
+  char *name;
+
+  if (!state) {
+    list_index = 0;
+    len = strlen (text);
+  }
+
+  while ((name = cmd_list[list_index])) {
+    list_index++;
+
+    if (strncmp (name, text, len) == 0)
+      return (dupstr(name));
+  }
+
+  /* If no names matched, then return NULL. */
+  return ((char *)NULL);
+
+}
+
+char* dupstr (char* s) {
+  char* r;
+
+  r = (char*) xmalloc((strlen (s) + 1));
+  strcpy (r, s);
+  return (r);
+}
+
+void* xmalloc (int size)
+{
+  void* buf;
+
+  buf = malloc (size);
+  if (!buf) {
+    fprintf (stderr, "Error: Out of memory. Exiting.\n");
+    exit (1);
+  }
+
+  return buf;
+}
