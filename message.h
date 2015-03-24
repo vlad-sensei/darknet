@@ -39,6 +39,7 @@ public:
   //static Msg_ptr copy_msg(Msg_ptr other);
   static Msg_ptr echo(const string& msg = "");
   static Msg_ptr chuhk_req(const Id& bid, const unordered_set<Id>& cids);
+  static Msg_ptr meta_req();
 };
 
 #endif // MESSAGE_H

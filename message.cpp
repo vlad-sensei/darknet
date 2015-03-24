@@ -25,3 +25,7 @@ Msg_ptr Message::echo(const string& msg){
 Msg_ptr Message::chuhk_req(const Id &bid, const unordered_set<Id> &cids){
   return make(T_CHUNK_REQ, K_BID, bid, K_CIDS, cids);
 }
+
+Msg_ptr Message::meta_req(){
+  return make(T_META_REQ);
+}
