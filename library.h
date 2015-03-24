@@ -22,8 +22,14 @@
 class Library: public Inventory {
 public:
 
+  Library();
+  //pattern ex Batman%movie%...
+  //TODO: right now you need to search the tags in the same order in which it was written.
   void search(const string& pattern, vector<Id>& mids);
   void upload_file(const string& filename, const string& tags = "");
+
+
+
   bool req_file(const Id& mid);
 
   void handle_chunk(const Id& bid, const Chunk& chunk);
