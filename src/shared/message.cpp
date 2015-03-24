@@ -28,4 +28,7 @@ Msg_ptr Message::chunk_req(const Id &bid, const unordered_set<Id> &cids){
 
 Msg_ptr Message::ui_text_command(const string& msg){
   return make(T_UI_TEXT_COMMAND, K_BODY, msg);
+
+Msg_ptr Message::meta_req(){
+  return make(T_META_REQ);
 }

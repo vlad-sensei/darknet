@@ -1,5 +1,7 @@
 #include "core.h"
 
+using literals;
+
 Core_ptr core;
 
 // -------- user interaction ----
@@ -43,6 +45,27 @@ void Core::req_chunks(const Id &bid, const unordered_set<Id> &cids){
   for(const auto& it:data.peers){
     const Peer_ptr& peer = it.second;
     peer->req_chunks(bid, cids);
+  }
+}
+
+static void Core::synch_loop(){
+  for (;;){
+      debug("synching with all");
+      synch_all();
+      this_thread::sleep_for(5s);
+    }
+}
+
+void Core::start_synch(){
+  thread th(synch_loop);
+  th.detach();
+}
+
+void Core::synch_all(){
+  r_lock l(peers_mtx);
+  for(const auto& it:data.peers){
+    const Peer_ptr& peer = it.second;
+    peer->synch();
   }
 }
 

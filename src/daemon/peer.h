@@ -40,7 +40,7 @@ public:
   void init();
   inline void echo(const string& echo_msg = "echo_msg") {send(Message::echo(echo_msg));}
   inline void req_chunks(const Id& bid, const unordered_set<Id>& cids) {send(Message::chunk_req(bid,cids));}
-  inline void sync();
+  inline void synch(){send(Message::meta_req());}
 private:
   Peer();
   void terminate();
