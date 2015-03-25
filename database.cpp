@@ -19,7 +19,7 @@ void Database::init_db(){
 }
 
 void Database::get_all_metaheads(vector<Metahead>& metaheads){
-  debug("get all");
+  debug("getting all..");
   Result_ptr res = exec_q(Q_ALL_METAHEADS);
   while(res->next()) {
     Metahead tmp(res->get_id(2),res->get_string(1));
