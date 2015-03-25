@@ -28,6 +28,7 @@ int main(int argc, char* argv[]){
     //debug("listening at port %u", port);
     core.reset(new Core);
     core->set_port(port);
+    core->start_synch();
     core->run();
   } catch(std::exception& e){
     debug(" *** exception : %s", e.what());
