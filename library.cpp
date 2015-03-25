@@ -1,6 +1,5 @@
 #include "library.h"
-Library::Library()
-{
+Library::Library() {
   debug("initializing Library..");
 
   //TODO remove this it's for test
@@ -10,19 +9,18 @@ Library::Library()
   //upload_file("/home/andno037/code/build-darknet-Desktop_Qt_5_3_0_GCC_64bit-Debug/hej3","hej3:tja3");
   //upload_file("/home/andno037/code/build-darknet-Desktop_Qt_5_3_0_GCC_64bit-Debug/hej4","hej4:tja4");
   //upload_file("/home/andno037/code/build-darknet-Desktop_Qt_5_3_0_GCC_64bit-Debug/hej4","hej5tja");
-   vector<Metahead>mids;
-   vector<Metahead>mids2;
+   vector<Metahead> metaheads;
+   Metahead metahead;
   // vector<uint64_t>size;
   // vector<string>tags;
   // vector<Id>bids;
   // search("hej",mids);
-   get_all_metaheads(mids);
-   for(unsigned i=0; i<mids.size(); i++){
-         //debug("[Id:%s]\n",mids[i] );
-    debug("[Id:%s][Tags:%s][Hash:%s]\n",mids[i].mid,mids[i].tags,mids[i].bid);
+   get_all_metaheads(metaheads);
+   for(const Metahead& mh: metaheads){
+    debug("[Id:%s][Tags:%s][Hash:%s]\n",mh.mid,mh.tags,mh.bid);
    }
   // Metahead metahead;
-  if (get_metahead_from_db(mids[0].mid,mids2)) debug("get [Id:%s][Tags:%s][Hash:%s]\n",mids[0].mid,mids[0].tags,mids[0].bid);
+  if (Database::get_metahead(metaheads[0].mid,metahead)) debug("get [Id:%s][Tags:%s][Hash:%s]\n",metahead.mid,metahead.tags,metahead.bid);
 
 }
 
@@ -35,7 +33,7 @@ void Library::upload_file(const string& filename, const string& tags){
    */
 
   ifstream in(filename, std::ifstream::ate | std::ifstream::binary);
-  int size=in.tellg();
+  //int size=in.tellg();
   Metahead metahead(hash512_t(filename),tags);
 //  metahead.file_size=size;
 //  metahead.bid=hash512_t(filename);
@@ -47,7 +45,7 @@ void Library::upload_file(const string& filename, const string& tags){
 }
 
 void Library::search(const string& pattern, vector<Id>& mids){
-  get_metaheads(pattern,mids);
+  get_mids_by_tag_pattern(pattern,mids);
 }
 
 bool Library::get_metahead(const Id& mid, Metahead& metahead){

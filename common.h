@@ -34,14 +34,11 @@ struct Metabody {
 
 //magnet link
 struct Metahead {
-  const Id bid, mid;
-  const string tags;
-  //Metahead(Metahead&& rhv): mid(move(rhv.mid)),bid(move(rhv.bid)),tags(move(rhv.tags)){}
+  Id mid, bid;
+  string tags;
+  Metahead() = default;
   Metahead(const Id& bid_,const string& tags_):
-      bid(bid_),mid(string((char*)&bid, sizeof(bid_))+tags_),  tags(tags_){}
-
-private:
-  Metahead();
+     mid(string((char*)&bid_, sizeof(bid_))+tags_),  bid(bid_), tags(tags_){}
 };
 
 

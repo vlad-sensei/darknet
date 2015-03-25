@@ -27,32 +27,18 @@ void Database::get_all_metaheads(vector<Metahead>& metaheads){
   }
 }
 
-bool Database::get_metahead_from_db(const Id& mid, vector<Metahead>& metahead){
+bool Database::get_metahead(const Id& mid, Metahead& metahead){
   debug("getting metahead..");
   Result_ptr res = exec_q(Q_METAHEAD,mid);
   if(!res->next())return false;
-  const Id& bid = res->get_id(2);
-  const string& tags = res->get_string(1);
-  metahead.emplace_back(Metahead(bid,tags));
+  metahead.mid = mid;
+  metahead.tags = res->get_string(0);
+  metahead.bid = res->get_id(1);
   return true;
 }
 
 
-void Database::get_metaheads(const string& pattern, vector<Id>& mids){
+void Database::get_mids_by_tag_pattern(const string& pattern, vector<Id>& mids){
   Result_ptr res = exec_q(Q_MIDS_BY_TAG_PATTERN,pattern);
   while(res->next()) mids.emplace_back(res->get_id(0));
 }
-
-
-
-/*
- * EXAMPLE
-bool Database::get_session(Id &uid, string &auth_token){
-  Result_ptr res = exec_q(Q_SESSION);
-  if(!res->next()) return false;
-  uid = res->get_id(0);
-  auth_token = res->get_string(1);
-  return true;
-}
-*/
-
