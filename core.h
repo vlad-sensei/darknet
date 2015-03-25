@@ -41,12 +41,12 @@ public:
   // user interaction (UI)
   void connect(const string& addr, const uint16_t& port);
   void broadcast_echo(const string& msg);
+  //start syncing at regular intervalls
+  //TODO add function to stop syncing
+  void start_synch();
 
 private:
   void req_chunks(const Id& bid, const unordered_set<Id>& cids);
-  //start syncing at regular intervalls
-  static void synch_loop();
-  void start_synch();
   //synchronize with all peers
   void synch_all();
   void spawn_peer(tcp::socket& socket);

@@ -1,6 +1,5 @@
 #include "core.h"
-
-using literals;
+#include <ratio>
 
 Core_ptr core;
 
@@ -39,17 +38,17 @@ void Core::req_chunks(const Id &bid, const unordered_set<Id> &cids){
   }
 }
 
-static void Core::synch_loop(){
-  for (;;){
-      debug("synching with all");
-      synch_all();
-      this_thread::sleep_for(5s);
-    }
-}
 
 void Core::start_synch(){
-  thread th(synch_loop);
-  th.detach();
+    //Capturing this might lead to a dangling pointer if core is destroyed
+    thread th( [this](void){
+        debug("synching with all");
+        synch_all();
+        std::chrono::seconds sec(2);
+        std::chrono::duration<int, ratio<1,1>> dur(sec);
+        this_thread::sleep_for(dur);
+    });
+    th.detach();
 }
 
 void Core::synch_all(){
