@@ -21,7 +21,7 @@
 #include <boost/asio.hpp>
 
 #include "glob.h"
-#include "core_network.h"
+#include "network_initiator_base.h"
 #include "message.h"
 #include "peer.h"
 #include "ui.h"
@@ -29,12 +29,15 @@
 
 class Core;
 typedef unique_ptr<Core> Core_ptr;
+class UI;
+typedef unique_ptr<UI> UI_ptr;
 
 extern Core_ptr core;
 
-class Core : public Core_network, public Library, public UI {
+class Core : Network_initiator_base, public Library {
 public:
   Core(){}
+  inline void set_port(const uint16_t& port){Network_initiator_base::set_port(port);}
   void run();
   bool remove_peer(const peer_id_t& pid);
 
@@ -55,6 +58,8 @@ private:
     inline bool peer_exists(const peer_id_t& pid) {return peers.find(pid)!=peers.end();}
   } data;
   rw_mutex peers_mtx, pid_mtx;
+
+  UI_ptr ui;
 };
 
 #endif // CORE_H

@@ -24,13 +24,14 @@
 
 #include "glob.h"
 #include "message.h"
-#include "peer_network.h"
+#include "network_base.h"
 
 namespace bs = boost::system;
 typedef boost::asio::ip::tcp::socket socket_t;
 
 class Peer;
 typedef shared_ptr<Peer> Peer_ptr;
+typedef Network_base<Peer> Peer_network;
 
 class Peer: public enable_shared_from_this<Peer>, Peer_network {
 public:

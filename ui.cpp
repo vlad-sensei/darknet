@@ -8,20 +8,43 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
+#include "core.h"
+
+
+
+UI::UI() {
+  init_commands();
+  init_readline();
+  safe_printf(" ~~~ welcome to darknet ~~~\n");
+  thread([this](){get_text_input();}).detach();
+}
+
+
+void UI::run(){
+  Network_initiator_base::set_port(DEFAULT_UI_LISTEN_PORT);
+  Network_initiator_base::run();
+}
+
+
+void UI::verify_new_connection(tcp::socket socket){
+  // do some verification if needed
+  spawn_client(socket);
+}
+
+void UI::spawn_client(tcp::socket &socket){
+  w_lock l(clients_mtx);
+  const peer_id_t& uid = ++data.current_ui_peer;
+  data.clients[uid] = UI_client_ptr(new UI_client(socket));
+  data.clients[uid]->init();
+}
+
+
 static char** my_completion(const char*, int ,int);
 char* my_generator(const char*,int);
 char* dupstr (char*);
 void* xmalloc (int);
 
 char** cmd_list;
-
-
-UI::UI() {
-  init_commands();
-  init_readline();
-  printf(" ~~~ welcome to darknet ~~~\n");
-  thread([this](){get_text_input();}).detach();
-}
 
 void UI::get_text_input(){
 
@@ -107,7 +130,7 @@ void UI::init_commands(){
       handle_invalid_args(e);
       return;
     }
-    connect(peer,port);
+    core->connect(peer,port);
   },
   "connect PEER_IP [PORT]",
   2,3);
@@ -121,7 +144,7 @@ void UI::init_commands(){
       handle_invalid_args(e);
       return;
     }
-    broadcast_echo(msg);
+    core->broadcast_echo(msg);
   },
   "broadcast MESSAGE",
   2,2);

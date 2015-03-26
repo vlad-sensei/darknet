@@ -5,12 +5,18 @@ Core_ptr core;
 // -------- user interaction ----
 
 void Core::run(){
-  Core::run_network();
+ thread network_thread([this](){Network_initiator_base::run();});
+ thread ui_thread([this](){
+   ui = make_unique<UI>();
+   ui->run();
+ });
+ network_thread.join();
+ ui_thread.join();
 }
 
 void Core::connect(const string &addr, const uint16_t &port){
   debug("connecting [%s:%d]..",addr.c_str(),port);
-  Core_network::connect(addr,port);
+  Network_initiator_base::connect(addr,port);
 }
 
 void Core::broadcast_echo(const string &msg){

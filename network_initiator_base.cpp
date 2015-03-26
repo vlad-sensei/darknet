@@ -1,9 +1,9 @@
-#include "core_network.h"
+#include "network_initiator_base.h"
 #include <csignal>
 #include <utility>
 #include <thread>
 
-Core_network::Core_network():
+Network_initiator_base::Network_initiator_base():
   io_service_(),
   signals_(io_service_),
   accept_socket_(io_service_),
@@ -14,7 +14,8 @@ Core_network::Core_network():
   await_stop();
 }
 
-void Core_network::run_network(){
+void Network_initiator_base::run(){
+  debug("Listening to port %s", get_port());
   tcp::endpoint endpoint = *resolver_.resolve({"localhost", to_string(get_port())});
   acceptor_.open(endpoint.protocol());
   acceptor_.set_option(tcp::acceptor::reuse_address(true));
@@ -24,7 +25,7 @@ void Core_network::run_network(){
   io_service_.run();
 }
 
-void Core_network::await_stop(){
+void Network_initiator_base::await_stop(){
   signals_.async_wait([this](const bs::error_code&, const int& signo){
     debug("got signal %d", signo);
     acceptor_.close();
@@ -33,7 +34,7 @@ void Core_network::await_stop(){
   });
 }
 
-void Core_network::listen(){
+void Network_initiator_base::listen(){
   acceptor_.async_accept(accept_socket_,
                          [this](const bs::error_code& ec){
     if(!acceptor_.is_open()) return;
@@ -44,7 +45,7 @@ void Core_network::listen(){
 }
 
 
-void Core_network::connect(const string &addr, const uint16_t &port){
+void Network_initiator_base::connect(const string &addr, const uint16_t &port){
   thread([this, addr, port](){
     tcp::socket s(io_service_);
     try{
@@ -58,12 +59,12 @@ void Core_network::connect(const string &addr, const uint16_t &port){
   }).detach();
 }
 
-void Core_network::set_port(const uint16_t &port){
+void Network_initiator_base::set_port(const uint16_t &port){
   w_lock l(port_mtx);
   data.port = port;
 }
 
-uint16_t Core_network::get_port(){
+uint16_t Network_initiator_base::get_port(){
  r_lock l(port_mtx);
  return data.port;
 }

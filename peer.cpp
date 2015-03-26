@@ -1,6 +1,8 @@
 #include "peer.h"
 #include "core.h"
 
+//typedef Network_base<Peer> Peer_network;
+
 Peer::Peer(socket_t &sock_, const peer_id_t& pid): Peer_network(sock_),
   data(pid) {
   debug("creating peer [id:%u]..", pid);

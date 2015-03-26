@@ -21,10 +21,10 @@ SOURCES += main.cpp \
     library.cpp \
     sqlite3_base.cpp \
     database.cpp \
-    core_network.cpp \
-    peer_network.cpp \
     common.cpp \
-    inventory.cpp
+    inventory.cpp \
+    network_initiator_base.cpp \
+    ui_client.cpp
 
 HEADERS += \
     glob.h \
@@ -36,8 +36,9 @@ HEADERS += \
     library.h \
     sqlite3_base.h \
     database.h \
-    core_network.h \
-    peer_network.h \
     common.h \
-    inventory.h
+    inventory.h \
+    network_base.h \
+    network_initiator_base.h \
+    ui_client.h
 
