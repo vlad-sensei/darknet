@@ -27,6 +27,8 @@
 #include "ui.h"
 #include "library.h"
 
+#define DEBUG
+
 class Core;
 typedef unique_ptr<Core> Core_ptr;
 
@@ -34,7 +36,7 @@ extern Core_ptr core;
 
 class Core : public Core_network, public Library, public UI {
 public:
-  Core(){}
+  Core();
   void run();
   bool remove_peer(const peer_id_t& pid);
 
@@ -42,12 +44,12 @@ public:
   void connect(const string& addr, const uint16_t& port);
   void broadcast_echo(const string& msg);
   //start syncing at regular intervalls
-  //TODO add function to stop syncing
   void start_synch();
+  //stop syncing after the next syncing is completed
+  void stop_synch();
 
 private:
   void req_chunks(const Id& bid, const unordered_set<Id>& cids);
-  //synchronize with all peers
   void synch_all();
   void spawn_peer(tcp::socket& socket);
   void verify_new_connection(tcp::socket socket);
@@ -59,6 +61,8 @@ private:
     inline bool peer_exists(const peer_id_t& pid) {return peers.find(pid)!=peers.end();}
   } data;
   rw_mutex peers_mtx, pid_mtx;
+  thread sync_thread;
+  bool should_sync;
 };
 
 #endif // CORE_H
