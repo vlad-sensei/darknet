@@ -1,7 +1,7 @@
 #include "ui_client.h"
 
 void UI_client::init(){
-  Network_base::run();
+  Connection_base::run();
 }
 
 void UI_client::process_msg(const Msg_ptr &msg){

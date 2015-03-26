@@ -1,5 +1,5 @@
-#ifndef PEER_NETWORK_H
-#define PEER_NETWORK_H
+#ifndef CONNECTION_BASE_H
+#define CONNECTION_BASE_H
 
 #include <mutex>
 #include <deque>
@@ -15,11 +15,11 @@ using tcp=boost::asio::ip::tcp;
 namespace bs = boost::system;
 
 template<typename Tparent>
-class Network_base {
-  Network_base();
+class Connection_base {
+  Connection_base();
 protected:
-  Network_base(tcp::socket& socket);
-  virtual ~Network_base(){}
+  Connection_base(tcp::socket& socket);
+  virtual ~Connection_base(){}
 
   void run();
   void send(Msg_ptr msg);
@@ -45,16 +45,16 @@ private:
   bool is_socket_closed = true;
 };
 
-template<typename Tparent> inline
-Network_base<Tparent>::Network_base(tcp::socket &socket): socket_(move(socket)){}
+template<typename Tderived> inline
+Connection_base<Tderived>::Connection_base(tcp::socket &socket): socket_(move(socket)){}
 
 template<typename Tparent> inline
-void Network_base<Tparent>::run(){
+void Connection_base<Tparent>::run(){
   do_read_header();
 }
 
 template<typename Tparent> inline
-void Network_base<Tparent>::do_read_header(){
+void Connection_base<Tparent>::do_read_header(){
   read_msg = Message::empty();
   auto self = shared_from_this();
   ba::async_read(socket_, read_msg->get_raw(),[this, self](const bs::error_code& ec, const size_t&bytes){
@@ -73,7 +73,7 @@ void Network_base<Tparent>::do_read_header(){
 
 
 template<typename Tparent> inline
-void Network_base<Tparent>::do_read_body(){
+void Connection_base<Tparent>::do_read_body(){
   auto self = shared_from_this();
   ba::async_read(socket_, read_msg->get_raw(),[this,self](const bs::error_code& ec, const size_t&bytes){
     if(ec) return 0UL;
@@ -92,7 +92,7 @@ void Network_base<Tparent>::do_read_body(){
 }
 
 template<typename Tparent> inline
-void Network_base<Tparent>::send(Msg_ptr msg){
+void Connection_base<Tparent>::send(Msg_ptr msg){
   unique_lock<mutex> lck(msg_write_mtx);
   msg_queue.push_back(msg);
   lck.unlock();
@@ -100,7 +100,7 @@ void Network_base<Tparent>::send(Msg_ptr msg){
 }
 
 template<typename Tparent> inline
-void Network_base<Tparent>::do_write(){
+void Connection_base<Tparent>::do_write(){
   unique_lock<mutex> lck(msg_write_mtx);
   if(msg_queue.empty()|| msg_is_writing) return;
   msg_is_writing = true;
@@ -122,13 +122,13 @@ void Network_base<Tparent>::do_write(){
 }
 
 template<typename Tparent> inline
-void Network_base<Tparent>::handle_connection_error(const string &location, const string &error){
+void Connection_base<Tparent>::handle_connection_error(const string &location, const string &error){
   debug(" *** connection error in %s : %s", location.c_str(), error.c_str());
   close();
 }
 
 template<typename Tparent> inline
-void Network_base<Tparent>::close(){
+void Connection_base<Tparent>::close(){
   unique_lock<mutex> lck(socket_close_mtx);
   if(!socket_.is_open()) return;
   socket_.close();
@@ -136,4 +136,4 @@ void Network_base<Tparent>::close(){
   terminate();
 }
 
-#endif // PEER_NETWORK_H
+#endif // CONNECTION_BASE_H

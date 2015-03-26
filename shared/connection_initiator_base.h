@@ -1,5 +1,5 @@
-#ifndef CORE_NETWORK_H
-#define CORE_NETWORK_H
+#ifndef CONNECTION_INITIATOR_BASE_H
+#define CONNECTION_INITIATOR_BASE_H
 
 #include <memory>
 #include <boost/asio.hpp>
@@ -12,18 +12,19 @@ namespace bs = boost::system;
 
 typedef shared_ptr<tcp::socket> socket_ptr;
 
-class Network_initiator_base {
+class Connection_initiator_base {
 public:
   void set_port(const uint16_t& port);
   void run();
+  void start_listen();
 protected:
-  Network_initiator_base();
-  virtual ~Network_initiator_base(){}
+  Connection_initiator_base();
+  virtual ~Connection_initiator_base(){}
 
   void connect(const string& addr, const uint16_t& port);
 
 private:
-  virtual void verify_new_connection(tcp::socket socket) = 0;
+  virtual void handle_new_connection(tcp::socket socket) = 0;
 
   void await_stop();
   void listen();
@@ -42,4 +43,4 @@ private:
   tcp::resolver resolver_;
 };
 
-#endif // CORE_NETWORK_H
+#endif // CONNECTION_INITIATOR_BASE_H

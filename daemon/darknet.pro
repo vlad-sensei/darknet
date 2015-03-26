@@ -12,33 +12,35 @@ LIBS += -lsqlite3
 LIBS += -lcryptopp
 LIBS += -lreadline
 
+INCLUDEPATH += $$PWD/../shared
+
 SOURCES += main.cpp \
-    message_base.cpp \
-    message.cpp \
+    ../shared/message_base.cpp \
+    ../shared/message.cpp \
     core.cpp \
     peer.cpp \
     ui.cpp \
     library.cpp \
     sqlite3_base.cpp \
     database.cpp \
-    common.cpp \
+    ../shared/common.cpp \
     inventory.cpp \
-    network_initiator_base.cpp \
+    ../shared/connection_initiator_base.cpp \
     ui_client.cpp
 
 HEADERS += \
-    glob.h \
-    message_base.h \
-    message.h \
+    ../shared/glob.h \
+    ../shared/message_base.h \
+    ../shared/message.h \
     core.h \
     peer.h \
     ui.h \
     library.h \
     sqlite3_base.h \
     database.h \
-    common.h \
+    ../shared/common.h \
     inventory.h \
-    network_base.h \
-    network_initiator_base.h \
+    ../shared/connection_base.h \
+    ../shared/connection_initiator_base.h \
     ui_client.h
 

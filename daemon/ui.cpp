@@ -21,12 +21,13 @@ UI::UI() {
 
 
 void UI::run(){
-  Network_initiator_base::set_port(DEFAULT_UI_LISTEN_PORT);
-  Network_initiator_base::run();
+  Connection_initiator_base::set_port(DEFAULT_UI_LISTEN_PORT);
+  Connection_initiator_base::start_listen();
+  Connection_initiator_base::run();
 }
 
 
-void UI::verify_new_connection(tcp::socket socket){
+void UI::handle_new_connection(tcp::socket socket){
   // do some verification if needed
   spawn_client(socket);
 }

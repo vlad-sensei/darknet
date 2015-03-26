@@ -21,7 +21,7 @@
 #include <boost/asio.hpp>
 
 #include "glob.h"
-#include "network_initiator_base.h"
+#include "connection_initiator_base.h"
 #include "message.h"
 #include "peer.h"
 #include "ui.h"
@@ -34,10 +34,10 @@ typedef unique_ptr<UI> UI_ptr;
 
 extern Core_ptr core;
 
-class Core : Network_initiator_base, public Library {
+class Core : Connection_initiator_base, public Library {
 public:
   Core(){}
-  inline void set_port(const uint16_t& port){Network_initiator_base::set_port(port);}
+  inline void set_port(const uint16_t& port){Connection_initiator_base::set_port(port);}
   void run();
   bool remove_peer(const peer_id_t& pid);
 
@@ -49,7 +49,7 @@ private:
   void req_chunks(const Id& bid, const unordered_set<Id>& cids);
 
   void spawn_peer(tcp::socket& socket);
-  void verify_new_connection(tcp::socket socket);
+  void handle_new_connection(tcp::socket socket);
 
   //all data&methods in data must be synchronized
   struct {

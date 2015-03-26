@@ -5,7 +5,10 @@ Core_ptr core;
 // -------- user interaction ----
 
 void Core::run(){
- thread network_thread([this](){Network_initiator_base::run();});
+ thread network_thread([this](){
+   Connection_initiator_base::start_listen();
+   Connection_initiator_base::run();
+ });
  thread ui_thread([this](){
    ui = make_unique<UI>();
    ui->run();
@@ -16,7 +19,7 @@ void Core::run(){
 
 void Core::connect(const string &addr, const uint16_t &port){
   debug("connecting [%s:%d]..",addr.c_str(),port);
-  Network_initiator_base::connect(addr,port);
+  Connection_initiator_base::connect(addr,port);
 }
 
 void Core::broadcast_echo(const string &msg){
@@ -28,7 +31,7 @@ void Core::broadcast_echo(const string &msg){
 }
 
 
-void Core::verify_new_connection(tcp::socket socket){
+void Core::handle_new_connection(tcp::socket socket){
   debug("new peer..");
   //TODO:check if we are already connected by MAC/IP parameters
   //maybe cache those in the future

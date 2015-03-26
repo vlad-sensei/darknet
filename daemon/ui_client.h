@@ -4,12 +4,12 @@
 #include <memory>
 
 #include "glob.h"
-#include "network_base.h"
+#include "connection_base.h"
 #include "message.h"
 
 class UI_client;
 typedef shared_ptr<UI_client> UI_client_ptr;
-typedef Network_base<UI_client> UI_client_network;
+typedef Connection_base<UI_client> UI_client_network;
 
 class UI_client : public enable_shared_from_this<UI_client>, UI_client_network {
   UI_client();
