@@ -3,6 +3,11 @@
 
 Core_ptr core;
 
+// -------- Constructors ----
+Core::Core()
+    :should_sync(true)
+{}
+
 // -------- user interaction ----
 
 void Core::run(){
@@ -50,16 +55,23 @@ void Core::req_chunks(const Id &bid, const unordered_set<Id> &cids){
 
 void Core::start_synch(){
     //Capturing this might lead to a dangling pointer if core is destroyed
-    thread th( [this](void){
-        debug("synching with all");
-        synch_all();
-        std::chrono::seconds sec(2);
-        std::chrono::duration<int, ratio<1,1>> dur(sec);
-        this_thread::sleep_for(dur);
+    should_sync = true;
+    sync_thread = thread([this](void){
+        while(should_sync){
+            debug("synching with all");
+            core->synch_all();
+            std::chrono::seconds sec(1);
+            std::chrono::duration<int, ratio<1,1>> dur(sec);
+            this_thread::sleep_for(dur);
+        }
     });
-    th.detach();
 }
 
+void Core::stop_synch(){
+    should_sync = false;
+}
+
+//-------- syncing ----
 void Core::synch_all(){
   r_lock l(peers_mtx);
   for(const auto& it:data.peers){
