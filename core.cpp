@@ -49,7 +49,6 @@ void Core::start_synch(){
     should_sync = true;
     sync_thread = thread([this](void){
         while(should_sync){
-            debug("synching with all");
             core->synch_all();
             std::chrono::seconds sec(1);
             std::chrono::duration<int, ratio<1,1>> dur(sec);

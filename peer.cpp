@@ -30,6 +30,9 @@ void Peer::process_msg(const Msg_ptr& msg){
   case Message::T_CHUNK_REQ:
     handle_chunk_req(msg);
     break;
+  case Message::T_META_REQ:
+    handle_meta_req(msg);
+    break;
   default:
     debug("unknown messape type");
   }
@@ -45,4 +48,8 @@ void Peer::handle_chunk_req(const Msg_ptr &msg){
   const unordered_set<Id> cids = msg->get_unordered_set_id(Message::K_CIDS);
   //TODO: do something with them..
   (void)bid; (void)cids;
+}
+
+void Peer::handle_meta_req(const Msg_ptr &msg){
+    debug("Has recieved sync req %s", msg);
 }
