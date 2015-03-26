@@ -41,3 +41,5 @@ HEADERS += \
     common.h \
     inventory.h
 
+
+unix|win32: LIBS += -lncurses

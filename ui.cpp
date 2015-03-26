@@ -5,13 +5,13 @@
 #include <iostream>
 #include <fstream>
 #include <iterator>
-#include <readline/readline.h>
-#include <readline/history.h>
+#include<istream>
+#include<string>
+#include<stdio.h>
+#include<ncurses.h>
 
-static char** my_completion(const char*, int ,int);
-char* my_generator(const char*,int);
-char* dupstr (char*);
-void* xmalloc (int);
+//to install ncurses (after using apt-get):
+//http://stackoverflow.com/questions/15466654/qt-creator-and-ncurses-initscr-not-found
 
 char** cmd_list;
 
@@ -19,31 +19,34 @@ char** cmd_list;
 UI::UI() {
   init_commands();
   init_readline();
+
   printf(" ~~~ welcome to darknet ~~~\n");
   thread([this](){get_text_input();}).detach();
 }
 
 void UI::get_text_input(){
+    initscr();
+    raw();
+    //noecho();
+    int c;
+    char* line;
+    printw("Hello World !!!\n");	/* Print Hello World		  */
+    printw(" ~~~ welcome to darknet ~~~\n");
+    while(1){
+        c = getch();                  /* Wait for user input */
+        if(c == '\t'){
+            const char* linec = line;
+            printw("GGGGGG");
 
-  while(1){
-    /*
-     * Uncomment the line below and 'rl_bind_key' line in
-     * 'my_completion' to disable 'ls' behavior of auto-complete.
-     * 'ls'-behavior is shown when there is a space to the left in cmd-line.
-     */
-    //    rl_bind_key('\t',rl_complete);
+        }
+        else{
+            line += c;
+        }
+        printw(line);
+        refresh();                  /* Print it on to the real screen */
 
-    char* line = readline("> ");
-
-    if(!line) break;
-    if(*line) add_history(line);
-
-    string input(line);
-
-    process_text_input(input);
-
-    free(line);
-  }
+    }
+    endwin();
   /*
   string text_input;
   while(getline(cin,text_input)){
@@ -150,67 +153,7 @@ void UI::init_readline(){
   }
   //Might be better way to build 'cmd_list'
   cmd_list = &command_keys[0];
-  // Used for custom auto-complete with 'readline'
-  rl_attempted_completion_function = my_completion;
-  rl_bind_key('\t',rl_complete);
-}
 
-static char** my_completion( const char * text , int start,  int end)
-{
-  (void)end;
-  char** matches;
-
-  matches = (char**)NULL;
-
-  if (start == 0){
-    matches = rl_completion_matches ((char*)text, &my_generator);
-  }else{
-    //        rl_bind_key('\t',rl_insert); //Disables 'ls'-behavior
-  }
-
-  return (matches);
 
 }
 
-char* my_generator(const char* text, int state)
-{
-  static int list_index, len;
-  char *name;
-
-  if (!state) {
-    list_index = 0;
-    len = strlen (text);
-  }
-
-  while ((name = cmd_list[list_index])) {
-    list_index++;
-
-    if (strncmp (name, text, len) == 0)
-      return (dupstr(name));
-  }
-
-  /* If no names matched, then return NULL. */
-  return ((char *)NULL);
-
-}
-
-char* dupstr (char* s) {
-  char* r;
-
-  r = (char*) xmalloc((strlen (s) + 1));
-  strcpy (r, s);
-  return (r);
-}
-
-void* xmalloc (int size)
-{
-  void* buf;
-
-  buf = malloc (size);
-  if (!buf) {
-    fprintf (stderr, "Error: Out of memory. Exiting.\n");
-    exit (1);
-  }
-
-  return buf;
-}
