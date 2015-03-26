@@ -34,3 +34,34 @@ deque<Chunk> Metabody::create_body_chunks(){
     res.emplace_front(data);
     return res;
 }
+
+
+bool Metabody::append_from_chunk(const Chunk& chunk){
+    size_t offs=0;
+    if(bid == chunk.cid){
+        uint32_t bid_count;
+        uint32_t cid_count;
+        memcpy((char*)&bid_count,&chunk.data[offs],sizeof(bid_count));
+        offs+=sizeof(bid_count);
+        memcpy((char*)&cid_count,&chunk.data[offs],sizeof(cid_count));
+        offs+=sizeof(cid_count);
+
+        if(bid_count > MAX_BIDS_PER_METABODY || cid_count > MAX_CIDS_PER_METABODY){
+            debug("*** too many cids or bids");
+            return false;
+        }
+        bids.resize(bid_count);
+        cids.resize(cid_count);
+
+        memcpy((char*)&bids,&chunk.data[offs],sizeof(Id)*bid_count);
+        offs+=sizeof(Id)*bid_count;
+    }
+    if((chunk.data.size()-offs)%sizeof(Id)!=0 ){
+        debug("*** extra bytes ?");
+        return false;
+    }
+    size_t cids_to_copy=(chunk.data.size()-offs)/sizeof(Id);
+    memcpy((char*)&cids[cids_offs],&chunk.data[offs],cids_to_copy*sizeof(Id));
+    cids_offs+=cids_to_copy*sizeof(Id);
+    return true;
+}

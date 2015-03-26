@@ -13,7 +13,8 @@
 */
 
 #define CHUNK_SIZE 524288
-
+#define MAX_CIDS_PER_METABODY 2000
+#define MAX_BIDS_PER_METABODY 30
 
 hash512_t hash512(const string& value);
 
@@ -50,8 +51,10 @@ private:
 struct Metabody {
   Id bid; //hash of the content.
   vector<Id> bids,cids; //hash of bids and chunk IDs
-  bool append_from_chunk(const Chunk& chunk); //returns false once last chunk
+  bool append_from_chunk(const Chunk& chunk); //returns false if trolling
   deque<Chunk> create_body_chunks();
+private:
+  size_t cids_offs=0; //offset for append chunk
 };
 
 //magnet link
