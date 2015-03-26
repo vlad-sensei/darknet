@@ -11,8 +11,10 @@ void Peer_network::do_read_header(){
   read_msg = Message::empty();
   auto self = shared_from_this();
   ba::async_read(socket_, read_msg->get_raw(),[this, self](const bs::error_code& ec, const size_t&bytes){
+
     if(ec) return 0UL;
     return Message::HEADER_SIZE-bytes;
+
   },
   [this,self](const bs::error_code& ec, const size_t&){
     if(ec){
@@ -28,8 +30,10 @@ void Peer_network::do_read_header(){
 void Peer_network::do_read_body(){
   auto self = shared_from_this();
   ba::async_read(socket_, read_msg->get_raw(),[this,self](const bs::error_code& ec, const size_t&bytes){
+
     if(ec) return 0UL;
     return read_msg->get_body_size()-bytes;
+
   },
   [this,self](const bs::error_code& ec, const size_t&){
     if(ec){

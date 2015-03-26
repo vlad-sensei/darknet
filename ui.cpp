@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <iterator>
+
 #include<istream>
 #include<string>
 #include<stdio.h>
@@ -12,6 +13,7 @@
 
 //to install ncurses (after using apt-get):
 //http://stackoverflow.com/questions/15466654/qt-creator-and-ncurses-initscr-not-found
+
 
 char** cmd_list;
 
@@ -25,6 +27,7 @@ UI::UI() {
 }
 
 void UI::get_text_input(){
+
     initscr();
     raw();
     //noecho();
@@ -47,6 +50,7 @@ void UI::get_text_input(){
 
     }
     endwin();
+
   /*
   string text_input;
   while(getline(cin,text_input)){
@@ -81,12 +85,14 @@ void UI::Command::exec(const vector<string> &args){
     printf("Wrong argument count\n");
     help();
     return;
+
   }
   try{
     execute_(args);
   } catch(exception&e){
     printf(" *** error processing command : %s\n",e.what());
   }
+
 }
 
 //TODO: make sure there are no copies
@@ -131,8 +137,10 @@ void UI::init_commands(){
 
   init_command({"exit", "quit"},
                [this](const vector<string>& args){
+
     (void)args;
     safe_printf("Exiting darknet...");
+
     exit(0);
   },
   "'exit' or 'quit'",
@@ -155,5 +163,7 @@ void UI::init_readline(){
   cmd_list = &command_keys[0];
 
 
+
 }
+
 

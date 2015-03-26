@@ -35,10 +35,12 @@ struct Metabody {
 //magnet link
 struct Metahead {
   Id mid, bid;
+
   string tags;
   Metahead() = default;
   Metahead(const Id& bid_,const string& tags_):
      mid(string((char*)&bid_, sizeof(bid_))+tags_),  bid(bid_), tags(tags_){}
+
 };
 
 
