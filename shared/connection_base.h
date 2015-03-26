@@ -14,7 +14,7 @@
 using tcp=boost::asio::ip::tcp;
 namespace bs = boost::system;
 
-template<typename Tparent>
+template<typename Tderived>
 class Connection_base {
   Connection_base();
 protected:
@@ -28,7 +28,7 @@ protected:
 private:
   virtual void process_msg(const Msg_ptr& msg)=0;
   virtual void terminate(){}
-  virtual shared_ptr<Tparent> shared_from_this() = 0;
+  virtual shared_ptr<Tderived> shared_from_this() = 0;
 
   void do_read_header();
   void do_read_body();
@@ -48,13 +48,13 @@ private:
 template<typename Tderived> inline
 Connection_base<Tderived>::Connection_base(tcp::socket &socket): socket_(move(socket)){}
 
-template<typename Tparent> inline
-void Connection_base<Tparent>::run(){
+template<typename Tderived> inline
+void Connection_base<Tderived>::run(){
   do_read_header();
 }
 
-template<typename Tparent> inline
-void Connection_base<Tparent>::do_read_header(){
+template<typename Tderived> inline
+void Connection_base<Tderived>::do_read_header(){
   read_msg = Message::empty();
   auto self = shared_from_this();
   ba::async_read(socket_, read_msg->get_raw(),[this, self](const bs::error_code& ec, const size_t&bytes){
@@ -72,8 +72,8 @@ void Connection_base<Tparent>::do_read_header(){
 }
 
 
-template<typename Tparent> inline
-void Connection_base<Tparent>::do_read_body(){
+template<typename Tderived> inline
+void Connection_base<Tderived>::do_read_body(){
   auto self = shared_from_this();
   ba::async_read(socket_, read_msg->get_raw(),[this,self](const bs::error_code& ec, const size_t&bytes){
     if(ec) return 0UL;
@@ -91,16 +91,16 @@ void Connection_base<Tparent>::do_read_body(){
   });
 }
 
-template<typename Tparent> inline
-void Connection_base<Tparent>::send(Msg_ptr msg){
+template<typename Tderived> inline
+void Connection_base<Tderived>::send(Msg_ptr msg){
   unique_lock<mutex> lck(msg_write_mtx);
   msg_queue.push_back(msg);
   lck.unlock();
   do_write();
 }
 
-template<typename Tparent> inline
-void Connection_base<Tparent>::do_write(){
+template<typename Tderived> inline
+void Connection_base<Tderived>::do_write(){
   unique_lock<mutex> lck(msg_write_mtx);
   if(msg_queue.empty()|| msg_is_writing) return;
   msg_is_writing = true;
@@ -121,14 +121,14 @@ void Connection_base<Tparent>::do_write(){
   });
 }
 
-template<typename Tparent> inline
-void Connection_base<Tparent>::handle_connection_error(const string &location, const string &error){
+template<typename Tderived> inline
+void Connection_base<Tderived>::handle_connection_error(const string &location, const string &error){
   debug(" *** connection error in %s : %s", location.c_str(), error.c_str());
   close();
 }
 
-template<typename Tparent> inline
-void Connection_base<Tparent>::close(){
+template<typename Tderived> inline
+void Connection_base<Tderived>::close(){
   unique_lock<mutex> lck(socket_close_mtx);
   if(!socket_.is_open()) return;
   socket_.close();
