@@ -32,3 +32,14 @@ Msg_ptr Message::ui_text_command(const string& msg){
 Msg_ptr Message::meta_req(){
   return make(T_META_REQ);
 }
+
+Msg_ptr Message::meta_list_reply(const vector<Metahead> &meta_list){
+  return make(T_META_LIST, K_BODY, to_binary_container(meta_list));
+}
+
+/*
+void f(){
+  vector<Metahead> m;
+  to_binary_container(m);
+}
+*/

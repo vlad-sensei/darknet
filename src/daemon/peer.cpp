@@ -35,6 +35,9 @@ void Peer::process_msg(const Msg_ptr& msg){
   case Message::T_META_REQ:
     handle_meta_req(msg);
     break;
+  case Message::T_META_LIST:
+    handle_meta_list(msg);
+    break;
   default:
     debug("unknown messape type");
   }
@@ -53,5 +56,11 @@ void Peer::handle_chunk_req(const Msg_ptr &msg){
 }
 
 void Peer::handle_meta_req(const Msg_ptr &msg){
-    debug("Has recieved sync req %s", msg);
+  safe_printf("SYNCH_REQ: %s", msg);
+
+}
+
+void Peer::handle_meta_list(const Msg_ptr &msg){
+  debug("META_LIST_REPLY: %s", msg);
+  //save to inventory
 }

@@ -40,12 +40,14 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <array>
 
 #include <boost/asio.hpp>
 
 namespace ba = boost::asio;
 
 #include "glob.h"
+#include "common.h"
 
 class Message_base;
 typedef shared_ptr<Message_base> Msg_base_ptr;
@@ -163,6 +165,22 @@ public:
   inline vector<Id> get_vector_id(const Key_type_t& key){return get_vector<Id>(key);}
   inline unordered_set<Id> get_unordered_set_id(const Key_type_t& key){return get_unordered_set<Id>(key);}
   inline Id get_id(const Key_type_t& key){return get<Id>(key);}
+  inline vector<Metahead> get_vector_metahead(const Key_type_t& key){
+    if(!has_key(key)){
+      handle_troll_input();
+      return vector<Metahead>();
+    }
+    const string& bin = h[key];
+    size_t size = bin.size()/tuple_size<metahead_ser_t>::value;
+    vector<Metahead> res(size);
+    for(size_t i = 0; i<size; i++){
+      metahead_ser_t meta_ser;
+      memcpy(&meta_ser[0], &bin[i], tuple_size<metahead_ser_t>::value);
+      res[i] = deserialize_metahead(meta_ser);
+      }
+
+    return res;
+  }
 
 protected:
 
@@ -177,6 +195,17 @@ protected:
     return res;
   }
 
+  static const string to_binary_container(const vector<Metahead> &container){
+    string res(container.size()*tuple_size<metahead_ser_t>::value,0);
+    size_t offset = 0;
+    for(const auto& e : container){
+      metahead_ser_t e_bin = serialize_metahead(e);
+      memcpy(&res[0]+offset, &e_bin[0], e_bin.size());
+      offset+=sizeof(e);
+    }
+    return res;
+  }
+
   template<typename T>
   inline string to_binary_base(const T& value){return string((char*)&value,sizeof(T));}
   inline string to_binary(const string& value) {return value;}
@@ -186,7 +215,6 @@ protected:
   inline string to_binary(const Id& value){return to_binary_base<Id>(value);}
   inline string to_binary(const vector<Id>& value){return to_binary_container<vector<Id> >(value);}
   inline string to_binary(const unordered_set<Id>& value){return to_binary_container<unordered_set<Id> >(value);}
-
 };
 
 #endif // MESSAGE_BASE_H

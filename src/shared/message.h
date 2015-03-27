@@ -42,6 +42,7 @@ public:
   static Msg_ptr chunk_req(const Id& bid, const unordered_set<Id>& cids);
   static Msg_ptr ui_text_command(const string& msg = "");
   static Msg_ptr meta_req();
+  static Msg_ptr meta_list_reply(const vector<Metahead> &meta_list);
 };
 
 #endif // MESSAGE_H
