@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "glob.h"
+#include <stdint.h>
 
 // ~~ Keccak
 /* Hash function that uses SHA-3, implemented using libcrypto++.
@@ -34,11 +35,21 @@ struct Metabody {
 
 //magnet link
 struct Metahead {
-  Id mid, bid;
-  size_t file_size;
-  string tags;
+  Id mid; //64 byte
+  Id bid; //64 byte
+  uint32_t file_size; //Not size_t becuase it should work on bot raspberry pi and x86
+  string tags; //
 };
 
+//the type of the serialized metahead
+const int MID_WIDTH = sizeof(Id);
+const int BID_WIDTH = sizeof(Id);
+const int FILE_WIDTH = sizeof(uint32_t);
+const int TAGS_WIDTH = 892;
+const int METAHEAD_SIZE = MID_WIDTH + BID_WIDTH + FILE_WIDTH + TAGS_WIDTH;
+typedef array<byte, METAHEAD_SIZE> metahead_ser_t;
 
+metahead_ser_t serialize_metahead(const Metahead& metahead);
+Metahead deserialize_metahead(const metahead_ser_t& meta_ser);
 
 #endif // COMMON_H

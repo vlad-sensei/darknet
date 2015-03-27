@@ -19,6 +19,8 @@ using namespace std;
 //TODO: actually make glob.cpp to not include cryptopp?
 struct hash512_t{
   inline hash512_t(){}
+  inline hash512_t(byte value[]){memcpy(data, value, 8);}
+  inline const uint64_t *get_data() const {return data;}
   inline hash512_t(const string& value){CryptoPP::SHA512().CalculateDigest((byte*)data, (byte*)value.data(), value.size());}
   inline bool operator== (const hash512_t& other)const {return  !memcmp(data, other.data, sizeof(data));}
   inline size_t std_hash() const {return data[0]^data[1]^data[2]^data[3]^data[4]^data[5]^data[6]^data[7];}
@@ -39,6 +41,7 @@ template<> struct hash<hash512_t>{
 typedef hash512_t Id;
 typedef int64_t ts_t; //time_t, different on different platforms
 typedef uint64_t peer_id_t;
+typedef unsigned char byte;
 
 #define DEFAULT_LISTEN_PORT 8453
 #define ID_SIZE 64
