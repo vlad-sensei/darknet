@@ -29,3 +29,14 @@ Msg_ptr Message::chuhk_req(const Id &bid, const unordered_set<Id> &cids){
 Msg_ptr Message::meta_req(){
   return make(T_META_REQ);
 }
+
+Msg_ptr Message::meta_list_reply(const vector<Metahead> &meta_list){
+  return make(T_META_LIST, K_BODY, to_binary_container(meta_list));
+}
+
+/*
+void f(){
+  vector<Metahead> m;
+  to_binary_container(m);
+}
+*/

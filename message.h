@@ -40,6 +40,7 @@ public:
   static Msg_ptr echo(const string& msg = "");
   static Msg_ptr chuhk_req(const Id& bid, const unordered_set<Id>& cids);
   static Msg_ptr meta_req();
+  static Msg_ptr meta_list_reply(const vector<Metahead> &meta_list);
 };
 
 #endif // MESSAGE_H

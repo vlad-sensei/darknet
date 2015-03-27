@@ -47,6 +47,7 @@ const int BID_WIDTH = sizeof(Id);
 const int FILE_WIDTH = sizeof(uint32_t);
 const int TAGS_WIDTH = 892;
 const int METAHEAD_SIZE = MID_WIDTH + BID_WIDTH + FILE_WIDTH + TAGS_WIDTH;
+const int N_METAHEADS = 5;
 typedef array<byte, METAHEAD_SIZE> metahead_ser_t;
 
 metahead_ser_t serialize_metahead(const Metahead& metahead);
