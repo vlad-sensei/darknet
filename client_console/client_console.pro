@@ -10,6 +10,7 @@ INCLUDEPATH += $$PWD/../shared
 LIBS += -lboost_system
 LIBS += -lboost_thread
 LIBS += -lpthread
+LIBS += -lcryptopp
 LIBS += -lreadline
 
 SOURCES += main.cpp \

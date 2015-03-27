@@ -30,22 +30,26 @@ struct Chunk {
 private:
   Chunk();
 };
+
 /*
- *  body chunk protocol
- *  size(int): bid_count N
- *  size(int): cid_count M
- *  size(Id): bid_1
- *  .
- *  .
- *  .
- *  size(Id): bid_N
- *  size(Id): cid_1
- *  .
- *  .
- *  .
- *  size(Id): cid_M
- *
- *
+ *  metabody chunk protocol
+ * +--------------------+
+ * | BID_COUNT [4]      |
+ * +--------------------+
+ * | CID_COUNT [4]      |
+ * +--------------------+
+ * | BID_1 [64]         |
+ * +--------------------+
+ *    ...
+ * +--------------------+
+ * | BID_BID_COUNT [64] |
+ * +--------------------+
+ * | CID_1 [64]         |
+ * +--------------------+
+ *    ...
+ * +--------------------+
+ * | CID_CID_COUNT [64] |
+ * +--------------------+
  */
 //.torrent
 struct Metabody {
