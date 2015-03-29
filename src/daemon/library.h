@@ -19,6 +19,7 @@
 #include "common.h"
 #include "inventory.h"
 
+
 class Library: public Inventory {
 public:
 
@@ -29,13 +30,14 @@ public:
   void upload_file(const string& filename, const string& tags = "");
 
   bool req_file(const Id& mid);
+  vector<Metahead> publish_metaheads(){return published_metaheads;}
 
   void handle_chunk(const Id& bid, const Chunk& chunk);
 
 
 private:
   virtual void req_chunks(const Id& bid, const unordered_set<Id>& cids) = 0; //request chunks
-  bool get_metahead(const Id& mid, Metahead& metahead);
+  bool get_metahead(const Id& mid, Metahead& Metahead);
 
   struct {
     unordered_map<Id, unordered_set<Id> > chunk_reqs; // chunk_req_map[mid] == set of chunks we are waiting for for that file
@@ -45,6 +47,11 @@ private:
     inline bool chunk_req_exists(const Id& bid,const Id& cid){ return (file_req_exists(bid) && chunk_reqs[bid].find(cid) != chunk_reqs[bid].end() );}
     inline bool has_metabody(const Id& bid){return has_metabody_.find(bid) !=has_metabody_.end();}
   } data;
+
+  Metahead m = {Id("a"), Id("a"), 0, "Batman"};
+  Metahead m1 = {Id("b"), Id("b"), 0, "Porn"};
+  Metahead m2 = {Id("c"), Id("c"), 0, "Batman Nude"};
+  vector<Metahead> published_metaheads = { m, m1, m2 };
   rw_mutex chunk_reqs_mtx;
 
 };

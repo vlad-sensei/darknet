@@ -35,8 +35,8 @@ void Peer::process_msg(const Msg_ptr& msg){
   case Message::T_META_REQ:
     handle_meta_req(msg);
     break;
-  case Message::T_META_LIST:
-    handle_meta_list(msg);
+  case Message::T_META_REPLY:
+    handle_meta_reply(msg);
     break;
   default:
     debug("unknown messape type");
@@ -56,11 +56,15 @@ void Peer::handle_chunk_req(const Msg_ptr &msg){
 }
 
 void Peer::handle_meta_req(const Msg_ptr &msg){
-  safe_printf("SYNCH_REQ: %s", msg);
-
+  //debug("SYNCH_REQ: %s", msg->get_string(Message::K_BODY));
+  send_metaheads(core->publish_metaheads());
 }
 
-void Peer::handle_meta_list(const Msg_ptr &msg){
-  debug("META_LIST_REPLY: %s", msg);
+void Peer::handle_meta_reply(const Msg_ptr &msg){
+  debug("META_LIST_REPLY:");
+   vector<Metahead> v = msg->get_vector_metahead(Message::K_BODY);
+   for (unsigned int i = 0; i < v.size(); i++){
+       debug("metahead: %s", v[i].tags);
+     }
   //save to inventory
 }
