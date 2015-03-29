@@ -15,19 +15,19 @@ LIBS += -lreadline
 
 SOURCES += main.cpp \
     ui.cpp \
+    connection.cpp \
     ../shared/common.cpp \
     ../shared/message.cpp \
     ../shared/message_base.cpp \
-    connection.cpp \
     ../shared/connection_initiator_base.cpp
 
 HEADERS += \
     ui.h \
+    connection.h \
     ../shared/common.h \
     ../shared/glob.h \
     ../shared/message.h \
     ../shared/message_base.h \
-    connection.h \
     ../shared/connection_initiator_base.h \
     ../shared/connection_base.h
 

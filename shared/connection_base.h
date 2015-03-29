@@ -17,12 +17,13 @@ namespace bs = boost::system;
 template<typename Tderived>
 class Connection_base {
   Connection_base();
+public:
+  void send(Msg_ptr msg);
 protected:
   Connection_base(tcp::socket& socket);
   virtual ~Connection_base(){}
 
   void run();
-  void send(Msg_ptr msg);
   void close();
 
 private:
@@ -58,7 +59,7 @@ void Connection_base<Tderived>::do_read_header(){
   read_msg = Message::empty();
   auto self = shared_from_this();
   ba::async_read(socket_, read_msg->get_raw(),[this, self](const bs::error_code& ec, const size_t&bytes){
-    if(ec) return 0UL;
+    if(ec) return (size_t)0;
     return Message::HEADER_SIZE-bytes;
   },
   [this,self](const bs::error_code& ec, const size_t&){
@@ -76,7 +77,7 @@ template<typename Tderived> inline
 void Connection_base<Tderived>::do_read_body(){
   auto self = shared_from_this();
   ba::async_read(socket_, read_msg->get_raw(),[this,self](const bs::error_code& ec, const size_t&bytes){
-    if(ec) return 0UL;
+    if(ec) return (size_t)0;
     return read_msg->get_body_size()-bytes;
   },
   [this,self](const bs::error_code& ec, const size_t&){

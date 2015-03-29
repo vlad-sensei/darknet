@@ -16,7 +16,9 @@ public:
   UI(){}
   void run();
 private:
-  inline void handle_new_connection(tcp::socket socket){(void)socket;}
+  void handle_new_connection(tcp::socket socket);
+  void init_readline();
+  void get_text_input();
   Connection_ptr connection;
 };
 
