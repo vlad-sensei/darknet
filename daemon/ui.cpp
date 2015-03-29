@@ -35,7 +35,7 @@ void UI::spawn_client(tcp::socket &socket){
   data.clients[uid]->init();
 }
 
-string UI::process_text_input(string& text_input){
+string UI::process_text_input(const string& text_input){
   istringstream ss(text_input);
   //istream_iterator<string> begin(ss), end;
   //vector<string> args(begin, end;

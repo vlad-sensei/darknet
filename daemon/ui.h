@@ -28,7 +28,7 @@ class UI : Connection_initiator_base {
 public:
   UI();
   void run();
-  string process_text_input(string& text_input);
+  string process_text_input(const string& text_input);
 private:
 
   void handle_new_connection(tcp::socket socket);

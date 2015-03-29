@@ -11,15 +11,6 @@ deque<Chunk> Metabody::to_chunks(){
     // hence bid_count = (cid_count+1)/(cids_per_bid-1) -1  rounded up (geometric sum)
     // TODO: check for possible precision errors
     bid_count = ceil( (double)(cid_count+1)/(double)(cids_per_bid-1));
-    /*int cid_remainder = cid_count + 1 - cids_per_bid;
-    while(cid_remainder > (int)cids_per_bid) {
-        unsigned new_bids = cid_remainder/cids_per_bid;
-        bid_count += new_bids;
-        cid_remainder%=cids_per_bid;
-        cid_remainder+=new_bids;
-    }
-    if(cid_remainder>0) bid_count++;
-    */
     for(size_t i=0; i<bid_count; i++){
       size_t cids_offs = (i+1)*cids_per_bid - bid_count - 1;
       size_t cids_to_copy = (cids_offs + cids_per_bid <= cids.size()) ? cids_per_bid : cids.size()-cids_offs;

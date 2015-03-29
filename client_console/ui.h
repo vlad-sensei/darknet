@@ -10,11 +10,16 @@
 class UI;
 typedef unique_ptr<UI> UI_ptr;
 typedef Connection_base<UI> UI_network;
+class Connection;
+typedef shared_ptr<Connection> Connection_ptr;
+
+extern UI_ptr ui; //might need to rename due to overload
 
 class UI: Connection_initiator_base {
 public:
   UI(){}
   void run();
+  void echo(const string& msg);
 private:
   void handle_new_connection(tcp::socket socket);
   void init_readline();
