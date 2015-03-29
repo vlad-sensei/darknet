@@ -35,39 +35,59 @@ void UI::echo(const string &msg){
 
 // ~~~~~~~~~~~~ text input ~~~~~~~~~~~~
 
+vector<string> command_map;
+vector<string> old_commands;
+
 void UI::get_text_input(){
 
-  init_readline();
+    init_readline();
 
-  safe_printf(" ~~~ welcome to darknet ~~~\n");
+    safe_printf(" ~~~ welcome to darknet ~~~\n");
 
-  //----------ncurses parts------------
-  initscr();
-  raw();
+    //----------ncurses parts------------
+    initscr();
+    //raw();
+    noecho();
+    cbreak();
+    keypad(stdscr, TRUE);
+    int c;
+    string line;
+    int row_no = 1;
+    printw(" ~~~ welcome to darknet ~~~\n");
+    while(1){
+        c = getch(); /* Wait for user input */
+        switch(c){
+        case '\b':
+            line.pop_back();
+            break;
+        case '\e':
+            row_no++;
+            old_commands.push_back(line);
+            break;
+        case '\t':
+            break;
+        case KEY_UP:
+            //line = old_commands.front();
+            line = "ghghgh";
+            break;
+        default:
+            line += c;
+        }
 
-  int c;
-  char* line;
 
-  printw(" ~~~ welcome to darknet ~~~\n");
-  while(1){
-      c = getch(); /* Wait for user input */
-      if(c == '\t'){
-          //const char* linec = line;
-          printw("GGGGGG");
-      }
-      else{
-          line += c;
+        const char* temp = line.c_str();
+        //mvprintw(row_no,0,temp);
+        printw(temp);
+        refresh(); /* Print it on to the real screen */
 
-      }
 
-      refresh(); /* Print it on to the real screen */
-  }
-  endwin();
+    }
+    endwin();
 
 
 
 
-  /*
+    /*
   while(1){
 
     //    rl_bind_key('\t',rl_complete);
@@ -84,11 +104,11 @@ void UI::get_text_input(){
 
       free(line);
 
-      /*
+
       //wait for return message of sent command
-      unique_lock<mutex> lk(connection->m);
-      connection->cv.wait(lk);
-      */
+      //unique_lock<mutex> lk(connection->m);
+      //connection->cv.wait(lk);
+
 
       //handle properly with ncurses
     }else{
@@ -103,7 +123,7 @@ void UI::get_text_input(){
 
 char** cmd_list;
 vector<char*> command_keys;
-vector<string> command_map;
+
 
 void UI::init_readline(){
 
