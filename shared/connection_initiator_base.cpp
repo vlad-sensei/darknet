@@ -21,7 +21,7 @@ void Connection_initiator_base::run(){
 
 void Connection_initiator_base::start_listen(){
   debug("listening to port %s..", get_port());
-  tcp::endpoint endpoint = *resolver_.resolve({"localhost", to_string(get_port())});
+  tcp::endpoint endpoint(tcp::v4(),get_port()); //*resolver_.resolve({"localhost", to_string(get_port())});
   acceptor_.open(endpoint.protocol());
   acceptor_.set_option(tcp::acceptor::reuse_address(true));
   acceptor_.bind(endpoint);
