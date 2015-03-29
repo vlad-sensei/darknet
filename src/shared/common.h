@@ -70,6 +70,8 @@ struct Metahead {
      mid(string((char*)&bid_, sizeof(bid_))+tags_),  bid(bid_), tags(tags_){}
 };
 
+//TODO: remove this
+inline int test_unittest_add(int a, int b){return a+b;}
 
 
 #endif // COMMON_H

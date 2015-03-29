@@ -21,7 +21,11 @@ void Connection_initiator_base::run(){
 
 void Connection_initiator_base::start_listen(){
   debug("listening to port %s..", get_port());
+<<<<<<< HEAD:shared/connection_initiator_base.cpp
   tcp::endpoint endpoint(tcp::v4(),get_port()); //*resolver_.resolve({"localhost", to_string(get_port())});
+=======
+  tcp::endpoint endpoint(tcp::v4(),get_port());// = *resolver_.resolve({"localhost", to_string(get_port())});
+>>>>>>> origin/unittesting_setup:noxnetmain/src/shared/connection_initiator_base.cpp
   acceptor_.open(endpoint.protocol());
   acceptor_.set_option(tcp::acceptor::reuse_address(true));
   acceptor_.bind(endpoint);
