@@ -1,6 +1,7 @@
 #include "library.h"
 Library::Library() {
   debug("initializing Library..");
+  chunkFile("tjena","dommy",CHUNK_SIZE);
 }
 
 

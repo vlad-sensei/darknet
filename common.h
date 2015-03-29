@@ -24,7 +24,7 @@ hash512_t hash512(const string& value);
 struct Chunk {
   string data;
   Id cid;
-  Chunk(string& data_):data(move(data_)), cid(data){}
+  Chunk(string& data_):data(move(data_)), cid(data_){}
   inline bool verify(const Id& cid_)const { return cid_ ==cid;}
   inline size_t size(){return data.size();}
 private:

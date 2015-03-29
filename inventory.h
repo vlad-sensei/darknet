@@ -38,6 +38,10 @@ protected:
   bool get_chunk(const Id& bid, const Id& cid, Chunk &chunk);
   void add_chunk(const Id& bid, const Chunk& chunk);  //take size into account
 
+
+  void chunkFile(char *fullFilePath, char *chunkName, unsigned long chunkSize);
+  void joinFile(char *chunkName, char *fileOutput);
+  int getFileSize(ifstream *file);
 private:
 
   struct {

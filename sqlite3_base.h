@@ -11,6 +11,7 @@
 #include <sqlite3.h>
 
 #include "glob.h"
+#include "common.h"
 
 class Sqlite3_base {
   Sqlite3_base();
