@@ -19,7 +19,7 @@
 #include "glob.h"
 #include "common.h"
 #include "sqlite3_base.h"
-
+#include <sstream>
 
 class Database:protected Sqlite3_base {
 public:
@@ -44,6 +44,8 @@ private:
   //create statements
   C_METAHEADS ="CREATE TABLE IF NOT EXISTS metaheads (mid BLOB PRIMARY KEY,tags BLOB,bid BLOB);",
 
+  C_BID_TABLE1 ="CREATE TABLE IF NOT EXISTS ",
+  C_BID_TABLE2 =" (cid BLOB PRIMARY KEY,data BLOB);",
 
   //IDX_CHAT_MESSAGES_RID = "CREATE INDEX chat_messages_rid_index ON chat_messages (rid)",
 
@@ -72,6 +74,47 @@ protected:
 public:
   //write
   //void add_data(const string& value1, const uint64_t& value2) {exec_s(i_items,value1,value2);}
+
+  void insert_chunk(const Id& bid,const Chunk& chunk){
+      debug("Inserting chunk");
+      stringstream tmp;
+      tmp <<"INSERT INTO ";
+      tmp << "'";
+      tmp << bid;
+      tmp << "'";
+      tmp << " (cid,data) VALUES (?,?);";
+      debug(tmp.str());
+      exec_s(tmp.str(),chunk.cid,chunk.data);
+
+  };
+
+
+  void creat_bid_table(const Id& bid){
+      debug("creat bid_table");
+      stringstream tmp;
+      tmp << C_BID_TABLE1;
+      tmp <<"'";
+      tmp << bid;
+      tmp <<"'";
+      tmp << C_BID_TABLE2;
+      debug(tmp.str());
+      exec_s(tmp.str());
+  };
+
+  void rename_bid_table(const Id& bid1,const Id& bid2){
+      debug("creat bid_table");
+      stringstream tmp;
+      tmp << "ALTER TABLE ";
+      tmp <<"'";
+      tmp << bid1;
+      tmp <<"'";
+      tmp << " RENAME TO ";
+      tmp <<"'";
+      tmp << bid2;
+      tmp <<"';";
+
+      exec_s(tmp.str());
+  };
 
   void add_metahead(const Metahead & metahead) {exec_s(I_METAHEAD,metahead.mid,metahead.tags,metahead.bid);}
 
