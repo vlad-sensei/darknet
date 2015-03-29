@@ -31,3 +31,5 @@ HEADERS += \
     ../shared/connection_initiator_base.h \
     ../shared/connection_base.h
 
+
+unix|win32: LIBS += -lncurses
