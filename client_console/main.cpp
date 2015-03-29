@@ -8,6 +8,7 @@ int main() {
   } catch (exception& e){
     debug(" *** exception : %s", e.what());
   }
+
   debug("terminated");
 
   return 0;

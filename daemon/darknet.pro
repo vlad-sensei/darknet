@@ -15,32 +15,31 @@ LIBS += -lreadline
 INCLUDEPATH += $$PWD/../shared
 
 SOURCES += main.cpp \
-    ../shared/message_base.cpp \
-    ../shared/message.cpp \
     core.cpp \
     peer.cpp \
     ui.cpp \
     library.cpp \
     sqlite3_base.cpp \
     database.cpp \
-    ../shared/common.cpp \
+    ui_client.cpp \
     inventory.cpp \
+    ../shared/common.cpp \
     ../shared/connection_initiator_base.cpp \
-    ui_client.cpp
+    ../shared/message_base.cpp \
+    ../shared/message.cpp \
 
 HEADERS += \
-    ../shared/glob.h \
-    ../shared/message_base.h \
-    ../shared/message.h \
     core.h \
     peer.h \
     ui.h \
     library.h \
     sqlite3_base.h \
     database.h \
-    ../shared/common.h \
+    ui_client.h \
     inventory.h \
+    ../shared/common.h \
     ../shared/connection_base.h \
     ../shared/connection_initiator_base.h \
-    ui_client.h
-
+    ../shared/glob.h \
+    ../shared/message_base.h \
+    ../shared/message.h \

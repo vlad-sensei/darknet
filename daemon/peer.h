@@ -39,7 +39,7 @@ public:
   ~Peer();
   void init();
   inline void echo(const string& echo_msg = "echo_msg") {send(Message::echo(echo_msg));}
-  inline void req_chunks(const Id& bid, const unordered_set<Id>& cids) {send(Message::chuhk_req(bid,cids));}
+  inline void req_chunks(const Id& bid, const unordered_set<Id>& cids) {send(Message::chunk_req(bid,cids));}
 
 private:
   Peer();
