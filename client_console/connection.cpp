@@ -16,7 +16,7 @@ void Connection::process_msg(const Msg_ptr &msg){
 }
 
 void Connection::handle_echo(const Msg_ptr &msg){
-  const string& echo_str = msg->get_string(Message::K_TEXT);
+  const string& echo_str = msg->get_string(Message::K_BODY);
   ui->echo(echo_str);
   /*safe_printf("%s\n",echo_str);
   lock_guard<mutex> lk(m);

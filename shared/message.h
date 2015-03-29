@@ -31,8 +31,7 @@ public:
   enum msg_keys : Key_type_t {
     K_BODY,
     K_BID,
-    K_CIDS,
-    K_TEXT
+    K_CIDS
   }; // header keys
 
   static Msg_ptr empty();
