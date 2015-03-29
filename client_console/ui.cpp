@@ -5,6 +5,8 @@
 #include <ncurses.h>
 
 
+UI_ptr ui;
+
 
 void UI::run(){
 
@@ -26,6 +28,12 @@ void UI::handle_new_connection(tcp::socket socket){
   connection = Connection_ptr(new Connection(socket));
   connection->init();
 }
+
+void UI::echo(const string &msg){
+  safe_printf("%s\n", msg);
+}
+
+// ~~~~~~~~~~~~ text input ~~~~~~~~~~~~
 
 void UI::get_text_input(){
 
@@ -72,15 +80,17 @@ void UI::get_text_input(){
 
       string input(line);
 
-      Msg_ptr cmd_msg = Message::command(input);
-
-      connection->send(cmd_msg);
+      connection->text_command(input);
 
       free(line);
 
-//wait for return message of sent command
+      /*
+      //wait for return message of sent command
       unique_lock<mutex> lk(connection->m);
       connection->cv.wait(lk);
+      */
+
+      //handle properly with ncurses
     }else{
       free(line);
     }
@@ -101,7 +111,7 @@ void UI::init_readline(){
   command_map.push_back("connect");
   command_map.push_back("broadcast");
 
-  for(auto key : command_map) {
+  for(const auto& key : command_map) {
     char* a = new char[key.size()+1];
     a[key.size()] = '\0';
     memcpy(a,key.c_str(),key.size());

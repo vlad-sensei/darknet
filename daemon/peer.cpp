@@ -38,7 +38,7 @@ void Peer::process_msg(const Msg_ptr& msg){
 }
 
 void Peer::handle_echo(const Msg_ptr &msg){
-  const string& text = msg->get_string(Message::K_BODY);
+  const string& text = msg->get_string(Message::K_TEXT);
   safe_printf("ECHO : %s\n", text);
 }
 

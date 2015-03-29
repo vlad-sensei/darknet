@@ -39,7 +39,7 @@ public:
   //static Msg_ptr copy_msg(Msg_ptr other);
   static Msg_ptr echo(const string& msg = "");
   static Msg_ptr chunk_req(const Id& bid, const unordered_set<Id>& cids);
-  static Msg_ptr command(const string& msg = "");
+  static Msg_ptr ui_text_command(const string& msg = "");
 };
 
 #endif // MESSAGE_H

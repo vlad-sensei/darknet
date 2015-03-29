@@ -3,7 +3,7 @@
 
 int main() {
   try{
-    UI_ptr ui = UI_ptr(new UI);
+    ui = UI_ptr(new UI);
     ui->run();
   } catch (exception& e){
     debug(" *** exception : %s", e.what());
