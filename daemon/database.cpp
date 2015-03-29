@@ -14,6 +14,7 @@ void Database::init_db(){
   remove_db(); // for clear for testing
 
   //create tables
+
   //creat table for mids
   exec_s(C_METAHEADS);
 }
@@ -42,3 +43,4 @@ void Database::get_mids_by_tag_pattern(const string& pattern, vector<Id>& mids){
   Result_ptr res = exec_q(Q_MIDS_BY_TAG_PATTERN,pattern);
   while(res->next()) mids.emplace_back(res->get_id(0));
 }
+

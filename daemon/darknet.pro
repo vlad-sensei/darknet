@@ -35,6 +35,7 @@ HEADERS += \
     library.h \
     sqlite3_base.h \
     database.h \
+
     ui_client.h \
     inventory.h \
     ../shared/common.h \

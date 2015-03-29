@@ -14,7 +14,9 @@
  *
  */
 
+
 #include <vector>
+
 
 #include "glob.h"
 #include "common.h"
@@ -40,6 +42,7 @@ private:
   /*
    * remove once there is some code avaible
    * EXAMPLES:
+
    */
   //create statements
   C_METAHEADS ="CREATE TABLE IF NOT EXISTS metaheads (mid BLOB PRIMARY KEY,tags BLOB,bid BLOB);",
@@ -61,6 +64,7 @@ private:
   Q_ALL_METAHEADS = "SELECT mid,tags,bid FROM metaheads;",
 
   Q_METAHEAD = "SELECT tags,bid FROM metaheads WHERE mid=?;",
+
   EMPTY_STRING ="";
 
 protected:
