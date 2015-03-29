@@ -63,6 +63,7 @@ private:
   Q_ALL_METAHEADS = "SELECT mid,tags,bid FROM metaheads;",
 
   Q_METAHEAD = "SELECT tags,bid FROM metaheads WHERE mid=?;",
+
   EMPTY_STRING ="";
 
 protected:
@@ -76,17 +77,33 @@ public:
   //void add_data(const string& value1, const uint64_t& value2) {exec_s(i_items,value1,value2);}
 
   void insert_chunk(const Id& bid,const Chunk& chunk){
-      debug("Inserting chunk");
+      //debug("Inserting chunk");
+      //debug("[hash %s]\n [data %s] \n [hash igen %s]\n",chunk.cid,chunk.data,hash512_t(chunk.data));
       stringstream tmp;
       tmp <<"INSERT INTO ";
       tmp << "'";
       tmp << bid;
       tmp << "'";
       tmp << " (cid,data) VALUES (?,?);";
-      debug(tmp.str());
+      //debug(tmp.str());
       exec_s(tmp.str(),chunk.cid,chunk.data);
 
   };
+
+  string get_chunk_data(const Id& bid,const Id& cid){
+      string ret;
+      string Q_CHUNK_DATA = "SELECT data FROM ? WHERE mid=?;";
+      stringstream tmp;
+      tmp << "SELECT data FROM ";
+      tmp <<"'";
+      tmp << bid;
+      tmp <<"'  WHERE cid=?;";
+      Result_ptr res = exec_q(tmp.str(),cid);
+      if(!res->next())debug("*** erro in get_chunk_data");
+      ret=res->get_string(0);
+
+      return ret;
+  }
 
 
   void creat_bid_table(const Id& bid){

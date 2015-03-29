@@ -24,7 +24,7 @@ hash512_t hash512(const string& value);
 struct Chunk {
   string data;
   Id cid;
-  Chunk(string& data_):data(move(data_)), cid(data_){}
+  Chunk(string& data_):data(move(data_)), cid(data){}
   inline bool verify(const Id& cid_)const { return cid_ ==cid;}
   inline size_t size(){return data.size();}
 private:
@@ -53,6 +53,7 @@ struct Metabody {
   vector<Id> bids,cids; //hash of bids and chunk IDs
   bool append_from_chunk(const Chunk& chunk); //returns false if trolling
   deque<Chunk> create_body_chunks();
+  void update_Id(){bid=Id(string((char*)this,sizeof(Metabody)));}
 private:
   size_t cids_offs=0; //offset for append chunk
 };
