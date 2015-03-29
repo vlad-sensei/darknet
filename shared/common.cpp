@@ -1,7 +1,7 @@
 #include "common.h"
 #include <cmath>
 
-deque<Chunk> Metabody::create_body_chunks(){
+deque<Chunk> Metabody::to_chunks(){
     deque<Chunk> res;
     uint32_t cid_count = cids.size();
     uint32_t bid_count = 0;
