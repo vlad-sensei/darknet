@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
 
+
 <!-- Written by QtCreator 3.1.1, 2015-03-27T14:11:15. -->
 <qtcreator>
  <data>
+
   <variable>ProjectExplorer.Project.ActiveTarget</variable>
   <value type="int">0</value>
  </data>
@@ -56,15 +58,18 @@
   <variable>ProjectExplorer.Project.Target.0</variable>
   <valuemap type="QVariantMap">
 
+
    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Desktop</value>
    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Desktop</value>
    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">{b9ae4e00-1e16-409d-87b6-61578d95e610}</value>
+
    <value type="int" key="ProjectExplorer.Target.ActiveBuildConfiguration">0</value>
    <value type="int" key="ProjectExplorer.Target.ActiveDeployConfiguration">0</value>
    <value type="int" key="ProjectExplorer.Target.ActiveRunConfiguration">0</value>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.0">
 
     <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/ram/build-client_console-Desktop-Debug</value>
+
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
@@ -124,7 +129,9 @@
     <value type="bool" key="Qt4ProjectManager.Qt4BuildConfiguration.UseShadowBuild">true</value>
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.1">
+
     <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/ram/build-client_console-Desktop-Release</value>
+
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
@@ -258,11 +265,13 @@
   <value type="int">1</value>
  </data>
  <data>
+
   <variable>ProjectExplorer.Project.Updater.EnvironmentId</variable>
   <value type="QByteArray">{8dccf249-7779-4583-8cb7-3416b43d7876}</value>
  </data>
  <data>
   <variable>ProjectExplorer.Project.Updater.FileVersion</variable>
   <value type="int">15</value>
+
  </data>
 </qtcreator>
