@@ -39,8 +39,8 @@ protected:
   void add_chunk(const Id& bid, const Chunk& chunk);  //take size into account
 
 
-  void chunkFile(char *fullFilePath, char *chunkName, unsigned long chunkSize);
-  void joinFile(char *chunkName, char *fileOutput);
+  void chunkFile(string fullFilePath, Metabody &metabody);
+  void joinFile(const Metabody &metabody, string fileOutput);
   int getFileSize(ifstream *file);
 private:
 

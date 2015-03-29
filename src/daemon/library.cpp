@@ -1,7 +1,9 @@
 #include "library.h"
 Library::Library() {
   debug("initializing Library..");
-  chunkFile("tjena","dommy",CHUNK_SIZE);
+  Metabody bid;
+  chunkFile("tjena",bid);
+  joinFile(bid,"pdf");
 }
 
 
