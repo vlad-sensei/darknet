@@ -27,12 +27,13 @@ public:
     T_ECHO,
     T_CHUNK_REQ,
     T_META_REQ, //sent by a client requesting meta heads
-    T_META_LIST //message contains a list of metaheads
+    T_META_REPLY //message contains a list of metaheads
   }; // message types
   enum msg_keys : Key_type_t {
     K_BODY,
     K_BID,
-    K_CIDS
+    K_CIDS,
+    K_META_LIST
   }; // header keys
 
   static Msg_ptr empty();
@@ -40,7 +41,7 @@ public:
   static Msg_ptr echo(const string& msg = "");
   static Msg_ptr chuhk_req(const Id& bid, const unordered_set<Id>& cids);
   static Msg_ptr meta_req();
-  static Msg_ptr meta_list_reply(const vector<Metahead> &meta_list);
+  static Msg_ptr meta_reply(const vector<Metahead> &meta_list);
 };
 
 #endif // MESSAGE_H

@@ -37,7 +37,7 @@ struct Metabody {
 struct Metahead {
   Id mid; //64 byte
   Id bid; //64 byte
-  uint32_t file_size; //Not size_t becuase it should work on bot raspberry pi and x86
+  uint32_t file_size; //Not size_t becuase it should work on both raspberry pi and x86
   string tags; //
 };
 

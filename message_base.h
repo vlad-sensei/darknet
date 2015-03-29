@@ -124,6 +124,9 @@ private:
     return res;
   }
 
+  Metahead get(const Key_type_t &key);
+
+
   //TODO: more trollchecks
   template<typename T>
   inline vector<T> get_vector(const Key_type_t& key){
@@ -136,6 +139,20 @@ private:
     vector<T> res(size);
     for(size_t i = 0; i<size; i++)
       memcpy(&res[i],&bin[0]+i*sizeof(T),sizeof(T));
+    return res;
+  }
+
+  template<typename T>
+  inline vector<T> get_vector_(const Key_type_t& key){
+    if(!has_key(key)){
+      handle_troll_input();
+      return vector<T>();
+    }
+    const string& bin = h[key];
+    size_t res_size = bin.size()/binary_size<T>::value;
+    vector<T> res(res_size);
+    for(size_t i = 0; i<res_size; i++)
+      res[i] = get(key);
     return res;
   }
 
@@ -165,22 +182,7 @@ public:
   inline vector<Id> get_vector_id(const Key_type_t& key){return get_vector<Id>(key);}
   inline unordered_set<Id> get_unordered_set_id(const Key_type_t& key){return get_unordered_set<Id>(key);}
   inline Id get_id(const Key_type_t& key){return get<Id>(key);}
-  inline vector<Metahead> get_vector_metahead(const Key_type_t& key){
-    if(!has_key(key)){
-      handle_troll_input();
-      return vector<Metahead>();
-    }
-    const string& bin = h[key];
-    size_t size = bin.size()/tuple_size<metahead_ser_t>::value;
-    vector<Metahead> res(size);
-    for(size_t i = 0; i<size; i++){
-      metahead_ser_t meta_ser;
-      memcpy(&meta_ser[0], &bin[i], tuple_size<metahead_ser_t>::value);
-      res[i] = deserialize_metahead(meta_ser);
-      }
-
-    return res;
-  }
+  inline vector<Metahead> get_vector_metahead(const Key_type_t& key){return get_vector_<Metahead>(key);}
 
 protected:
 
@@ -195,16 +197,13 @@ protected:
     return res;
   }
 
-  static const string to_binary_container(const vector<Metahead> &container){
-    string res(container.size()*tuple_size<metahead_ser_t>::value,0);
-    size_t offset = 0;
-    for(const auto& e : container){
-      metahead_ser_t e_bin = serialize_metahead(e);
-      memcpy(&res[0]+offset, &e_bin[0], e_bin.size());
-      offset+=sizeof(e);
-    }
-    return res;
-  }
+  /* Input a data type as parameter T, the size binary version lies in value
+   * Specialization of this struct is located in the .cpp file
+   */
+  template<typename T>
+  struct binary_size{
+    static const size_t value = sizeof(T);
+  };
 
   template<typename T>
   inline string to_binary_base(const T& value){return string((char*)&value,sizeof(T));}
@@ -215,6 +214,17 @@ protected:
   inline string to_binary(const Id& value){return to_binary_base<Id>(value);}
   inline string to_binary(const vector<Id>& value){return to_binary_container<vector<Id> >(value);}
   inline string to_binary(const unordered_set<Id>& value){return to_binary_container<unordered_set<Id> >(value);}
+  string to_binary(const Metahead& metahead);
+  inline string to_binary(const vector<Metahead>& metaheads){return to_binary_container_(metaheads);}
+
+  template<typename T>
+  const string to_binary_container_(const T& container){
+    string res(container.size() * binary_size<typename T::value_type>::value, 0);
+    for(const auto& e : container){
+        res.append(to_binary(e));
+    }
+    return res;
+  }
 };
 
 #endif // MESSAGE_BASE_H

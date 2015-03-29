@@ -43,7 +43,6 @@ void Core::req_chunks(const Id &bid, const unordered_set<Id> &cids){
   }
 }
 
-
 void Core::start_synch(){
     //Capturing this might lead to a dangling pointer if core is destroyed
     should_sync = true;

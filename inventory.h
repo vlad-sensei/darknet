@@ -28,7 +28,7 @@ protected:
    * and building metabody in progress. Then add metabody to arena.
    * finally compute and return metahead
    */
-  void upload_file(const string& filename, Metahead& metahead);
+  void upload_file(const string& filename, Metahead& Metahead);
 
   bool get_metabody(const Id& bid, Metabody& metabody);
   bool add_metabody(const Metabody& metabody);
