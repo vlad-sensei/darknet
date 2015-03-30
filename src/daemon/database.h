@@ -105,7 +105,7 @@ public:
       return ret;
   }
 
-  bool get_chunk(const Id& bid,Chunk& chunk){
+bool get_chunk(const Id& bid,Chunk& chunk){
       string Q_CHUNK_DATA = "SELECT data FROM ? WHERE mid=?;";
       stringstream tmp;
       tmp << "SELECT data FROM ";
@@ -120,7 +120,6 @@ public:
       chunk.data=res->get_string(0);
       return true;
   }
-
 
   void creat_bid_table(const Id& bid){
       debug("creat bid_table");
