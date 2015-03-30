@@ -1,7 +1,7 @@
 #include "common.h"
 #include <cmath>
 
-deque<Chunk> Metabody::to_chunks(){
+deque<Chunk> Metabody::create_body_chunks(){
     deque<Chunk> res;
     uint32_t cid_count = cids.size();
     uint32_t bid_count = 0;
@@ -11,9 +11,12 @@ deque<Chunk> Metabody::to_chunks(){
     // hence bid_count = (cid_count+1)/(cids_per_bid-1) -1  rounded up (geometric sum)
     // TODO: check for possible precision errors
     bid_count = ceil( (double)(cid_count+1)/(double)(cids_per_bid-1));
-    for(size_t i=0; i<bid_count; i++){
-      size_t cids_offs = (i+1)*cids_per_bid - bid_count - 1;
+    if(bid_count>0) bid_count-=1;
+    for(size_t i=1; i<bid_count; i++){
+      size_t cids_offs = (i)*cids_per_bid - bid_count - 1;
       size_t cids_to_copy = (cids_offs + cids_per_bid <= cids.size()) ? cids_per_bid : cids.size()-cids_offs;
+
+      //debug("\n [cids_offs %s] \n [cids_to_copy %s]\n [sizeof(Id) %s]\n [cids_per_bid %s]\n [CHUNK_SIZE %S]",cids_offs,cids_to_copy,sizeof(Id),cids_per_bid,CHUNK_SIZE);
       string data(cids_to_copy*sizeof(Id),'\0');
       memcpy(&data[0], (char*)&cids[cids_offs], data.size());
       res.emplace_back(data);
@@ -30,11 +33,15 @@ deque<Chunk> Metabody::to_chunks(){
     offs+=sizeof(Id)*bids.size();
     memcpy(&data[offs], (char*)&cids[0], chunk_size-offs);
     res.emplace_front(data);
+    //TODO: do we need this ?
+    this->bid=res[0].cid;
+
     return res;
 }
 
 
 bool Metabody::append_from_chunk(const Chunk& chunk){
+    debug("append_from_chunk \n[bid %s]\n[chunk.cid %s]",bid,chunk.cid);
     size_t offs=0;
     if(bid == chunk.cid){
         uint32_t bid_count;
@@ -48,18 +55,24 @@ bool Metabody::append_from_chunk(const Chunk& chunk){
             debug("*** too many cids or bids");
             return false;
         }
+
         bids.resize(bid_count);
         cids.resize(cid_count);
 
-        memcpy((char*)&bids,&chunk.data[offs],sizeof(Id)*bid_count);
+        memcpy((char*)&bids[0],&chunk.data[offs],sizeof(Id)*bid_count);
         offs+=sizeof(Id)*bid_count;
     }
     if((chunk.data.size()-offs)%sizeof(Id)!=0 ){
         debug("*** extra bytes ?");
         return false;
     }
-    size_t cids_to_copy=(chunk.data.size()-offs)/sizeof(Id);
+
+    size_t cids_to_copy=cids.size();
+
+    //debug("[offs %s]\n[cids_to_copy %s]\n[cids_offs %s]\n",offs,cids_to_copy,cids_offs);
     memcpy((char*)&cids[cids_offs],&chunk.data[offs],cids_to_copy*sizeof(Id));
+
     cids_offs+=cids_to_copy*sizeof(Id);
+
     return true;
 }

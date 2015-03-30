@@ -13,6 +13,7 @@
 */
 
 #define CHUNK_SIZE 524288
+
 #define MAX_CIDS_PER_METABODY 2000
 #define MAX_BIDS_PER_METABODY 30
 
@@ -58,7 +59,9 @@ struct Metabody {
   vector<Id> bids,cids; //hash of bids and chunk IDs
   bool append_from_chunk(const Chunk& chunk); //returns false if trolling
   deque<Chunk> create_body_chunks();
-  void update_Id(){bid=Id(string((char*)this,sizeof(Metabody)));}
+  Metabody(const Id& bid_):bid(bid_){}
+  Metabody() = default;
+  //void update_Id(){bid=Id(string((char*)this,sizeof(Metabody)));}
 private:
   size_t cids_offs=0; //offset for append chunk
 };

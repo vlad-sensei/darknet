@@ -4,7 +4,7 @@
 void Inventory::chunkFile(string fullFilePath, Metabody& metabody) {
         ifstream fileStream;
         fileStream.open(fullFilePath, ios::in | ios::binary);
-        //do need a bid to save chunks under to begin with
+        //TODO: tmp_bid how to save chunks with out bid
         Id tmp_bid("tmp");
         creat_bid_table(tmp_bid);
         int length=getFileSize(&fileStream);
@@ -32,8 +32,8 @@ void Inventory::chunkFile(string fullFilePath, Metabody& metabody) {
             // Close input file stream.
             fileStream.close();
             cout << "Chunking complete! " << counter - 1 << " files created." << endl;
-            metabody.update_Id();
-            rename_bid_table(tmp_bid,metabody.bid);
+
+
         }
         else { cout << "Error opening file!" << endl; }
 }
