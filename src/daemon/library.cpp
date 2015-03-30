@@ -1,9 +1,27 @@
 #include "library.h"
 Library::Library() {
   debug("initializing Library..");
-  Metabody bid;
-  chunkFile("tjena",bid);
-  joinFile(bid,"pdf");
+  Metabody metahead;
+  chunkFile("tjena",metahead);
+//  for(Chunk chunk:metahead.create_body_chunks()){
+//      debug("adding chunk [hash %s]",chunk.cid);
+//      add_chunk(metahead.bid,chunk);
+//  }
+//  Metabody new_bid;
+//  Chunk chunk;
+//  get_chunk(metahead.bid,metahead.bid,chunk);
+//  new_bid.append_from_chunk(chunk);
+
+
+//  debug("metahead %s \n new_bid %s",metahead.bid,new_bid.bid);
+//  for(Id bids:metahead.bids){
+//      debug("reding chunk...");
+//      get_chunk(metahead.bid,bids,chunk);
+//      new_bid.append_from_chunk(chunk);
+//  }
+
+
+  joinFile(metahead,"pdf");
 }
 
 

@@ -4,6 +4,7 @@
 void Inventory::chunkFile(string fullFilePath, Metabody& metabody) {
         ifstream fileStream;
         fileStream.open(fullFilePath, ios::in | ios::binary);
+        //do need a bid to save chunks under to begin with
         Id tmp_bid("tmp");
         creat_bid_table(tmp_bid);
         int length=getFileSize(&fileStream);
@@ -14,23 +15,19 @@ void Inventory::chunkFile(string fullFilePath, Metabody& metabody) {
 
             int counter = 1;
 
-
-
             // Keep reading until end of file
             while (!fileStream.eof()&& length!=fileStream.tellg()) {
+            // creat data string with aprobriate size
             string data(fileStream.tellg()+CHUNK_SIZE<= length ? CHUNK_SIZE:(length-fileStream.tellg()) ,'\0');
 
             fileStream.read((char*)data.data(),data.size());
             Chunk chunk(data);
-            insert_chunk(tmp_bid,chunk);
+            add_chunk(tmp_bid,chunk);
             metabody.cids.emplace_back(chunk.cid);
 
             counter++;
             debug("spliting");
             }
-
-            // Cleanup buffer
-
 
             // Close input file stream.
             fileStream.close();
@@ -67,8 +64,13 @@ void Inventory::joinFile(const Metabody& metabody, string fileOutput) {
 
 
             for(Id cid:metabody.cids){
-                string data=get_chunk_data(metabody.bid,cid);
-                outputfile.write(data.data(),data.size());
+
+                Chunk chunk;
+
+                if(!get_chunk(metabody.bid,cid,chunk)){
+                    debug("*** need to request chunk on the nettwork");
+                }
+                outputfile.write(chunk.data.data(),chunk.data.size());
                 counter++;
             }
 

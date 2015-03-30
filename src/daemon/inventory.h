@@ -35,8 +35,11 @@ protected:
 
   //write chunk to file, chunk_map and database
   //TODO: (optimization) queue ~1000 cids in memory before putting them into database
-  bool get_chunk(const Id& bid, const Id& cid, Chunk &chunk);
-  void add_chunk(const Id& bid, const Chunk& chunk);  //take size into account
+  bool get_chunk(const Id& bid, const Id& cid, Chunk &chunk){
+      chunk.cid=cid;
+      return Database::get_chunk(bid,chunk);
+  }
+  void add_chunk(const Id& bid, const Chunk& chunk){insert_chunk(bid,chunk);}  //take size into account
 
 
   void chunkFile(string fullFilePath, Metabody &metabody);

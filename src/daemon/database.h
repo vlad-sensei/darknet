@@ -105,6 +105,22 @@ public:
       return ret;
   }
 
+  bool get_chunk(const Id& bid,Chunk& chunk){
+      string Q_CHUNK_DATA = "SELECT data FROM ? WHERE mid=?;";
+      stringstream tmp;
+      tmp << "SELECT data FROM ";
+      tmp <<"'";
+      tmp << bid;
+      tmp <<"'  WHERE cid=?;";
+      Result_ptr res = exec_q(tmp.str(),chunk.cid);
+      if(!res->next()){
+          debug("*** no chunk in the data base with this\n [hash %s]\n",chunk.cid);
+          return false;
+      }
+      chunk.data=res->get_string(0);
+      return true;
+  }
+
 
   void creat_bid_table(const Id& bid){
       debug("creat bid_table");
