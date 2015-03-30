@@ -149,10 +149,16 @@ private:
       return vector<T>();
     }
     const string& bin = h[key];
+
+    std::array<char,3072> arr(debug_str<3072>(bin.data()));
     size_t res_size = bin.size()/binary_size<T>::value;
     vector<T> res(res_size);
-    for(size_t i = 0; i<res_size; i++)
-      res[i] = get(key);
+    size_t step_size = binary_size<Metahead>::value;
+    size_t offset = 0;
+    for(size_t i = 0; i<res_size; i++){
+      res[i] = to_data_struct<Metahead>(bin.substr(offset, step_size));
+      offset += step_size;
+  }
     return res;
   }
 
@@ -197,14 +203,6 @@ protected:
     return res;
   }
 
-  /* Input a data type as parameter T, the size binary version lies in value
-   * Specialization of this struct is located in the .cpp file
-   */
-  template<typename T>
-  struct binary_size{
-    static const size_t value = sizeof(T);
-  };
-
   template<typename T>
   inline string to_binary_base(const T& value){return string((char*)&value,sizeof(T));}
   inline string to_binary(const string& value) {return value;}
@@ -219,12 +217,46 @@ protected:
 
   template<typename T>
   const string to_binary_container_(const T& container){
-    string res(container.size() * binary_size<typename T::value_type>::value, 0);
+    string res;
     for(const auto& e : container){
         res.append(to_binary(e));
     }
+
+    debug_str<3072>(res.data());
     return res;
   }
+
+  template<typename T>
+  T to_data_struct(const string& bin){
+    T res;
+    memcpy(&res, bin.data(), binary_size<T>::value);
+    return res;
+  }
+
 };
+
+template<>
+inline Metahead Message_base::to_data_struct(const string& bin){
+  const size_t BID_OFFSET = binary_size<Id>::value;
+  const size_t FILE_SIZE_OFFSET = BID_OFFSET + binary_size<Id>::value;
+  const size_t TAGS_OFFSET = FILE_SIZE_OFFSET + FILE_WIDTH;
+
+  Metahead metahead;
+  //size_t s1 = bin.size();
+  //size_t s2 = binary_size<Metahead>::value;
+
+  if(bin.size()!= binary_size<Metahead>::value){
+    handle_troll_input();
+    return metahead;
+  }
+
+  memcpy(&metahead.mid,       &bin[0],                binary_size<Id>::value );
+  memcpy(&metahead.bid,       &bin[BID_OFFSET],       binary_size<Id>::value);
+  memcpy(&metahead.file_size, &bin[FILE_SIZE_OFFSET], FILE_WIDTH);
+
+  metahead.tags = string((char*) &bin[TAGS_OFFSET], TAGS_WIDTH);
+
+  return metahead;
+ }
 
 #endif // MESSAGE_BASE_H

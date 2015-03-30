@@ -93,10 +93,6 @@ void Message_base::print(){
 }
 
 // ----------- Binary conversion --------------
-template<>
-struct Message_base::binary_size<Metahead>{
-  static const size_t value = METAHEAD_SIZE;
-};
 
 /* Serialization format of metahead:
  *
@@ -119,26 +115,4 @@ string Message_base::to_binary(const Metahead& metahead){
 
   return buffer;
 }
-
-Metahead Message_base::get(const Key_type_t &key){
-  const size_t BID_OFFSET = binary_size<Id>::value;
-  const size_t FILE_SIZE_OFFSET = BID_OFFSET + binary_size<Id>::value;
-  const size_t TAGS_OFFSET = FILE_SIZE_OFFSET + FILE_WIDTH;
-
-  Metahead metahead;
-  if(!has_key(key) || h[key].size()!= binary_size<Metahead>::value){
-    handle_troll_input();
-    return metahead;
-  }
-
-  const string& bin = h[key];
-
-  memcpy(&metahead.mid,       &bin[0],                binary_size<Id>::value );
-  memcpy(&metahead.bid,       &bin[BID_OFFSET],       binary_size<Id>::value);
-  memcpy(&metahead.file_size, &bin[FILE_SIZE_OFFSET], FILE_WIDTH);
-
-  metahead.tags = string((char*) &bin[TAGS_OFFSET], TAGS_WIDTH);
-
-  return metahead;
- }
 

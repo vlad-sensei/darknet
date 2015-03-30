@@ -62,7 +62,7 @@ void Peer::handle_meta_req(const Msg_ptr &msg){
 
 void Peer::handle_meta_reply(const Msg_ptr &msg){
   debug("META_LIST_REPLY:");
-   vector<Metahead> v = msg->get_vector_metahead(Message::K_BODY);
+   vector<Metahead> v = msg->get_vector_metahead(Message::K_META_LIST);
    for (unsigned int i = 0; i < v.size(); i++){
        debug("metahead: %s", v[i].tags);
      }

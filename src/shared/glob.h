@@ -118,6 +118,15 @@ void debug(const std::string& fmt, const Ts&...args){
   safe_printf(fmt.c_str(),args...);
   cout << "\n";
 #endif //DEBUG_ON
+
+}
+
+//Temporary debug function used for inspecting long strings
+template<size_t size>
+array<char, size> debug_str(const string& str){
+  array<char, size> arr;
+  memcpy(arr.data(), str.data(), size);
+  return arr;
 }
 
 #endif // GLOB_H
