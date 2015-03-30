@@ -49,7 +49,7 @@ void Core::start_synch(){
     sync_thread = thread([this](void){
         while(should_sync){
             core->synch_all();
-            std::chrono::seconds sec(1);
+            std::chrono::seconds sec(10);
             std::chrono::duration<int, ratio<1,1>> dur(sec);
             this_thread::sleep_for(dur);
         }

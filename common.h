@@ -42,15 +42,23 @@ struct Metahead {
 };
 
 //the type of the serialized metahead
+const int METAHEAD_SIZE = 1024;
 const int MID_WIDTH = sizeof(Id);
 const int BID_WIDTH = sizeof(Id);
 const int FILE_WIDTH = sizeof(uint32_t);
-const int TAGS_WIDTH = 892;
-const int METAHEAD_SIZE = MID_WIDTH + BID_WIDTH + FILE_WIDTH + TAGS_WIDTH;
-const int N_METAHEADS = 5;
-typedef array<byte, METAHEAD_SIZE> metahead_ser_t;
+const int TAGS_WIDTH = METAHEAD_SIZE - MID_WIDTH - BID_WIDTH - FILE_WIDTH;
 
-metahead_ser_t serialize_metahead(const Metahead& metahead);
-Metahead deserialize_metahead(const metahead_ser_t& meta_ser);
+/* Input a data type as parameter T, the size binary version lies in value
+ * Specialization of this struct is located in the .cpp file
+ */
+template<typename T>
+struct binary_size{
+  static const size_t value = sizeof(T);
+};
+
+template<>
+struct binary_size<Metahead>{
+  static const size_t value = METAHEAD_SIZE;
+};
 
 #endif // COMMON_H

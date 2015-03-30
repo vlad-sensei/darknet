@@ -31,7 +31,7 @@ Msg_ptr Message::meta_req(){
 }
 
 Msg_ptr Message::meta_reply(const vector<Metahead> &metaheads){
-  return make(T_META_REPLY, K_BODY, metaheads);
+  return make(T_META_REPLY, K_META_LIST, metaheads);
 }
 
 /*
