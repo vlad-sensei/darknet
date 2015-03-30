@@ -102,11 +102,11 @@ void Message_base::print(){
  * 0        63|64     127|128    131|132         892
  */
 string Message_base::to_binary(const Metahead& metahead){
-  const size_t BID_OFFSET = binary_size<Id>::value;
-  const size_t FILE_SIZE_OFFSET = BID_OFFSET + binary_size<Id>::value;
+  const size_t BID_OFFSET = binary_size<Id>();
+  const size_t FILE_SIZE_OFFSET = BID_OFFSET + binary_size<Id>();
   const size_t TAGS_OFFSET = FILE_SIZE_OFFSET + FILE_WIDTH;
 
-  string buffer(binary_size<Metahead>::value, 0);
+  string buffer(binary_size<Metahead>(), 0);
 
   memcpy(&buffer[0],                &metahead.mid,        MID_WIDTH);
   memcpy(&buffer[BID_OFFSET],       &metahead.bid,        BID_WIDTH);

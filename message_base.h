@@ -113,6 +113,11 @@ protected:
   unordered_map<Key_type_t, string> h;
 
 private:
+  const int MID_WIDTH = sizeof(Id);
+  const int BID_WIDTH = sizeof(Id);
+  const int FILE_WIDTH = sizeof(uint32_t);
+  const int TAGS_WIDTH = METAHEAD_SIZE - MID_WIDTH - BID_WIDTH - FILE_WIDTH;
+
   template<typename T>
   inline T get(const Key_type_t& key){
     T res = T();
@@ -142,6 +147,10 @@ private:
     return res;
   }
 
+  /*
+   * Retrieves a vector of type T from the message for the given key. Use this
+   * in conjunction with the template function to_data_struct.
+   */
   template<typename T>
   inline vector<T> get_vector_(const Key_type_t& key){
     if(!has_key(key)){
@@ -150,15 +159,15 @@ private:
     }
     const string& bin = h[key];
 
-    std::array<char,3072> arr(debug_str<3072>(bin.data()));
-    size_t res_size = bin.size()/binary_size<T>::value;
-    vector<T> res(res_size);
-    size_t step_size = binary_size<Metahead>::value;
+    size_t step_size = binary_size<T>();
     size_t offset = 0;
+    size_t res_size = bin.size()/step_size;
+    vector<T> res(res_size);
+
     for(size_t i = 0; i<res_size; i++){
       res[i] = to_data_struct<Metahead>(bin.substr(offset, step_size));
       offset += step_size;
-  }
+    }
     return res;
   }
 
@@ -215,6 +224,10 @@ protected:
   string to_binary(const Metahead& metahead);
   inline string to_binary(const vector<Metahead>& metaheads){return to_binary_container_(metaheads);}
 
+  /*
+   * Creates a binary string representing a serialized vector of type T. Uses
+   * to_binary to serialize each element.
+   */
   template<typename T>
   const string to_binary_container_(const T& container){
     string res;
@@ -222,36 +235,47 @@ protected:
         res.append(to_binary(e));
     }
 
-    debug_str<3072>(res.data());
     return res;
   }
 
+  /*
+   * Takes a binary string that represents a serialized instance of type T,
+   * and deserializes it back to a instance of type T. Specilazations of the
+   * template is declared outside the class
+   */
   template<typename T>
   T to_data_struct(const string& bin){
     T res;
-    memcpy(&res, bin.data(), binary_size<T>::value);
+    memcpy(&res, bin.data(), binary_size<T>());
     return res;
   }
 
+  /*
+   * Value holds the length in bytes of the serialized binary string of type T.
+   * Specializations lies outside the class.
+   */
+  template <typename T>
+  inline size_t binary_size(){return sizeof(T);}
 };
 
 template<>
+inline size_t Message_base::binary_size<Metahead>(){return METAHEAD_SIZE;}
+
+template<>
 inline Metahead Message_base::to_data_struct(const string& bin){
-  const size_t BID_OFFSET = binary_size<Id>::value;
-  const size_t FILE_SIZE_OFFSET = BID_OFFSET + binary_size<Id>::value;
+  const size_t BID_OFFSET = binary_size<Id>();
+  const size_t FILE_SIZE_OFFSET = BID_OFFSET + binary_size<Id>();
   const size_t TAGS_OFFSET = FILE_SIZE_OFFSET + FILE_WIDTH;
 
   Metahead metahead;
-  //size_t s1 = bin.size();
-  //size_t s2 = binary_size<Metahead>::value;
 
-  if(bin.size()!= binary_size<Metahead>::value){
+  if(bin.size()!= binary_size<Metahead>()){
     handle_troll_input();
     return metahead;
   }
 
-  memcpy(&metahead.mid,       &bin[0],                binary_size<Id>::value );
-  memcpy(&metahead.bid,       &bin[BID_OFFSET],       binary_size<Id>::value);
+  memcpy(&metahead.mid,       &bin[0],                binary_size<Id>() );
+  memcpy(&metahead.bid,       &bin[BID_OFFSET],       binary_size<Id>());
   memcpy(&metahead.file_size, &bin[FILE_SIZE_OFFSET], FILE_WIDTH);
 
   metahead.tags = string((char*) &bin[TAGS_OFFSET], TAGS_WIDTH);

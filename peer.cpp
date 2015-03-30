@@ -54,7 +54,7 @@ void Peer::handle_chunk_req(const Msg_ptr &msg){
 }
 
 void Peer::handle_meta_req(const Msg_ptr &msg){
-  //debug("SYNCH_REQ: %s", msg->get_string(Message::K_BODY));
+  debug("SYNCH_REQ: %s", msg->get_string(Message::K_BODY));
   send_metaheads(core->publish_metaheads());
 }
 
