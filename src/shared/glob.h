@@ -30,21 +30,27 @@ struct hash512_t{
       return *this;
   }*/
   void tmp_set_data(){
-    data[0]=0xb052a5a45e4579b7;
-    data[1]=0xb91747d3276577ac;
-    data[2]=0x56212ab629a0cca0;
-    data[3]=0x7e152f57bfd783df;
-    data[4]=0x8c0dfb08e32cf98e;
-    data[5]=0x7a4f4eeb87392341;
-    data[6]=0x1cb726d124dbd822;
-    data[7]=0xf482156fd1ad97c6;
+    data[0]=0xf628a784c8a4b793;
+    data[1]=0x4be0e3e91d528b43;
+    data[2]=0x237126807c4810a6;
+    data[3]=0xc306f3ff061eba46;
+    data[4]=0x7c77f583687c7637;
+    data[5]=0x90f7e6119de2e6b6;
+    data[6]=0xccea4b7e1e87931a;
+    data[7]=0x0c09fee3b9001ee5;
   }
 
 private:
   uint64_t data[8];
 };
 
-inline void operator << (ostream& os, const hash512_t& h){ os << setw(16) << setfill('0')  << std::hex << h.data[0] << h.data[1] << h.data[2] << h.data[3] << h.data[4] << h.data[5] << h.data[6] << h.data[7] << std::dec << setw(1);}
+inline void operator << (ostream& os, const hash512_t& h){
+  os << std::hex;
+  for(int i=0; i<8;i++){
+    os << setw(16) << setfill('0') << h.data[i];
+  }
+  os << std::dec;
+}
 
 namespace std {
 template<> struct hash<hash512_t>{
