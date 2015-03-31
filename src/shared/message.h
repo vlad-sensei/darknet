@@ -10,6 +10,7 @@
 #include <memory>
 
 #include "glob.h"
+#include "common.h"
 #include "message_base.h"
 
 class Message;
@@ -26,6 +27,7 @@ public:
     T_NONE,
     T_ECHO,
     T_CHUNK_REQ,
+    T_CHUNK,
     T_UI_TEXT_COMMAND
   }; // message types
   enum msg_keys : Key_type_t {
@@ -39,6 +41,7 @@ public:
   static Msg_ptr echo(const string& msg = "");
   static Msg_ptr chunk_req(const Id& bid, const unordered_set<Id>& cids);
   static Msg_ptr ui_text_command(const string& msg = "");
+  static Msg_ptr chunk(const Id& bid,const Chunk& chunk);
 };
 
 #endif // MESSAGE_H

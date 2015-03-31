@@ -41,7 +41,7 @@ deque<Chunk> Metabody::create_body_chunks(){
 
 
 bool Metabody::append_from_chunk(const Chunk& chunk){
-    debug("append_from_chunk \n[bid %s]\n[chunk.cid %s]",bid,chunk.cid);
+    debug("append_from_chunk");// \n[bid %s]\n[chunk.cid %s]",bid,chunk.cid);
     size_t offs=0;
     if(bid == chunk.cid){
         uint32_t bid_count;

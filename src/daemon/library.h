@@ -32,6 +32,7 @@ public:
 
   void handle_chunk(const Id& bid, const Chunk& chunk);
 
+  void run_test();
 
 private:
   virtual void req_chunks(const Id& bid, const unordered_set<Id>& cids) = 0; //request chunks
@@ -42,6 +43,9 @@ private:
     unordered_set<Id> has_metabody_; //rename?
 
     inline bool file_req_exists(const Id& bid){ return chunk_reqs.find(bid) != chunk_reqs.end();}
+    inline bool file_req_exists_and_not_empty(const Id& bid){
+      return chunk_reqs.find(bid) != chunk_reqs.end() && !chunk_reqs[bid].empty();
+    }
     inline bool chunk_req_exists(const Id& bid,const Id& cid){ return (file_req_exists(bid) && chunk_reqs[bid].find(cid) != chunk_reqs[bid].end() );}
     inline bool has_metabody(const Id& bid){return has_metabody_.find(bid) !=has_metabody_.end();}
   } data;
