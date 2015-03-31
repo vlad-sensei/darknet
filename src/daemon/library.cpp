@@ -1,22 +1,6 @@
 #include "library.h"
 Library::Library() {
   debug("initializing Library..");
-//  Metabody metabody;
-//  chunkFile("tjena",metabody);
-//  deque<Chunk> chunks=metabody.create_body_chunks();
-//  rename_bid_table(Id("tmp"),metabody.bid);
-//  for(Chunk chunk:chunks){
-//      debug("adding chunk\n[hash %s]\n[metahead %s]",chunk.cid,metabody.bid);
-//      add_chunk(metabody.bid,chunk);
-//  }
-//  Metabody new_bid(metabody.bid);
-//  Chunk chunk;
-//  get_chunk(metabody.bid,metabody.bid,chunk);
-//  new_bid.append_from_chunk(chunk);
-//  debug("size %s",new_bid.cids.size());
-
-//  joinFile(new_bid,"pdf");
-  debug("size %s",sizeof(Id));
 }
 
 
