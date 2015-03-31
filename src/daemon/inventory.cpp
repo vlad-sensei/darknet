@@ -50,12 +50,11 @@ int Inventory::getFileSize(ifstream *file) {
 bool Inventory::get_file(const Id& bid, const string& dest_path){
 
   Chunk chunk;
-  Metabody metabody;
-  metabody(bid);
+  Metabody metabody(bid);
   //TODO: get more then one chunk to metabody
   get_chunk(bid,bid,chunk);
 
-  bid.append_from_chunk(chunk);
+  metabody.append_from_chunk(chunk);
 
   joinFile(metabody,dest_path);
 
@@ -72,7 +71,7 @@ void Inventory::upload_file(const string& filename, Metahead& metahead){
     debug("adding chunk\n[hash %s]\n[metahead %s]",chunk.cid,metabody.bid);
     add_chunk(metabody.bid,chunk);
   }
-
+  metahead.bid=metabody.bid;
 
 }
 
