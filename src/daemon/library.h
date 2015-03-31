@@ -48,9 +48,9 @@ private:
     inline bool has_metabody(const Id& bid){return has_metabody_.find(bid) !=has_metabody_.end();}
   } data;
 
-  Metahead m = {Id("a"), Id("a"), 0, "Batman"};
-  Metahead m1 = {Id("b"), Id("b"), 0, "Porn"};
-  Metahead m2 = {Id("c"), Id("c"), 0, "Batman Nude"};
+  Metahead m = Metahead(Id("a"), "Batman");
+  Metahead m1 = Metahead(Id("b"), "Spiderman");
+  Metahead m2 = Metahead(Id("c"), "Pop eye");
   vector<Metahead> published_metaheads = { m, m1, m2 };
   rw_mutex chunk_reqs_mtx;
 

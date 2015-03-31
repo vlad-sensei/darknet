@@ -115,8 +115,7 @@ protected:
 private:
   const int MID_WIDTH = sizeof(Id);
   const int BID_WIDTH = sizeof(Id);
-  const int FILE_WIDTH = sizeof(uint32_t);
-  const int TAGS_WIDTH = METAHEAD_SIZE - MID_WIDTH - BID_WIDTH - FILE_WIDTH;
+  const int TAGS_WIDTH = METAHEAD_SIZE - MID_WIDTH - BID_WIDTH;
 
   template<typename T>
   inline T get(const Key_type_t& key){
@@ -251,7 +250,7 @@ protected:
   }
 
   /*
-   * Value holds the length in bytes of the serialized binary string of type T.
+   * Returns the length in bytes of the serialized binary string of type T.
    * Specializations lies outside the class.
    */
   template <typename T>
@@ -264,8 +263,7 @@ inline size_t Message_base::binary_size<Metahead>(){return METAHEAD_SIZE;}
 template<>
 inline Metahead Message_base::to_data_struct(const string& bin){
   const size_t BID_OFFSET = binary_size<Id>();
-  const size_t FILE_SIZE_OFFSET = BID_OFFSET + binary_size<Id>();
-  const size_t TAGS_OFFSET = FILE_SIZE_OFFSET + FILE_WIDTH;
+  const size_t TAGS_OFFSET = BID_OFFSET + binary_size<Id>();
 
   Metahead metahead;
 
@@ -276,7 +274,6 @@ inline Metahead Message_base::to_data_struct(const string& bin){
 
   memcpy(&metahead.mid,       &bin[0],                binary_size<Id>() );
   memcpy(&metahead.bid,       &bin[BID_OFFSET],       binary_size<Id>());
-  memcpy(&metahead.file_size, &bin[FILE_SIZE_OFFSET], FILE_WIDTH);
 
   metahead.tags = string((char*) &bin[TAGS_OFFSET], TAGS_WIDTH);
 

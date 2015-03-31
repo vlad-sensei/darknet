@@ -51,7 +51,7 @@ typedef unsigned char byte;
 #define DEFAULT_UI_LISTEN_PORT 8888
 #define ID_SIZE 64
 #define METAHEAD_SIZE 1024
-#define SYNC false
+#define SYNC true
 
 #define DEFAULT_DATABASE_PATH "test.db"
 
