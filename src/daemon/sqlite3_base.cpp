@@ -38,3 +38,7 @@ Id Sqlite3_base::Result::get_id(const unsigned& pos){
 ts_t Sqlite3_base::Result::get_ts_t(const unsigned &pos){
   return sqlite3_column_int64(stmt_,pos);
 }
+
+size_t Sqlite3_base::Result::get_size_t(const unsigned &pos){
+  return (size_t)sqlite3_column_int64(stmt_,pos);
+}

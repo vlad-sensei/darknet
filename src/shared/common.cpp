@@ -1,7 +1,17 @@
 #include "common.h"
 #include <cmath>
 
-deque<Chunk> Metabody::create_body_chunks(){
+bool Chunk::set_data(string &data_){
+  if(data_.size()>CHUNK_SIZE) {
+    debug(" *** data.size()>CHUNK_SIZE");
+    return false;
+  }
+  data = move(data_);
+  cid = Id(data);
+  return true;
+}
+
+deque<Chunk> Metabody::to_chunks(){
     deque<Chunk> res;
     uint32_t cid_count = cids.size();
     uint32_t bid_count = 0;

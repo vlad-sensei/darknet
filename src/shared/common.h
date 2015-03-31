@@ -12,7 +12,8 @@
  * the result is moved into the return value.
 */
 
-#define CHUNK_SIZE 524288
+//#define CHUNK_SIZE 524288UL
+const size_t CHUNK_SIZE = 1 << 19;
 
 #define MAX_CIDS_PER_METABODY 2000
 #define MAX_BIDS_PER_METABODY 30
@@ -22,12 +23,14 @@ hash512_t hash512(const string& value);
 /* Prints a hash_t using the debug function.*/
 //void debug_hash512(const hash_t&);
 
+//TODO: make cid/data private
 struct Chunk {
   string data;
   Id cid;
   Chunk(string& data_):data(move(data_)), cid(data){}
-  inline bool verify(const Id& cid_)const { return cid_ ==cid;}
-  inline size_t size(){return data.size();}
+  bool set_data(string& data_);
+  inline bool verify(const Id& cid_) const { return cid_ ==cid;}
+  inline size_t size() const {return data.size();}
   Chunk() = default;
 private:
 
@@ -58,7 +61,7 @@ struct Metabody {
   Id bid; //hash of the content.
   vector<Id> bids,cids; //hash of bids and chunk IDs
   bool append_from_chunk(const Chunk& chunk); //returns false if trolling
-  deque<Chunk> create_body_chunks();
+  deque<Chunk> to_chunks();
   Metabody(const Id& bid_):bid(bid_){}
   Metabody() = default;
   //void update_Id(){bid=Id(string((char*)this,sizeof(Metabody)));}

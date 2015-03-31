@@ -43,15 +43,16 @@ private:
    */
   //create statements
   C_METAHEADS ="CREATE TABLE IF NOT EXISTS metaheads (mid BLOB PRIMARY KEY,tags BLOB,bid BLOB);",
+  C_CHUNKS = "CREATE TABLE IF NOT EXISTS chunks (bid BLOB, cid BLOB, size UNSIGNED BIGINT, slot UNSIGNED BIGINT);",
 
-  C_BID_TABLE1 ="CREATE TABLE IF NOT EXISTS ",
-  C_BID_TABLE2 =" (cid BLOB PRIMARY KEY,data BLOB);",
+  IDX_CHUNKS_BID = "CREATE INDEX idx_chunks_bid ON chunks (bid)",
+  IDX_CHUNKS_BID_CID = "CREATE UNIQUE INDEX idx_chunks_bid_cid ON chunks (bid,cid)",
 
-  //IDX_CHAT_MESSAGES_RID = "CREATE INDEX chat_messages_rid_index ON chat_messages (rid)",
 
   //insert statement
 
   I_METAHEAD = "INSERT INTO metaheads (mid,tags,bid) VALUES (?,?,?);",
+  I_CHUNK = "INSERT INTO chunk (bid,cid,size,slot) VALUES (?,?,?,?)",
 
   //update
 
@@ -61,8 +62,8 @@ private:
 
   Q_MIDS_BY_TAG_PATTERN = "SELECT mid FROM metaheads WHERE tags LIKE '%' || ? || '%';",
   Q_ALL_METAHEADS = "SELECT mid,tags,bid FROM metaheads;",
-
   Q_METAHEAD = "SELECT tags,bid FROM metaheads WHERE mid=?;",
+  Q_CHUNK = "SELECT size,slot FROM chunks WHERE bid=? AND cid=?;",
 
   EMPTY_STRING ="";
 
@@ -75,87 +76,17 @@ protected:
 public:
   //write
   //void add_data(const string& value1, const uint64_t& value2) {exec_s(i_items,value1,value2);}
+protected:
 
-  void insert_chunk(const Id& bid,const Chunk& chunk){
-      //debug("Inserting chunk");
-      //debug("[hash %s]\n [data %s] \n [hash igen %s]\n",chunk.cid,chunk.data,hash512_t(chunk.data));
-      stringstream tmp;
-      tmp <<"INSERT INTO ";
-      tmp << "'";
-      tmp << bid;
-      tmp << "'";
-      tmp << " (cid,data) VALUES (?,?);";
-      //debug(tmp.str());
-      exec_s(tmp.str(),chunk.cid,chunk.data);
-
-  };
-
-  string get_chunk_data(const Id& bid,const Id& cid){
-      string ret;
-      string Q_CHUNK_DATA = "SELECT data FROM ? WHERE mid=?;";
-      stringstream tmp;
-      tmp << "SELECT data FROM ";
-      tmp <<"'";
-      tmp << bid;
-      tmp <<"'  WHERE cid=?;";
-      Result_ptr res = exec_q(tmp.str(),cid);
-      if(!res->next())debug("*** erro in get_chunk_data");
-      ret=res->get_string(0);
-
-      return ret;
-  }
-
-bool get_chunk(const Id& bid,Chunk& chunk){
-      string Q_CHUNK_DATA = "SELECT data FROM ? WHERE mid=?;";
-      stringstream tmp;
-      tmp << "SELECT data FROM ";
-      tmp <<"'";
-      tmp << bid;
-      tmp <<"'  WHERE cid=?;";
-      Result_ptr res = exec_q(tmp.str(),chunk.cid);
-      if(!res->next()){
-          debug("*** no chunk in the data base with this\n [hash %s]\n",chunk.cid);
-          return false;
-      }
-      chunk.data=res->get_string(0);
-      return true;
-  }
-
-  void creat_bid_table(const Id& bid){
-      debug("creat bid_table");
-      stringstream tmp;
-      tmp << C_BID_TABLE1;
-      tmp <<"'";
-      tmp << bid;
-      tmp <<"'";
-      tmp << C_BID_TABLE2;
-      debug(tmp.str());
-      exec_s(tmp.str());
-  };
-
-  void rename_bid_table(const Id& bid1,const Id& bid2){
-      debug("creat bid_table");
-      stringstream tmp;
-      tmp << "ALTER TABLE ";
-      tmp <<"'";
-      tmp << bid1;
-      tmp <<"'";
-      tmp << " RENAME TO ";
-      tmp <<"'";
-      tmp << bid2;
-      tmp <<"';";
-
-      exec_s(tmp.str());
-  };
-
+  void add_chunk(const Id& bid, const Id& cid, const size_t& size, const size_t& slot){exec_s(I_CHUNK,bid,cid,size,slot);}
   void add_metahead(const Metahead & metahead) {exec_s(I_METAHEAD,metahead.mid,metahead.tags,metahead.bid);}
 
   //read
-  //void get_data(const uint64_t& ref_id, vector<uint64_t>& id, vector<string>& value1, vector<uint64_t>& value2);
   void get_all_metaheads(vector<Metahead>& metaheads);
 
   bool get_metahead(const Id &mid, Metahead& metahead);
   void get_mids_by_tag_pattern(const string& ref_pettern, vector<Id>& id);
+  bool get_chunk(const Id& bid, const Id& cid, size_t& size, size_t& slot);
 
 };
 
