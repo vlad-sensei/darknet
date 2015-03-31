@@ -18,6 +18,7 @@ void Library::run_test_uploader(){
 void Library::run_test_downloader(){
   Id bid;
   bid.tmp_set_data();
+  Database::creat_bid_table(bid);
   data.chunk_reqs[bid]={bid};
   req_chunks(bid,data.chunk_reqs[bid]);
 
