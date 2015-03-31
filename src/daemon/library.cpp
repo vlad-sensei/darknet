@@ -11,22 +11,15 @@ void Library::run_test_uploader(){
   search("tjena",mids);
   Metahead metahead;
   get_metahead(mids[0],metahead);
-  req_file(metahead.mid);
-  Chunk chunk;
-  get_chunk(metahead.bid,metahead.bid,chunk);
-  handle_chunk(metahead.bid,chunk);
-  Metabody metabody;
-  get_metabody(metahead.bid,metabody);
-  for(Id cid:metabody.cids){
-    //debug("cid %s",cid);
-    get_chunk(metabody.bid,cid,chunk);
-    handle_chunk(metabody.bid,chunk);
-  }
-
+  debug("[bid %s]",metahead.bid);
 }
 
 
 void Library::run_test_downloader(){
+  Id bid;
+  bid.tmp_set_data();
+  data.chunk_reqs[bid]={bid};
+  req_chunks(bid,data.chunk_reqs[bid]);
 
 }
 
@@ -101,6 +94,8 @@ bool Library::req_file(const Id& mid){
   }
   //debug("req_file with:\n[mid %s]\n[bid %s]",mid,metahead.bid);
   data.chunk_reqs[metahead.bid]={metahead.bid};
+  debug("*** TODO: check if file is on local pc");
+  req_chunks(metahead.bid,data.chunk_reqs[metahead.bid]);
   return true;
 }
 

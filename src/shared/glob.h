@@ -9,6 +9,7 @@ using namespace std;
 #include <cinttypes>
 #include <iostream>
 #include "cryptopp/sha.h"
+#include <iomanip>
 
 /* Example usage:
   Id id1(""), id2("The quick brown fox jumps over the lazy dog"), id3("The quick brown fox jumps over the lazy dog."), id4("");
@@ -28,11 +29,22 @@ struct hash512_t{
       memcpy(data,blob.data(),sizeof(uint64_t)*8);
       return *this;
   }*/
+  void tmp_set_data(){
+    data[0]=0xb052a5a45e4579b7;
+    data[1]=0xb91747d3276577ac;
+    data[2]=0x56212ab629a0cca0;
+    data[3]=0x7e152f57bfd783df;
+    data[4]=0x8c0dfb08e32cf98e;
+    data[5]=0x7a4f4eeb87392341;
+    data[6]=0x1cb726d124dbd822;
+    data[7]=0xf482156fd1ad97c6;
+  }
+
 private:
   uint64_t data[8];
 };
 
-inline void operator << (ostream& os, const hash512_t& h){ os << std::hex << h.data[0] << h.data[1] << h.data[2] << h.data[3] << h.data[4] << h.data[5] << h.data[6] << h.data[7] << std::dec;}
+inline void operator << (ostream& os, const hash512_t& h){ os << setw(16) << setfill('0')  << std::hex << h.data[0] << h.data[1] << h.data[2] << h.data[3] << h.data[4] << h.data[5] << h.data[6] << h.data[7] << std::dec << setw(1);}
 
 namespace std {
 template<> struct hash<hash512_t>{
