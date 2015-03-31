@@ -45,8 +45,18 @@ bool Inventory::get_file(const Id& bid, const string& dest_path){
 bool Inventory::get_chunk(const Id &bid, const Id &cid, Chunk &chunk){
   size_t size, slot;
   if(!Database::get_chunk(bid,cid,size,slot)) return false;
+  debug("got chunk from database");
   if(!read_from_arena_slot(slot,size,chunk)) return false;
+  debug("got chunk from arena");
   if(!chunk.verify(cid)) return false;
+  debug("verifyd chunk");
+  return true;
+}
+bool Inventory::add_chunk(const Id &bid, const Chunk &chunk){
+  size_t idx;
+  if (!write_to_arena_slot(chunk.data,idx)) return false;
+  //TODO: check if in database
+  Database::add_chunk(bid,chunk.cid,chunk.size(),idx);
   return true;
 }
 
@@ -59,12 +69,12 @@ bool Inventory::upload_file(const string& filename, Metahead& metahead){
 
   file.seekg(0,ios::end);
   file_size_t file_size = file.tellg();
-  file.seekg(ios::beg);
+  file.seekg(0,ios::beg);
 
   unordered_map<Id, pair<size_t, size_t> > cids; // cids[Id] = {slot, size} to ensure to not to write chunks twice
 
   // Keep reading until end of file
-  while ((int)file_size<file.tellg()) {
+  while (file.tellg()<(int)file_size) {
     // creat data string with aprobriate size
     const file_size_t& bytes_to_read = ((file_size_t)file.tellg() + CHUNK_SIZE <= file_size) ? CHUNK_SIZE : (file_size_t)(file_size-file.tellg());
 
@@ -98,11 +108,11 @@ bool Inventory::upload_file(const string& filename, Metahead& metahead){
   //TODO: use BEGIN; .. COMMIT;
   for(size_t i = 0; i<metabody_chunks.size(); i++){
     const Id& cid = metabody_chunks[i].cid;
-    Database::add_chunk(metabody.bid, cid, cids[cid].first, cids[cid].second);
+    Database::add_chunk(metabody.bid, cid, cids[cid].second, cids[cid].first);
   }
   for(size_t i = 0; i < metabody.cids.size(); i++){
     const Id& cid = metabody.cids[i];
-    Database::add_chunk(metabody.bid, cid, cids[cid].first, cids[cid].second);
+    Database::add_chunk(metabody.bid, cid, cids[cid].second, cids[cid].first);
   }
   metahead.bid = metabody_chunks[0].cid;
   return true;
@@ -115,7 +125,7 @@ bool Inventory::add_new_arena_slots(const size_t &num){
   string buff(CHUNK_SIZE, '\0');
   for(size_t i = 0; i<num; i++){
     data.arena.write(buff.data(),buff.size());
-    data.free_slots.emplace(++data.arena_slots_size);
+    data.free_slots.emplace(data.arena_slots_size++);
   }
   return true;
 }
@@ -126,19 +136,24 @@ bool Inventory::write_to_arena_slot(const string &raw_data, size_t &idx){
     debug(" *** no free slots avaible in arena");
     return false;
   }
-  if(raw_data.size()>=CHUNK_SIZE) {
+  if(raw_data.size()>CHUNK_SIZE) {
     debug( " *** raw_data size is bigger than CHUNK_SIZE");
     return false;
   }
+
   idx = *data.free_slots.begin();
   data.free_slots.erase(idx);
+  //TODO: overfllow!!!
   data.arena.seekp(idx*CHUNK_SIZE);
+
   data.arena.write(raw_data.data(), raw_data.size());
+  //debug("write to arena:\n[arena %s]\n[size %s]\n[substring %s]",idx,raw_data.size(),raw_data);
+  data.arena.flush();
   return true;
 }
 
 bool Inventory::read_from_arena_slot(const size_t &idx, const size_t &chunk_size, Chunk &chunk){
-  if(chunk_size>=CHUNK_SIZE){
+  if(chunk_size>CHUNK_SIZE){
     debug(" *** chunk_size>=CHUNK_SIZE");
     return false;
   }
@@ -148,8 +163,14 @@ bool Inventory::read_from_arena_slot(const size_t &idx, const size_t &chunk_size
     return false;
   }
   ifstream arena(DEFAULT_ARENA_PATH);
+  //TODO overflow!!!
   arena.seekg(idx*CHUNK_SIZE);
+
+
+
   string raw_data(chunk_size, '\0');
   arena.read(&raw_data[0],chunk_size);
+  //debug("read from arena:\n[arena %s]\n[size %s]\n[substring %s]",idx,chunk_size,raw_data);
   return chunk.set_data(raw_data);
 }
+

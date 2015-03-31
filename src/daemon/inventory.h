@@ -50,7 +50,7 @@ protected:
   bool add_metabody(const Metabody& metabody);
 
   //write chunk to file, chunk_map and database
-  void add_chunk(const Id& bid, const Chunk& chunk);  //take size into account
+  bool add_chunk(const Id& bid, const Chunk& chunk);  //take size into account
 
 private:
   bool add_new_arena_slots(const size_t& num = 1);

@@ -6,34 +6,43 @@ Library::Library() {
 }
 
 void Library::run_test_uploader(){
-  upload_file("tjena","tjena:pdf");
+  if(upload_file("tjena","tjena:pdf")){
+    debug("upload return true");
+  }
+
+
   vector<Id> mids;
   search("tjena",mids);
   Metahead metahead;
   get_metahead(mids[0],metahead);
+//  debug("[bid %s]",metahead.bid);
   debug("[bid %s]",metahead.bid);
+  if(get_file(metahead.bid,"pdf")){
+    debug("get_file return true");
+  }else{
+    debug("no file built");
+  }
 }
 
 
 void Library::run_test_downloader(){
   Id bid;
   bid.tmp_set_data();
-  Database::creat_bid_table(bid);
   data.chunk_reqs[bid]={bid};
   req_chunks(bid,data.chunk_reqs[bid]);
 
 }
 
-void Library::upload_file(const string& filename, const string& tags){
+bool Library::upload_file(const string& filename, const string& tags){
   /*
    * TODO: do properly, in other words when Inventory is done
    * What we have now is temporary until then
    */
 
-  ifstream in(filename, std::ifstream::ate | std::ifstream::binary);
   Metahead metahead(hash512_t(filename),tags);
-  Inventory::upload_file(filename,metahead);
+  if(!Inventory::upload_file(filename,metahead))return false;
   add_metahead(metahead);
+  return true;
 }
 
 void Library::search(const string& pattern, vector<Id>& mids){

@@ -20,10 +20,9 @@ deque<Chunk> Metabody::to_chunks(){
     // bid_count = ceil((cid_count +1)*S) - 1, where S = a+a^2+..a^inf, where 0 < a = 1/cids_per_bid < 1
     // hence bid_count = (cid_count+1)/(cids_per_bid-1) -1  rounded up (geometric sum)
     // TODO: check for possible precision errors
-    bid_count = ceil( (double)(cid_count+1)/(double)(cids_per_bid-1));
-    if(bid_count>0) bid_count-=1;
-    for(size_t i=1; i<bid_count; i++){
-      size_t cids_offs = (i)*cids_per_bid - bid_count - 1;
+    bid_count = ceil( (double)(cid_count+1)/(double)(cids_per_bid-1))-1;
+    for(size_t i=0; i<bid_count; i++){
+      size_t cids_offs = (i+1)*cids_per_bid - bid_count - 1;
       size_t cids_to_copy = (cids_offs + cids_per_bid <= cids.size()) ? cids_per_bid : cids.size()-cids_offs;
 
       //debug("\n [cids_offs %s] \n [cids_to_copy %s]\n [sizeof(Id) %s]\n [cids_per_bid %s]\n [CHUNK_SIZE %S]",cids_offs,cids_to_copy,sizeof(Id),cids_per_bid,CHUNK_SIZE);

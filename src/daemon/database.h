@@ -52,7 +52,7 @@ private:
   //insert statement
 
   I_METAHEAD = "INSERT INTO metaheads (mid,tags,bid) VALUES (?,?,?);",
-  I_CHUNK = "INSERT INTO chunk (bid,cid,size,slot) VALUES (?,?,?,?)",
+  I_CHUNK = "INSERT INTO chunks (bid,cid,size,slot) VALUES (?,?,?,?)",
 
   //update
 
