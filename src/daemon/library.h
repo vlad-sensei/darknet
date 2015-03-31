@@ -32,7 +32,8 @@ public:
 
   void handle_chunk(const Id& bid, const Chunk& chunk);
 
-  void run_test();
+  void run_test_uploader();
+  void run_test_downloader();
 
 private:
   virtual void req_chunks(const Id& bid, const unordered_set<Id>& cids) = 0; //request chunks
