@@ -16,6 +16,9 @@ void Database::init_db(){
   //create tables
   //creat table for mids
   exec_s(C_METAHEADS);
+  exec_s(C_CHUNKS);
+  exec_s(IDX_CHUNKS_BID);
+  exec_s(IDX_CHUNKS_BID_CID);
 }
 
 void Database::get_all_metaheads(vector<Metahead>& metaheads){
@@ -37,8 +40,15 @@ bool Database::get_metahead(const Id& mid, Metahead& metahead){
   return true;
 }
 
-
 void Database::get_mids_by_tag_pattern(const string& pattern, vector<Id>& mids){
   Result_ptr res = exec_q(Q_MIDS_BY_TAG_PATTERN,pattern);
   while(res->next()) mids.emplace_back(res->get_id(0));
+}
+
+bool Database::get_chunk(const Id &bid, const Id &cid, size_t &size, size_t &slot){
+  Result_ptr res = exec_q(Q_CHUNK, bid, cid);
+  if(!res->next()) return false;
+  size = res->get_size_t(0);
+  slot = res->get_size_t(1);
+  return true;
 }

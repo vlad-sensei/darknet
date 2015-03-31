@@ -1,50 +1,10 @@
 #include "inventory.h"
 
-
-void Inventory::chunkFile(string fullFilePath, Metabody& metabody) {
-  ifstream fileStream;
-  fileStream.open(fullFilePath, ios::in | ios::binary);
-  //TODO: tmp_bid how to save chunks with out bid
-  Id tmp_bid("tmp");
-  creat_bid_table(tmp_bid);
-  int length=getFileSize(&fileStream);
-
-
-  // File open a success
-  if (fileStream.is_open()) {
-
-    int counter = 1;
-
-    // Keep reading until end of file
-    while (!fileStream.eof()&& length!=fileStream.tellg()) {
-      // creat data string with aprobriate size
-      string data(fileStream.tellg()+CHUNK_SIZE<= length ? CHUNK_SIZE:(length-fileStream.tellg()) ,'\0');
-
-      fileStream.read((char*)data.data(),data.size());
-      Chunk chunk(data);
-      add_chunk(tmp_bid,chunk);
-      metabody.cids.emplace_back(chunk.cid);
-
-      counter++;
-      debug("spliting");
-    }
-
-    // Close input file stream.
-    fileStream.close();
-    cout << "Chunking complete! " << counter - 1 << " files created." << endl;
-
-
-  }
-  else { cout << "Error opening file!" << endl; }
-}
-
-
-// Simply gets the file size of file.
-int Inventory::getFileSize(ifstream *file) {
-  file->seekg(0,ios::end);
-  int filesize = file->tellg();
-  file->seekg(ios::beg);
-  return filesize;
+Inventory::Inventory(){
+  //TODO: for now remove the old arena and create a new
+  remove(DEFAULT_ARENA_PATH);
+  data.arena.open(DEFAULT_ARENA_PATH);
+  add_new_arena_slots(DEFAULT_ARENA_SLOT_NUM);
 }
 
 bool Inventory::get_file(const Id& bid, const string& dest_path){
@@ -52,60 +12,144 @@ bool Inventory::get_file(const Id& bid, const string& dest_path){
   Chunk chunk;
   Metabody metabody(bid);
   //TODO: get more then one chunk to metabody
-  get_chunk(bid,bid,chunk);
-
+  if(!get_chunk(bid,bid,chunk)) return false;
   metabody.append_from_chunk(chunk);
 
-  joinFile(metabody,dest_path);
-
-}
-void Inventory::upload_file(const string& filename, Metahead& metahead){
-
-  Metabody metabody;
-  chunkFile(filename,metabody);
-  deque<Chunk> chunks=metabody.create_body_chunks();
-
-  rename_bid_table(Id("tmp"),metabody.bid);
-
-  for(Chunk chunk:chunks){
-    debug("adding chunk\n[hash %s]\n[metahead %s]",chunk.cid,metabody.bid);
-    add_chunk(metabody.bid,chunk);
-  }
-  metahead.bid=metabody.bid;
-
-}
-
-
-
-// Finds chunks by "chunkName" and creates file specified in fileOutput
-void Inventory::joinFile(const Metabody& metabody, string fileOutput) {
+  const string tmp_dest_path = dest_path + ".part";
 
   // Create our output file
-  ofstream outputfile;
-  outputfile.open(fileOutput, ios::out | ios::binary);
+  //TODO: check whether file exists already
+  ofstream out_file(tmp_dest_path);
+  if(!out_file.is_open()){
+    debug("could not open output file");
+    return false;
+  }
 
-  // If successful, loop through chunks matching chunkName
-  if (outputfile.is_open()) {
+  for(const Id& cid:metabody.cids){
+    Chunk chunk;
+    if(!get_chunk(metabody.bid,cid,chunk)){
+      debug("*** need to request chunk on the network");
+      return false;
+    }
+    out_file.write(chunk.data.data(),chunk.size());
+  }
 
-    int counter = 1;
+  // Close output file.
+  out_file.close();
+
+  debug("file assembly complete!");
+  return true;
+}
 
 
-    for(Id cid:metabody.cids){
+bool Inventory::get_chunk(const Id &bid, const Id &cid, Chunk &chunk){
+  size_t size, slot;
+  if(!Database::get_chunk(bid,cid,size,slot)) return false;
+  if(!read_from_arena_slot(slot,size,chunk)) return false;
+  if(!chunk.verify(cid)) return false;
+  return true;
+}
 
-      Chunk chunk;
+//TODO: hadle case where the upload is canceled before finised. Enable to cancel uploads
+bool Inventory::upload_file(const string& filename, Metahead& metahead){
+  Metabody metabody;
+  ifstream file;
+  file.open(filename, ios::in | ios::binary);
+  if(!file.is_open()) return false;
 
-      if(!get_chunk(metabody.bid,cid,chunk)){
-        debug("*** need to request chunk on the nettwork");
-      }
-      outputfile.write(chunk.data.data(),chunk.data.size());
-      counter++;
+  file.seekg(0,ios::end);
+  file_size_t file_size = file.tellg();
+  file.seekg(ios::beg);
+
+  unordered_map<Id, pair<size_t, size_t> > cids; // cids[Id] = {slot, size} to ensure to not to write chunks twice
+
+  // Keep reading until end of file
+  while ((int)file_size<file.tellg()) {
+    // creat data string with aprobriate size
+    const file_size_t& bytes_to_read = ((file_size_t)file.tellg() + CHUNK_SIZE <= file_size) ? CHUNK_SIZE : (file_size_t)(file_size-file.tellg());
+
+    string data(bytes_to_read,'\0');
+    file.read((char*)data.data(),data.size());
+    Chunk chunk(data);
+    size_t idx;
+    if(cids.find(chunk.cid)==cids.end()){
+      write_to_arena_slot(chunk.data, idx);
+      cids[chunk.cid]=make_pair(idx, chunk.size());
     }
 
-    // Close output file.
-    outputfile.close();
-
-    cout << "File assembly complete!" << endl;
+    metabody.cids.emplace_back(chunk.cid);
+    debug("spliting [%s]..", metabody.cids.size());
   }
-  else { cout << "Error: Unable to open file for output." << endl; }
+  // Close input file stream.
+  file.close();
+  debug("chunking complete");
 
+  deque<Chunk> metabody_chunks=metabody.to_chunks();
+  for(const Chunk& chunk:metabody_chunks){
+    size_t idx;
+    if(cids.find(chunk.cid)==cids.end()){
+      write_to_arena_slot(chunk.data, idx);
+      cids[chunk.cid]=make_pair(idx, chunk.size());
+    }
+  }
+
+
+  //once added to arena, add to database.
+  //TODO: use BEGIN; .. COMMIT;
+  for(size_t i = 0; i<metabody_chunks.size(); i++){
+    const Id& cid = metabody_chunks[i].cid;
+    Database::add_chunk(metabody.bid, cid, cids[cid].first, cids[cid].second);
+  }
+  for(size_t i = 0; i < metabody.cids.size(); i++){
+    const Id& cid = metabody.cids[i];
+    Database::add_chunk(metabody.bid, cid, cids[cid].first, cids[cid].second);
+  }
+  metahead.bid = metabody_chunks[0].cid;
+  return true;
+}
+
+//TODO: handle disk space issues..
+bool Inventory::add_new_arena_slots(const size_t &num){
+  w_lock l(arena_mtx);
+  data.arena.seekp(data.arena.end);
+  string buff(CHUNK_SIZE, '\0');
+  for(size_t i = 0; i<num; i++){
+    data.arena.write(buff.data(),buff.size());
+    data.free_slots.emplace(++data.arena_slots_size);
+  }
+  return true;
+}
+
+bool Inventory::write_to_arena_slot(const string &raw_data, size_t &idx){
+  w_lock l(arena_mtx);
+  if(data.free_slots.empty()) {
+    debug(" *** no free slots avaible in arena");
+    return false;
+  }
+  if(raw_data.size()>=CHUNK_SIZE) {
+    debug( " *** raw_data size is bigger than CHUNK_SIZE");
+    return false;
+  }
+  idx = *data.free_slots.begin();
+  data.free_slots.erase(idx);
+  data.arena.seekp(idx*CHUNK_SIZE);
+  data.arena.write(raw_data.data(), raw_data.size());
+  return true;
+}
+
+bool Inventory::read_from_arena_slot(const size_t &idx, const size_t &chunk_size, Chunk &chunk){
+  if(chunk_size>=CHUNK_SIZE){
+    debug(" *** chunk_size>=CHUNK_SIZE");
+    return false;
+  }
+  r_lock l(arena_mtx);
+  if(idx>=data.arena_slots_size){
+    debug(" *** idx>=data.arena_slots_size");
+    return false;
+  }
+  ifstream arena(DEFAULT_ARENA_PATH);
+  arena.seekg(idx*CHUNK_SIZE);
+  string raw_data(chunk_size, '\0');
+  arena.read(&raw_data[0],chunk_size);
+  return chunk.set_data(raw_data);
 }
