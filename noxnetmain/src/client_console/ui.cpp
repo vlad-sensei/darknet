@@ -5,6 +5,8 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
+#include <boost/lexical_cast.hpp>
+
 
 void UI::run(){
   Connection_initiator_base::connect("localhost",DEFAULT_UI_LISTEN_PORT);
@@ -70,15 +72,11 @@ void* xmalloc (int);
 
 char** cmd_list;
 vector<char*> command_keys;
-vector<string> command_map;
 
 void UI::init_readline(){
 
-  //TODO: Fix sharing of available commands. This is for testing.
-  command_map.push_back("connect");
-  command_map.push_back("broadcast");
-
-  for(auto key : command_map) {
+  // Converts vector<string> to vector<char*>
+  for(auto key : command_list) {
     char* a = new char[key.size()+1];
     a[key.size()] = '\0';
     memcpy(a,key.c_str(),key.size());

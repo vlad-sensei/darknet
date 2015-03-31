@@ -17,6 +17,7 @@
 #include "glob.h"
 #include "connection_initiator_base.h"
 #include "ui_client.h"
+#include "common.h"
 
 #define DEFAULT_COMMAND_HELP_TEXT "No text available for this command"
 typedef function<string (const vector<string>&args)> cmd_lambda_t;
@@ -29,12 +30,31 @@ public:
   UI();
   void run();
   string process_text_input(string& text_input);
+
 private:
 
   void handle_new_connection(tcp::socket socket);
   void spawn_client(tcp::socket& socket);
 
   void init_commands();
+
+#define HANDLE_CMD(cmd_enum, cmd_full_name, cmd_short_name) cmd_enum,
+enum Commands {
+
+  CMD_LIST
+
+};
+#undef HANDLE_CMD
+
+#define HANDLE_CMD(cmd_enum, cmd_full_name, cmd_short_name) \
+  {cmd_full_name, Commands::cmd_enum }, {cmd_short_name, Commands::cmd_enum },
+  unordered_map<string,Commands> command_map {
+
+  CMD_LIST
+
+};
+#undef HANDLE_CMD
+
 
   class Command{
   public:
@@ -51,18 +71,16 @@ private:
   //in case multiple keys want to point to same command
   typedef shared_ptr<Command> Command_ptr;
 
-  unordered_map<string, Command_ptr> cmd;
-
   inline void handle_invalid_args(const exception& e) {safe_printf("invalid arguments : %s", e.what());}
-  void init_command(const vector<string>& key_words,const cmd_lambda_t& execute,const string& help_text = DEFAULT_COMMAND_HELP_TEXT, const unsigned& minargc=1, const unsigned& maxargc=-1);
+  void init_command(const Commands cmd_enum,const cmd_lambda_t& execute,const string& help_text = DEFAULT_COMMAND_HELP_TEXT, const unsigned& minargc=1, const unsigned& maxargc=-1);
 
 
   struct {
     peer_id_t current_ui_peer=0;
     unordered_map<peer_id_t,UI_client_ptr> clients;
 
-    unordered_map<string, Command_ptr> commands;
-    inline bool command_exists(const string& cmd) {return commands.find(cmd)!=commands.end();}
+    unordered_map<Commands, Command_ptr,hash<int>> commands;
+    inline bool command_exists(const Commands cmd_enum) {return commands.find(cmd_enum)!=commands.end();}
   } data;
   rw_mutex commands_mtx, clients_mtx;
 };

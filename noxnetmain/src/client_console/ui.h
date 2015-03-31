@@ -6,6 +6,7 @@
 #include "glob.h"
 #include "connection_initiator_base.h"
 #include "connection.h"
+#include "common.h"
 
 class UI;
 typedef unique_ptr<UI> UI_ptr;
@@ -21,5 +22,14 @@ private:
   void get_text_input();
   Connection_ptr connection;
 };
+
+#define HANDLE_CMD(cmd_enum, cmd_full_name, cmd_short_name) cmd_full_name, cmd_short_name,
+static vector<string> command_list {
+
+  CMD_LIST
+
+};
+#undef HANDLE_CMD
+
 
 #endif // UI_H
