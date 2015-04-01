@@ -66,7 +66,7 @@ typedef uint64_t file_size_t;
 #define DEFAULT_UI_LISTEN_PORT 8888
 #define ID_SIZE 64
 #define METAHEAD_SIZE 1024
-#define SYNC false
+#define SYNC true
 #define SYNC_PERIOD 2
 #define DEFAULT_DATABASE_PATH "test.db"
 #define DEFAULT_ARENA_PATH "/tmp/arena"
