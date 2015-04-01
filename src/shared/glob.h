@@ -9,6 +9,7 @@ using namespace std;
 #include <cinttypes>
 #include <iostream>
 #include "cryptopp/sha.h"
+#include "cryptopp/hex.h"
 #include <iomanip>
 
 /* Example usage:
@@ -42,11 +43,13 @@ private:
 };
 
 inline void operator << (ostream& os, const hash512_t& h){
-  os << std::hex;
-  for(int i=0; i<8;i++){
-    os << setw(16) << setfill('0') << h.data[i];
-  }
-  os << std::dec;
+  CryptoPP::HexEncoder encoder;
+  std::string output;
+  encoder.Attach( new CryptoPP::StringSink( output ) );
+  encoder.Put( (unsigned char*) h.data, sizeof(h.data) );
+  encoder.MessageEnd();
+
+  os << output;
 }
 
 namespace std {

@@ -9,5 +9,6 @@ INCLUDEPATH += \
     ../src
 
 LIBS += -lunittest++
+LIBS += -lcryptopp
 
 SOURCES += main.cpp
