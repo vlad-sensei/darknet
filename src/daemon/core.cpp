@@ -3,12 +3,9 @@
 Core_ptr core;
 
 // -------- Constructors ----
-Core::Core()
-    :should_sync(true)
-{}
+Core::Core(){}
 
 // -------- user interaction ----
-
 void Core::run(){
  thread network_thread([this](){
    Connection_initiator_base::start_listen();
@@ -19,7 +16,6 @@ void Core::run(){
    ui->run();
  });
 
- start_synch();
  network_thread.join();
  ui_thread.join();
 }
@@ -54,15 +50,20 @@ void Core::req_chunks(const Id &bid, const unordered_set<Id> &cids){
   }
 }
 
-void Core::start_synch(){
+//TODO fix starting after stopping
+void Core::start_synch(int period){
     //Capturing this might lead to a dangling pointer if core is destroyed
     should_sync = true;
-    sync_thread = thread([this](void){
-        while(should_sync){
-          this_thread::sleep_for(chrono::seconds(SYNC_PERIOD));
-          core->synch_all();
-        }
-    });
+
+    if (!sync_thread_exists){
+      sync_thread = thread([this, period](void){
+          while(should_sync){
+            this_thread::sleep_for(chrono::seconds(period));
+            core->synch_all();
+          }
+      });
+      sync_thread_exists = true;
+    }
 }
 
 void Core::stop_synch(){

@@ -67,7 +67,7 @@ typedef uint64_t file_size_t;
 #define ID_SIZE 64
 #define METAHEAD_SIZE 1024
 #define SYNC true
-#define SYNC_PERIOD 2
+#define SYNC_PERIOD 30
 #define DEFAULT_DATABASE_PATH "test.db"
 #define DEFAULT_ARENA_PATH "/tmp/arena"
 #define DEFAULT_ARENA_SLOT_NUM 200

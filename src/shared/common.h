@@ -87,6 +87,7 @@ I thought that it's not neccessary with more than two names per command
 That is why I have explicitly specified a short and full name.
 */
 #define CMD_LIST \
+HANDLE_CMD(CMD_SYNCH,"synch", "sy") \
 HANDLE_CMD(CMD_DOWNLOAD,"download","do") \
 HANDLE_CMD(CMD_UPLOAD,"upload","up") \
 HANDLE_CMD(CMD_CONNECT,"connect","co") \

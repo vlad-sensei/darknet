@@ -47,7 +47,7 @@ public:
   void connect(const string& addr, const uint16_t& port);
   void broadcast_echo(const string& msg);
   //start syncing at regular intervalls
-  void start_synch();
+  void start_synch(int period);
   //stop syncing after the next syncing is completed
   void stop_synch();
 
@@ -67,7 +67,8 @@ private:
 
   UI_ptr ui;
   thread sync_thread;
-  bool should_sync;
+  bool should_sync = SYNC;
+  bool sync_thread_exists = false;
 };
 
 #endif // CORE_H
