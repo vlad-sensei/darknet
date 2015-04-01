@@ -12,7 +12,9 @@
  * the result is moved into the return value.
 */
 
-#define CHUNK_SIZE 524288
+const size_t CHUNK_SIZE = 1 << 19;
+
+
 #define MAX_CIDS_PER_METABODY 2000
 #define MAX_BIDS_PER_METABODY 30
 
@@ -21,14 +23,17 @@ hash512_t hash512(const string& value);
 /* Prints a hash_t using the debug function.*/
 //void debug_hash512(const hash_t&);
 
+//TODO: make cid/data private
 struct Chunk {
   string data;
   Id cid;
   Chunk(string& data_):data(move(data_)), cid(data){}
-  inline bool verify(const Id& cid_)const { return cid_ ==cid;}
-  inline size_t size(){return data.size();}
+  bool set_data(string& data_);
+  inline bool verify(const Id& cid_) const { return cid_ ==cid;}
+  inline size_t size() const {return data.size();}
+  Chunk() = default;
 private:
-  Chunk();
+
 };
 
 /*
@@ -57,6 +62,13 @@ struct Metabody {
   vector<Id> bids,cids; //hash of bids and chunk IDs
   bool append_from_chunk(const Chunk& chunk); //returns false if trolling
   deque<Chunk> to_chunks();
+  Metabody(const Id& bid_):bid(bid_){}
+  Metabody() = default;
+  Id bid_next(){
+    debug("*** give the next bid to add for the metabody finishid");
+    return bid;
+  }
+  //void update_Id(){bid=Id(string((char*)this,sizeof(Metabody)));}
 private:
   size_t cids_offs=0; //offset for append chunk
 };
@@ -69,6 +81,17 @@ struct Metahead {
   Metahead(const Id& bid_,const string& tags_):
      mid(string((char*)&bid_, sizeof(bid_))+tags_),  bid(bid_), tags(tags_){}
 };
+
+/* List contains (enum name,full command name, short command name)
+I thought that it's not neccessary with more than two names per command
+That is why I have explicitly specified a short and full name.
+*/
+#define CMD_LIST \
+HANDLE_CMD(CMD_DOWNLOAD,"download","do") \
+HANDLE_CMD(CMD_UPLOAD,"upload","up") \
+HANDLE_CMD(CMD_CONNECT,"connect","co") \
+HANDLE_CMD(CMD_BROADCAST,"broadcast","br") \
+HANDLE_CMD(CMD_EXIT,"exit", "quit")
 
 //TODO: remove this
 inline int test_unittest_add(int a, int b){return a+b;}

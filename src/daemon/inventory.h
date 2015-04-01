@@ -11,7 +11,7 @@
 
 class Inventory: protected Database {
 public:
-  Inventory(){}
+  Inventory();
 
   /*
    * to be used by a search function
@@ -19,8 +19,11 @@ public:
    * create temp file from chunks, verifying each one
    * if successful move to dest_path ant return true
    */
+
   bool get_file(const Id& bid, const string& dest_path);
 
+  //TODO: (optimization) queue ~1000 cids in memory before putting them into database
+  bool get_chunk(const Id& bid, const Id& cid, Chunk &chunk);
 protected:
 
   /*
@@ -28,24 +31,39 @@ protected:
    * and building metabody in progress. Then add metabody to arena.
    * finally compute and return metahead
    */
-  void upload_file(const string& filename, Metahead& metahead);
+  bool upload_file(const string& filename, Metahead& metahead);
 
-  bool get_metabody(const Id& bid, Metabody& metabody);
+  bool get_metabody(const Id& bid, Metabody& metabody){
+    //TODO: do this right
+    debug("*** get_metabody more then one");
+    Chunk chunk;
+    //TODO: get more then one chunk to metabody
+    metabody.bid=bid;
+
+    if (!get_chunk(bid,bid,chunk)) {
+      debug("*** get_metabody no chunk");
+      return false;
+    }
+    metabody.append_from_chunk(chunk);
+    return true;
+  }
   bool add_metabody(const Metabody& metabody);
 
   //write chunk to file, chunk_map and database
-  //TODO: (optimization) queue ~1000 cids in memory before putting them into database
-  bool get_chunk(const Id& bid, const Id& cid, Chunk &chunk);
-  void add_chunk(const Id& bid, const Chunk& chunk);  //take size into account
+  bool add_chunk(const Id& bid, const Chunk& chunk);  //take size into account
 
 private:
+  bool add_new_arena_slots(const size_t& num = 1);
+  bool write_to_arena_slot(const string& data, size_t& idx);
+  bool read_from_arena_slot(const size_t& idx, const size_t& chunk_size, Chunk& chunk);
 
+private:
   struct {
-    unordered_map<Id, unordered_map<Id, size_t> > chunk_map; //inmemory map[bid][cid] == chunk_offs
     unordered_set<size_t> free_slots;
-    fstream arena;
+    size_t arena_slots_size = 0;
+    ofstream arena; //for writing only
   } data;
-  rw_mutex chunk_map_mtx, arena_mtx;
+  rw_mutex arena_mtx;
 };
 
 #endif // INVENTORY_H

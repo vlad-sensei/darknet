@@ -9,6 +9,7 @@ using namespace std;
 #include <cinttypes>
 #include <iostream>
 #include "cryptopp/sha.h"
+#include <iomanip>
 
 /* Example usage:
   Id id1(""), id2("The quick brown fox jumps over the lazy dog"), id3("The quick brown fox jumps over the lazy dog."), id4("");
@@ -24,16 +25,29 @@ struct hash512_t{
   inline bool operator== (const hash512_t& other)const {return  !memcmp(data, other.data, sizeof(data));}
   inline size_t std_hash() const {return data[0]^data[1]^data[2]^data[3]^data[4]^data[5]^data[6]^data[7];}
   friend void operator << (ostream& os, const hash512_t& h);
-  //string get_string()const {return string((char*) data,sizeof(uint64_t)*8);}
-  /*hash512_t& set(const string& blob){
-      memcpy(data,blob.data(),sizeof(uint64_t)*8);
-      return *this;
-  }*/
+  //TODO: remove this tmp_set_data
+  void tmp_set_data(){
+    data[0]=0xf628a784c8a4b793;
+    data[1]=0x4be0e3e91d528b43;
+    data[2]=0x237126807c4810a6;
+    data[3]=0xc306f3ff061eba46;
+    data[4]=0x7c77f583687c7637;
+    data[5]=0x90f7e6119de2e6b6;
+    data[6]=0xccea4b7e1e87931a;
+    data[7]=0x0c09fee3b9001ee5;
+  }
+
 private:
   uint64_t data[8];
 };
 
-inline void operator << (ostream& os, const hash512_t& h){ os << std::hex << h.data[0] << h.data[1] << h.data[2] << h.data[3] << h.data[4] << h.data[5] << h.data[6] << h.data[7] << std::dec;}
+inline void operator << (ostream& os, const hash512_t& h){
+  os << std::hex;
+  for(int i=0; i<8;i++){
+    os << setw(16) << setfill('0') << h.data[i];
+  }
+  os << std::dec;
+}
 
 namespace std {
 template<> struct hash<hash512_t>{
@@ -46,15 +60,17 @@ typedef hash512_t Id;
 typedef int64_t ts_t; //time_t, different on different platforms
 typedef uint64_t peer_id_t;
 typedef unsigned char byte;
+typedef uint64_t file_size_t;
 
 #define DEFAULT_LISTEN_PORT 8453
 #define DEFAULT_UI_LISTEN_PORT 8888
 #define ID_SIZE 64
 #define METAHEAD_SIZE 1024
-#define SYNC true
+#define SYNC false
 #define SYNC_PERIOD 2
-
 #define DEFAULT_DATABASE_PATH "test.db"
+#define DEFAULT_ARENA_PATH "/tmp/arena"
+#define DEFAULT_ARENA_SLOT_NUM 200
 
 // c++14
 #include <shared_mutex>
@@ -112,6 +128,7 @@ inline void safe_printf(const char *s, T value, Args... args)
 template <typename ...Ts>
 void debug(const std::string& fmt, const Ts&...args){
 #ifdef DEBUG_ON
+  //TODO: getting time causes race condition. synchronize
   /*
   time_t now_ = time(nullptr);
   unique_ptr<struct tm> now = unique_ptr<struct tm>(new struct tm);

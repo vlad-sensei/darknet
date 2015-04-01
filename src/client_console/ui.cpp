@@ -80,15 +80,11 @@ void* xmalloc (int);
 
 char** cmd_list;
 vector<char*> command_keys;
-vector<string> command_map;
 
 void UI::init_readline(){
 
-  //TODO: Fix sharing of available commands. This is for testing.
-  command_map.push_back("connect");
-  command_map.push_back("broadcast");
 
-  for(const auto& key : command_map) {
+  for(const auto& key : command_list) {
     char* a = new char[key.size()+1];
     a[key.size()] = '\0';
     memcpy(a,key.c_str(),key.size());

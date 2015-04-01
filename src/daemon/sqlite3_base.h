@@ -11,6 +11,7 @@
 #include <sqlite3.h>
 
 #include "glob.h"
+#include "common.h"
 
 class Sqlite3_base {
   Sqlite3_base();
@@ -31,6 +32,7 @@ protected:
     string get_string(const unsigned& pos);
     Id get_id(const unsigned& pos);
     ts_t get_ts_t(const unsigned& pos);
+    size_t get_size_t(const unsigned& pos);
 
   private:
     sqlite3* db_;

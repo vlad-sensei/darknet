@@ -53,6 +53,7 @@ private:
   void handle_chunk_req(const Msg_ptr& msg);
   void handle_meta_req(const Msg_ptr& msg);
   void handle_meta_reply(const Msg_ptr& msg);
+  void handle_chunk(const Msg_ptr& msg);
 
   struct Data{
     Data(const peer_id_t& pid_):pid(pid_){}

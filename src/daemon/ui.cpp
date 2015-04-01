@@ -42,12 +42,14 @@ string UI::process_text_input(const string& text_input){
   if(cmd_args.empty()){
     return "";
   }
+  Commands cmd_enum = command_map[cmd_args[0]];
+
   r_lock(commands_mtx);
-  if(!data.command_exists(cmd_args[0])){
+  if(!data.command_exists(cmd_enum)){
     safe_printf("No such command: %s\n", cmd_args[0]);
     return "No such command: "+ cmd_args[0]+"\n";
   }
-  return data.commands[cmd_args[0]]->exec(cmd_args);
+  return data.commands[cmd_enum]->exec(cmd_args);
 }
 
 string UI::Command::exec(const vector<string> &args){
@@ -63,15 +65,16 @@ string UI::Command::exec(const vector<string> &args){
 }
 
 //TODO: make sure there are no copies
-void UI::init_command(const vector<string> &key_words, const cmd_lambda_t &execute, const string &help_text, const unsigned &minargc, const unsigned &maxargc){
-  Command_ptr cmd = Command_ptr(new Command(execute, help_text, minargc, maxargc));
-  w_lock w(commands_mtx);
-  for(const string& key_word : key_words) data.commands[key_word]=cmd;
+void UI::init_command(const Commands cmd_enum, const cmd_lambda_t &execute, const string &help_text, const unsigned &minargc, const unsigned &maxargc){
+Command_ptr cmd = Command_ptr(new Command(execute, help_text, minargc, maxargc));
+w_lock w(commands_mtx);
+data.commands[cmd_enum] = cmd;
+// for(const string& key_word : key_words) data.commands[key_word]=cmd;
 }
 
 //TODO: check if that this does not lead to any race condition when "this" (UI/Core) is destroyed
 void UI::init_commands(){
-  init_command({"c", "connect"},
+  init_command(Commands::CMD_CONNECT,
                [this](const vector<string>& args){
     //TODO: find a better way to parse args, perhaps a template of some kind
     string peer;
@@ -96,7 +99,7 @@ void UI::init_commands(){
   "connect PEER_IP [PORT]",
   2,3);
 
-  init_command({"br", "broadcast"},
+  init_command(Commands::CMD_BROADCAST,
                [this](const vector<string>& args){
     string msg;
     try{
@@ -111,7 +114,7 @@ void UI::init_commands(){
   "broadcast MESSAGE",
   2,2);
 
-  init_command({"exit", "quit"},
+  init_command(Commands::CMD_EXIT,
                [this](const vector<string>& args){
     safe_printf("Exiting darknet...");
     exit(0);
@@ -120,4 +123,36 @@ void UI::init_commands(){
   },
   "'exit' or 'quit'",
   1,1);
+
+  init_command(Commands::CMD_UPLOAD,
+               [this](const vector<string>& args){
+    string filename;
+    try{
+      filename = args[1];
+    } catch(exception& e){
+      handle_invalid_args(e);
+      return "Invalid arguments.";
+    }
+    core->run_test_uploader();
+    return "upload done.";
+
+  },
+  "upload filname",
+  2,2);
+
+  init_command(Commands::CMD_DOWNLOAD,
+               [this](const vector<string>& args){
+    string filename;
+    try{
+      filename = args[1];
+    } catch(exception& e){
+      handle_invalid_args(e);
+      return "Invalid arguments.";
+    }
+    core->run_test_downloader();
+    return "download done.";
+
+  },
+  "download filname",
+  2,2);
 }

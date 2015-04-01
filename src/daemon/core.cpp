@@ -46,6 +46,7 @@ void Core::handle_new_connection(tcp::socket socket){
 }
 
 void Core::req_chunks(const Id &bid, const unordered_set<Id> &cids){
+   debug("req_chunks");
   r_lock l(peers_mtx);
   for(const auto& it:data.peers){
     const Peer_ptr& peer = it.second;
