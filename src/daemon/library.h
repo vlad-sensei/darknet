@@ -34,6 +34,10 @@ public:
 
   void run_test_uploader();
   void run_test_downloader();
+  void add_metahead(const Metahead & metahead){
+    //TODO: metahead in ram ?
+    Database::add_metahead(metahead);
+  }
 
 private:
   virtual void req_chunks(const Id& bid, const unordered_set<Id>& cids) = 0; //request chunks
