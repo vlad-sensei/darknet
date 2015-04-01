@@ -45,11 +45,11 @@ bool Inventory::get_file(const Id& bid, const string& dest_path){
 bool Inventory::get_chunk(const Id &bid, const Id &cid, Chunk &chunk){
   size_t size, slot;
   if(!Database::get_chunk(bid,cid,size,slot)) return false;
-  debug("got chunk from database");
+  //debug("got chunk from database");
   if(!read_from_arena_slot(slot,size,chunk)) return false;
-  debug("got chunk from arena");
+  //debug("got chunk from arena");
   if(!chunk.verify(cid)) return false;
-  debug("verifyd chunk");
+  //debug("verifyd chunk");
   return true;
 }
 bool Inventory::add_chunk(const Id &bid, const Chunk &chunk){
