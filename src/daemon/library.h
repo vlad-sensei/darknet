@@ -30,7 +30,12 @@ public:
   void upload_file(const string& filename, const string& tags = "");
 
   bool req_file(const Id& mid);
-  vector<Metahead> publish_metaheads(){return published_metaheads;}
+
+  //TODO:
+  vector<Metahead> publish_metaheads(){
+    r_lock l(metaheads_mtx);
+    return data.published_metaheads;
+  }
 
   void handle_chunk(const Id& bid, const Chunk& chunk);
 
@@ -46,13 +51,16 @@ private:
     inline bool file_req_exists(const Id& bid){ return chunk_reqs.find(bid) != chunk_reqs.end();}
     inline bool chunk_req_exists(const Id& bid,const Id& cid){ return (file_req_exists(bid) && chunk_reqs[bid].find(cid) != chunk_reqs[bid].end() );}
     inline bool has_metabody(const Id& bid){return has_metabody_.find(bid) !=has_metabody_.end();}
+
+    Metahead m = Metahead(Id("a"), "Batman");
+    Metahead m1 = Metahead(Id("b"), "Spiderman");
+    Metahead m2 = Metahead(Id("c"), "Pop eye");
+    vector<Metahead> published_metaheads = { m, m1, m2 };
+
   } data;
 
-  Metahead m = Metahead(Id("a"), "Batman");
-  Metahead m1 = Metahead(Id("b"), "Spiderman");
-  Metahead m2 = Metahead(Id("c"), "Pop eye");
-  vector<Metahead> published_metaheads = { m, m1, m2 };
-  rw_mutex chunk_reqs_mtx;
+
+  rw_mutex chunk_reqs_mtx, metaheads_mtx;
 
 };
 

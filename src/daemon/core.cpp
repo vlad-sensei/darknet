@@ -1,6 +1,5 @@
 #include "core.h"
 #include <ratio>
-
 Core_ptr core;
 
 // -------- Constructors ----
@@ -19,6 +18,8 @@ void Core::run(){
    ui = make_unique<UI>();
    ui->run();
  });
+
+ start_synch();
  network_thread.join();
  ui_thread.join();
 }
@@ -57,10 +58,8 @@ void Core::start_synch(){
     should_sync = true;
     sync_thread = thread([this](void){
         while(should_sync){
-            core->synch_all();
-            std::chrono::seconds sec(10);
-            std::chrono::duration<int, ratio<1,1>> dur(sec);
-            this_thread::sleep_for(dur);
+          this_thread::sleep_for(chrono::seconds(SYNC_PERIOD));
+          core->synch_all();
         }
     });
 }
@@ -74,7 +73,7 @@ void Core::synch_all(){
   r_lock l(peers_mtx);
   for(const auto& it:data.peers){
     const Peer_ptr& peer = it.second;
-    peer->synch();
+    peer->req_metaheads();
   }
 }
 

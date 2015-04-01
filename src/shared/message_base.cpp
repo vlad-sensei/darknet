@@ -97,19 +97,19 @@ void Message_base::print(){
 /* Serialization format of metahead:
  *
  * +----------+----------+------------+
- * | MID [64] | BID [64] | TAGS [892] |
+ * | MID [64] | BID [64] | TAGS [896] |
  * +----------+----------+------------+
- * 0        63|64     127|128        896
+ * 0        63|64     127|128        1024
  */
 string Message_base::to_binary(const Metahead& metahead){
-  const size_t BID_OFFSET = binary_size<Id>();
-  const size_t TAGS_OFFSET = BID_OFFSET + binary_size<Id>();
+  const size_t BID_OFFSET = MID_SIZE;
+  const size_t TAGS_OFFSET = BID_OFFSET + BID_SIZE;
+  const size_t tags_size = metahead.tags.size() >= TAGS_SIZE ? TAGS_SIZE : metahead.tags.size();
+  string buffer(METAHEAD_SIZE, 0);
 
-  string buffer(binary_size<Metahead>(), 0);
-
-  memcpy(&buffer[0],           &metahead.mid,     MID_WIDTH);
-  memcpy(&buffer[BID_OFFSET],  &metahead.bid,     BID_WIDTH);
-  memcpy(&buffer[TAGS_OFFSET], &metahead.tags[0], metahead.tags.size());
+  memcpy(&buffer[0],           &metahead.mid,     MID_SIZE);
+  memcpy(&buffer[BID_OFFSET],  &metahead.bid,     BID_SIZE);
+  memcpy(&buffer[TAGS_OFFSET], &metahead.tags[0], tags_size);
 
   return buffer;
 }

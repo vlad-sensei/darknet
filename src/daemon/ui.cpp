@@ -5,8 +5,6 @@
 #include <iostream>
 #include <fstream>
 #include <iterator>
-#include <readline/readline.h>
-#include <readline/history.h>
 
 #include "core.h"
 
@@ -122,5 +120,4 @@ void UI::init_commands(){
   },
   "'exit' or 'quit'",
   1,1);
-
 }

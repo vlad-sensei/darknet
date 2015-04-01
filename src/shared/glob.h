@@ -52,6 +52,7 @@ typedef unsigned char byte;
 #define ID_SIZE 64
 #define METAHEAD_SIZE 1024
 #define SYNC true
+#define SYNC_PERIOD 2
 
 #define DEFAULT_DATABASE_PATH "test.db"
 
@@ -111,12 +112,14 @@ inline void safe_printf(const char *s, T value, Args... args)
 template <typename ...Ts>
 void debug(const std::string& fmt, const Ts&...args){
 #ifdef DEBUG_ON
+  /*
   time_t now_ = time(nullptr);
   unique_ptr<struct tm> now = unique_ptr<struct tm>(new struct tm);
   localtime_r(&now_, now.get());
   string datestr = asctime(now.get());
   datestr.pop_back();
   cout << "["<<datestr << "] ";
+  */
   safe_printf(fmt.c_str(),args...);
   cout << "\n";
 #endif //DEBUG_ON

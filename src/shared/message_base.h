@@ -113,9 +113,9 @@ protected:
   unordered_map<Key_type_t, string> h;
 
 private:
-  const int MID_WIDTH = sizeof(Id);
-  const int BID_WIDTH = sizeof(Id);
-  const int TAGS_WIDTH = METAHEAD_SIZE - MID_WIDTH - BID_WIDTH;
+  const size_t MID_SIZE = binary_size<Id>();
+  const size_t BID_SIZE = binary_size<Id>();
+  const size_t TAGS_SIZE = METAHEAD_SIZE - MID_SIZE - BID_SIZE;
 
   template<typename T>
   inline T get(const Key_type_t& key){
@@ -158,16 +158,16 @@ private:
     }
     const string& bin = h[key];
 
-    size_t step_size = binary_size<T>();
     size_t offset = 0;
-    size_t res_size = bin.size()/step_size;
-    vector<T> res(res_size);
+    size_t elem_size = binary_size<T>();
+    size_t vec_size = bin.size()/elem_size;
+    vector<T> vec(vec_size);
 
-    for(size_t i = 0; i<res_size; i++){
-      res[i] = to_data_struct<Metahead>(bin.substr(offset, step_size));
-      offset += step_size;
+    for(auto&  e: vec){
+      e = from_binary<T>(bin, offset);
+      offset += elem_size;
     }
-    return res;
+    return vec;
   }
 
   template<typename T>
@@ -200,6 +200,9 @@ public:
 
 protected:
 
+  //Can't be used directly on user defined structs, because data struct
+  //alignment is implementation defined and may differ depending on compiler
+  //and plattform
   template<typename T>
   const string to_binary_container(const T& container){
     string res(container.size()*sizeof(typename T::value_type),0);
@@ -233,7 +236,6 @@ protected:
     for(const auto& e : container){
         res.append(to_binary(e));
     }
-
     return res;
   }
 
@@ -243,9 +245,11 @@ protected:
    * template is declared outside the class
    */
   template<typename T>
-  T to_data_struct(const string& bin){
+  T from_binary(const string& bin, size_t offset){
     T res;
-    memcpy(&res, bin.data(), binary_size<T>());
+    if (offset + binary_size<T>() > bin.size())
+      return res;
+    memcpy(&res, &bin[offset], binary_size<T>());
     return res;
   }
 
@@ -261,21 +265,17 @@ template<>
 inline size_t Message_base::binary_size<Metahead>(){return METAHEAD_SIZE;}
 
 template<>
-inline Metahead Message_base::to_data_struct(const string& bin){
-  const size_t BID_OFFSET = binary_size<Id>();
-  const size_t TAGS_OFFSET = BID_OFFSET + binary_size<Id>();
-
+inline Metahead Message_base::from_binary(const string& bin, size_t start){
   Metahead metahead;
-
-  if(bin.size()!= binary_size<Metahead>()){
-    handle_troll_input();
+  if(start + binary_size<Metahead>() > bin.size())
     return metahead;
-  }
 
-  memcpy(&metahead.mid,       &bin[0],                binary_size<Id>() );
-  memcpy(&metahead.bid,       &bin[BID_OFFSET],       binary_size<Id>());
+  const size_t BID_OFFSET = start + MID_SIZE;
+  const size_t TAGS_OFFSET = BID_OFFSET + BID_SIZE;
 
-  metahead.tags = string((char*) &bin[TAGS_OFFSET], TAGS_WIDTH);
+  memcpy(&metahead.mid, &bin[start],          MID_SIZE);
+  memcpy(&metahead.bid, &bin[BID_OFFSET], BID_SIZE);
+  metahead.tags = string(&bin[TAGS_OFFSET], TAGS_SIZE);
 
   return metahead;
  }
