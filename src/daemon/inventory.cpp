@@ -44,12 +44,9 @@ bool Inventory::get_file(const Id& bid, const string& dest_path){
 
 bool Inventory::get_chunk(const Id &bid, const Id &cid, Chunk &chunk){
   size_t size, slot;
-  if(!Database::get_chunk(bid,cid,size,slot)) return false;
-  //debug("got chunk from database");
-  if(!read_from_arena_slot(slot,size,chunk)) return false;
-  //debug("got chunk from arena");
-  if(!chunk.verify(cid)) return false;
-  //debug("verifyd chunk");
+  if(!Database::get_chunk(bid,cid,size,slot)||
+     !read_from_arena_slot(slot,size,chunk) ||
+     !chunk.verify(cid)) return false;
   return true;
 }
 bool Inventory::add_chunk(const Id &bid, const Chunk &chunk){
@@ -62,6 +59,7 @@ bool Inventory::add_chunk(const Id &bid, const Chunk &chunk){
 
 //TODO: hadle case where the upload is canceled before finised. Enable to cancel uploads
 bool Inventory::upload_file(const string& filename, Metahead& metahead){
+  //open file and calculating its size
   Metabody metabody;
   ifstream file;
   file.open(filename, ios::in | ios::binary);
@@ -73,9 +71,9 @@ bool Inventory::upload_file(const string& filename, Metahead& metahead){
 
   unordered_map<Id, pair<size_t, size_t> > cids; // cids[Id] = {slot, size} to ensure to not to write chunks twice
 
-  // Keep reading until end of file
+  // iterate through file, while adding chunks to arena
   while (file.tellg()<(int)file_size) {
-    // creat data string with aprobriate size
+    // creating buffer string with appropriate size
     const file_size_t& bytes_to_read = ((file_size_t)file.tellg() + CHUNK_SIZE <= file_size) ? CHUNK_SIZE : (file_size_t)(file_size-file.tellg());
 
     string data(bytes_to_read,'\0');
@@ -88,9 +86,7 @@ bool Inventory::upload_file(const string& filename, Metahead& metahead){
     }
 
     metabody.cids.emplace_back(chunk.cid);
-    debug("spliting [%s]..", metabody.cids.size());
   }
-  // Close input file stream.
   file.close();
   debug("chunking complete");
 
@@ -127,6 +123,7 @@ bool Inventory::add_new_arena_slots(const size_t &num){
     data.arena.write(buff.data(),buff.size());
     data.free_slots.emplace(data.arena_slots_size++);
   }
+  data.arena.flush();
   return true;
 }
 
@@ -143,11 +140,10 @@ bool Inventory::write_to_arena_slot(const string &raw_data, size_t &idx){
 
   idx = *data.free_slots.begin();
   data.free_slots.erase(idx);
-  //TODO: overfllow!!!
+  //TODO: overflow on 32bit systems for large files!!!
   data.arena.seekp(idx*CHUNK_SIZE);
 
   data.arena.write(raw_data.data(), raw_data.size());
-  //debug("write to arena:\n[arena %s]\n[size %s]\n[substring %s]",idx,raw_data.size(),raw_data);
   data.arena.flush();
   return true;
 }
@@ -163,10 +159,8 @@ bool Inventory::read_from_arena_slot(const size_t &idx, const size_t &chunk_size
     return false;
   }
   ifstream arena(DEFAULT_ARENA_PATH);
-  //TODO overflow!!!
+  //TODO: overflow on 32bit systems for large files!!!
   arena.seekg(idx*CHUNK_SIZE);
-
-
 
   string raw_data(chunk_size, '\0');
   arena.read(&raw_data[0],chunk_size);

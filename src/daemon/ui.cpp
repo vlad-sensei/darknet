@@ -135,7 +135,7 @@ void UI::init_commands(){
       handle_invalid_args(e);
       return "Invalid arguments.";
     }
-    core->run_test_uploader();
+   // core->run_test_uploader();
     return "upload done.";
 
   },
@@ -151,7 +151,7 @@ void UI::init_commands(){
       handle_invalid_args(e);
       return "Invalid arguments.";
     }
-    core->run_test_downloader();
+    //core->run_test_downloader();
     return "download done.";
 
   },

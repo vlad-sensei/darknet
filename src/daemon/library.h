@@ -29,15 +29,9 @@ public:
   bool upload_file(const string& filename, const string& tags = "");
 
   bool req_file(const Id& mid);
-
   void handle_chunk(const Id& bid, const Chunk& chunk);
 
-  void run_test_uploader();
-  void run_test_downloader();
-  void add_metahead(const Metahead & metahead){
-    //TODO: metahead in ram ?
-    Database::add_metahead(metahead);
-  }
+  inline void add_metahead(const Metahead & metahead) {Database::add_metahead(metahead);}
 
 private:
   virtual void req_chunks(const Id& bid, const unordered_set<Id>& cids) = 0; //request chunks
