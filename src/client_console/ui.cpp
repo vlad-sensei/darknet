@@ -43,9 +43,6 @@ void UI::get_text_input(){
 
     init_readline();
 
-    safe_printf(" ~~~ welcome to darknet ~~~\n");
-
-
     vector<string> old_commands;
     //initiate curse window
     initscr();
@@ -53,20 +50,21 @@ void UI::get_text_input(){
     cbreak();
     keypad(stdscr, TRUE);
 
-
     string line("");    
-    int c,x,y,index = 0;
+    int c,x,y,index = 0;    
 
     printw(" ~~~ welcome to darknet ~~~\n");
     move(y+1,0);
 
 
     while(1){
+
         c = 0;
-        c = wgetch(stdscr); /* Wait for user input */
+        c = wgetch(stdscr); // Wait for user input
         getyx(stdscr,y,x);
 
         switch(c){
+
         case KEY_BACKSPACE:
             if(x > 0){
                 line.pop_back();
@@ -86,12 +84,18 @@ void UI::get_text_input(){
             else{
                 line = old_commands[index];
                 index++;
+            }           
+            break;
+        case KEY_DOWN:
+            if(index > 0 ){
+                line.clear();
+                index--;
+                line = old_commands[index];
             }
             break;
-        case '\t':
-            //TODO:fixa fungerande autocomplete funktion
+        case '\t':            
             line = find_match(line);
-            break;        
+            break;
         default:   
             line += c;
         }
@@ -111,7 +115,7 @@ void UI::get_text_input(){
         }
 
         //reset the history index if c not arrow up
-        if(c != KEY_UP)index = 0;
+        if(c != KEY_UP && c != KEY_DOWN)index = 0;
 
         refresh();
 
@@ -124,13 +128,14 @@ void UI::get_text_input(){
         */
 
     }
+
     endwin();
 }
 
 
 string find_match(string input){
     for(string str:command_map){
-        if(input.find(str))return str;
+        if(str.size() > str.find(input) && str.find(input) == 0) return str;
     }
     return input;
 }
