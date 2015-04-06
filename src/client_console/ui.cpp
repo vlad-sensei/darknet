@@ -2,14 +2,13 @@
 
 #include <thread>
 #include <mutex>
-#include <readline/readline.h>
-#include <readline/history.h>
+#include <ncurses.h>
 
 UI_ptr ui;
 
 
 void UI::run(){
-  Connection_initiator_base::connect("localhost",DEFAULT_UI_LISTEN_PORT);
+  //Connection_initiator_base::connect("localhost",DEFAULT_UI_LISTEN_PORT);
 
   thread input_thread([this](){
     get_text_input();
@@ -33,54 +32,109 @@ void UI::echo(const string &msg){
 
 // ~~~~~~~~~~~~ text input ~~~~~~~~~~~~
 
-void UI::get_text_input(){
-
-  init_readline();
-
-  safe_printf(" ~~~ welcome to darknet ~~~\n");
-
-  while(1){
-    /*
-     * Uncomment the line below and 'rl_bind_key' line in
-     * 'my_completion' to disable 'ls' behavior of auto-complete.
-     * 'ls'-behavior is shown when there is a space to the left in cmd-line.
-     */
-    //    rl_bind_key('\t',rl_complete);
-
-    char* line = readline("> ");
-
-    if(!line) break;
-    if(*line){
-      add_history(line);
-
-      string input(line);
-
-      connection->text_command(input);
-
-      free(line);
-
-      /*
-      //wait for return message of sent command
-      unique_lock<mutex> lk(connection->m);
-      connection->cv.wait(lk);
-      */
-
-      //handle properly with ncurses
-    }else{
-      free(line);
-    }
-  }
-}
-
-
-static char** my_completion(const char*, int ,int);
-char* my_generator(const char*,int);
-char* dupstr (char*);
-void* xmalloc (int);
+string find_match(string input);
 
 char** cmd_list;
 vector<char*> command_keys;
 vector<string> command_map;
+
+
+void UI::get_text_input(){
+
+    init_readline();
+
+    safe_printf(" ~~~ welcome to darknet ~~~\n");
+
+
+    vector<string> old_commands;
+    //initiate curse window
+    initscr();
+    noecho();    
+    cbreak();
+    keypad(stdscr, TRUE);
+
+
+    string line("");    
+    int c,x,y,index = 0;
+
+    printw(" ~~~ welcome to darknet ~~~\n");
+    move(y+1,0);
+
+
+    while(1){
+        c = 0;
+        c = wgetch(stdscr); /* Wait for user input */
+        getyx(stdscr,y,x);
+
+        switch(c){
+        case KEY_BACKSPACE:
+            if(x > 0){
+                line.pop_back();
+                move(y,x-1);
+                delch();
+            }
+            break;
+        case '\n'://ENTER
+            if(line.size()>0) old_commands.insert(old_commands.begin(),line);
+            break;
+        case KEY_UP:
+            line.clear();
+            if(index == old_commands.size()){
+                line = "";
+                index = 0;
+            }
+            else{
+                line = old_commands[index];
+                index++;
+            }
+            break;
+        case '\t':
+            //TODO:fixa fungerande autocomplete funktion
+            line = find_match(line);
+            break;        
+        default:   
+            line += c;
+        }
+
+        const char* temp;
+
+        //clear print area and print new text
+        move(y,0);
+        clrtoeol();
+        temp = (line).c_str();
+        printw(temp);
+
+        //special case for enter
+        if(c == '\n'){
+            line.clear();
+            move(y+1,0);
+        }
+
+        //reset the history index if c not arrow up
+        if(c != KEY_UP)index = 0;
+
+        refresh();
+
+
+        //connection->text_command(line);
+        /*
+      add_history(line);
+      string input(line);
+      connection->text_command(input);
+        */
+
+    }
+    endwin();
+}
+
+
+string find_match(string input){
+    for(string str:command_map){
+        if(input.find(str))return str;
+    }
+    return input;
+}
+
 
 void UI::init_readline(){
 
@@ -97,67 +151,6 @@ void UI::init_readline(){
 
   //Might be better way to build 'cmd_list'
   cmd_list = &command_keys[0];
-  // Used for custom auto-complete with 'readline'
-  rl_attempted_completion_function = my_completion;
-  rl_bind_key('\t',rl_complete);
-}
-
-static char** my_completion( const char * text , int start,  int end)
-{
-  (void)end;
-  char** matches;
-
-  matches = (char**)NULL;
-
-  if (start == 0){
-    matches = rl_completion_matches ((char*)text, &my_generator);
-  }else{
-    //        rl_bind_key('\t',rl_insert); //Disables 'ls'-behavior
-  }
-
-  return (matches);
 
 }
 
-char* my_generator(const char* text, int state)
-{
-  static int list_index, len;
-  char *name;
-
-  if (!state) {
-    list_index = 0;
-    len = strlen (text);
-  }
-
-  while ((name = cmd_list[list_index])) {
-    list_index++;
-
-    if (strncmp (name, text, len) == 0)
-      return (dupstr(name));
-  }
-
-  /* If no names matched, then return NULL. */
-  return ((char *)NULL);
-
-}
-
-char* dupstr (char* s) {
-  char* r;
-
-  r = (char*) xmalloc((strlen (s) + 1));
-  strcpy (r, s);
-  return (r);
-}
-
-void* xmalloc (int size)
-{
-  void* buf;
-
-  buf = malloc (size);
-  if (!buf) {
-    fprintf (stderr, "Error: Out of memory. Exiting.\n");
-    exit (1);
-  }
-
-  return buf;
-}
