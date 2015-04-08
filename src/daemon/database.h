@@ -80,7 +80,6 @@ public:
   //void add_data(const string& value1, const uint64_t& value2) {exec_s(i_items,value1,value2);}
 protected:
 
-  //Consider using tuples as return values instead of using out parameters
   void add_chunk(const Id& bid, const Id& cid, const size_t& size, const size_t& slot){exec_s(I_CHUNK,bid,cid,size,slot);}
   void add_metahead(const Metahead & metahead) {exec_s(I_METAHEAD,metahead.mid,metahead.tags,metahead.bid);}
 
@@ -88,8 +87,8 @@ protected:
   void get_all_metaheads(vector<Metahead>& metaheads);
 
   bool get_metahead(const Id &mid, Metahead& metahead);
-  //passing int by const ref is unnessary, the pointer value is the same length as an int
-  //passing by const int is faster less typing and no lookup is needed.
+  //passing int by const ref is unnessary, the pointer value is the same size as an int
+  //passing by const int requires less typing and no lookup is needed during runtime.
   void get_random_metaheads(const int n, vector<Metahead>& metaheads);
   void get_mids_by_tag_pattern(const string& ref_pettern, vector<Id>& id);
   bool get_chunk(const Id& bid, const Id& cid, size_t& size, size_t& slot);
