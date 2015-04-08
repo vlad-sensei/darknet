@@ -1,6 +1,6 @@
 #include "sqlite3_base.h"
 
-Sqlite3_base::Sqlite3_base(const string& db_path): DATABASE_PATH(db_path){
+Sqlite3_base::Sqlite3_base(const string& db_path): SQLITE3_PATH(db_path){
   sqlite3_config(SQLITE_CONFIG_MULTITHREAD);
   if(SQLITE_OK!=sqlite3_initialize())
     debug(" *** could not initialize database");

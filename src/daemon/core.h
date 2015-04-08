@@ -38,7 +38,7 @@ class Core : Connection_initiator_base, public Library {
 public:
   Core(){}
   inline void set_port(const uint16_t& port){Connection_initiator_base::set_port(port);}
-  void run();
+  void run(uint16_t ui_port);
   bool remove_peer(const peer_id_t& pid);
 
   // user interaction (UI)

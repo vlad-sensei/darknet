@@ -19,7 +19,7 @@ extern UI_ptr ui; //might need to rename due to overload
 class UI: Connection_initiator_base {
 public:
   UI(){}
-  void run();
+  void run(uint16_t ui_port);
   void echo(const string& msg);
 private:
   void handle_new_connection(tcp::socket socket);

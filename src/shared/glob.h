@@ -76,7 +76,6 @@ template<> struct hash<hash512_t>{
 const hash512_t NULL_ID = hash512_t();
 
 
-
 //typedef string hash_t;
 typedef hash512_t Id;
 typedef int64_t ts_t; //time_t, different on different platforms
@@ -86,9 +85,24 @@ typedef uint64_t file_size_t;
 #define DEFAULT_LISTEN_PORT 8453
 #define DEFAULT_UI_LISTEN_PORT 8888
 
-#define DEFAULT_DATABASE_PATH "test.db"
+#define DEFAULT_DATABASE_PATH "database.db"
 #define DEFAULT_ARENA_PATH "/tmp/arena"
 #define DEFAULT_ARENA_SLOT_NUM 200
+
+#ifdef __GNUC__
+#define VARIABLE_IS_NOT_USED __attribute__ ((unused))
+#else
+#define VARIABLE_IS_NOT_USED
+#endif
+
+
+//static uint16_t PORT=DEFAULT_LISTEN_PORT;
+static string DATABASE_PATH=DEFAULT_DATABASE_PATH;
+static string ARENA_PATH=DEFAULT_ARENA_PATH;
+
+static uint16_t VARIABLE_IS_NOT_USED PORT=DEFAULT_LISTEN_PORT;
+//static uint16_t VARIABLE_IS_NOT_USED UI_PORT=DEFAULT_UI_LISTEN_PORT;
+
 
 // c++14
 #include <shared_mutex>
@@ -158,6 +172,18 @@ void debug(const std::string& fmt, const Ts&...args){
   safe_printf(fmt.c_str(),args...);
   cout << "\n";
 #endif //DEBUG_ON
+}
+
+inline uint16_t get_port(){
+  return PORT;
+}
+
+inline string get_database_path(){
+  return DATABASE_PATH;
+}
+
+inline string get_arena_path(){
+  return ARENA_PATH;
 }
 
 
