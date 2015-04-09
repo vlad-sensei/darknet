@@ -28,23 +28,10 @@ public:
   //TODO: right now you need to search the tags in the same order in which it was written.
   void search(const string& pattern, vector<Id>& mids);
   bool upload_file(const string& filename, const string& tags = "");
-
   bool req_file(const Id& mid);
-
-  //TODO:
-  vector<Metahead> publish_metaheads(){
-    r_lock l(metaheads_mtx);
-    return data.published_metaheads;
-  }
-
   void handle_chunk(const Id& bid, const Chunk& chunk);
-
-  void run_test_uploader();
-  void run_test_downloader();
-  void add_metahead(const Metahead & metahead){
-    //TODO: metahead in ram ?
-    Database::add_metahead(metahead);
-  }
+  inline void add_metahead(const Metahead & metahead) {Database::add_metahead(metahead);}
+  vector<Metahead> publish_metaheads();
 
 private:
   virtual void req_chunks(const Id& bid, const unordered_set<Id>& cids) = 0; //request chunks

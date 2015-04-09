@@ -2,10 +2,6 @@
 #include "common.h"
 #include "database_test.h"
 
-TEST(test_unittest){
-  CHECK(test_unittest_add(2,3) == 5);
-}
-
 TEST(sha512){
   vector<hash512_t> hashes = {
     Id("wj01lEv8X4PwlP2Rciyn"),

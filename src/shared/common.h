@@ -94,8 +94,4 @@ HANDLE_CMD(CMD_CONNECT,"connect","co") \
 HANDLE_CMD(CMD_BROADCAST,"broadcast","br") \
 HANDLE_CMD(CMD_EXIT,"exit", "quit")
 
-//TODO: remove this
-inline int test_unittest_add(int a, int b){return a+b;}
-
-
 #endif // COMMON_H
