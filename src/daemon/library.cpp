@@ -15,8 +15,9 @@ Id Library::upload_file(const string& file_path, const string& tags){
   debug("PATH: [%s]",boost_file_path.c_str());
   debug("PATH FILENAME: [%s]",boost_file_path.filename().c_str());
 
-  Metahead metahead(hash512_t(boost_file_path.filename().string()),tags);
-  if(!Inventory::upload_file(file_path,metahead))return NULL_ID;
+  //Metahead metahead(hash512_t(boost_file_path.filename().string()),tags);
+  Metahead metahead;
+  if(!Inventory::upload_file(file_path,metahead,tags))return NULL_ID;
   add_metahead(metahead);
   return metahead.mid;
 }
@@ -31,7 +32,7 @@ bool Library::get_metahead(const Id& mid, Metahead& metahead){
 
 vector<Metahead> Library::publish_metaheads(){
   vector<Metahead> res;
-  Database::get_random_metaheads(N_SHARED_METAHEADS, res);
+  Database::get_all_metaheads( res);
   return res;
 }
 

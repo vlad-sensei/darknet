@@ -66,7 +66,7 @@ bool Inventory::add_chunk(const Id &bid, const Chunk &chunk){
 }
 
 //TODO: hadle case where the upload is canceled before finised. Enable to cancel uploads
-bool Inventory::upload_file(const string& filename, Metahead& metahead){
+bool Inventory::upload_file(const string& filename, Metahead& metahead, const string tags){
   //open file and calculating its size
   Metabody metabody;
   ifstream file;
@@ -117,7 +117,9 @@ bool Inventory::upload_file(const string& filename, Metahead& metahead){
     const Id& cid = metabody.cids[i];
     Database::add_chunk(metabody.bid, cid, cids[cid].second, cids[cid].first);
   }
-  metahead.bid = metabody_chunks[0].cid;  
+  metahead.bid = metabody_chunks[0].cid;
+  metahead.tags =tags;
+  metahead.mid=Id(string((char*)&metahead.bid, sizeof(metahead.bid)) + metahead.tags );
   return true;
 }
 

@@ -79,7 +79,7 @@ struct Metahead {
   string tags;
   Metahead() = default;
   Metahead(const Id& bid_,const string& tags_):
-    mid(string((char*)&bid_, sizeof(bid_))+tags_),  bid(bid_), tags(tags_){}
+    mid(string((char*)&bid_, sizeof(bid_)) + tags_ ),  bid(bid_), tags(tags_){}
 };
 
 /* List contains (enum name,full command name, short command name)
