@@ -48,13 +48,21 @@ struct hash512_t{
   }
 
   inline string to_string() const{
-    CryptoPP::HexEncoder encoder;
-    string output;
-    encoder.Attach( new CryptoPP::StringSink( output ) );
-    encoder.Put( (unsigned char*) data, sizeof(data) );
-    encoder.MessageEnd();
+    //    CryptoPP::HexEncoder encoder;
+    //    string output;
+    //    encoder.Attach( new CryptoPP::StringSink( output ) );
+    //    encoder.Put( (unsigned char*) data, sizeof(data) );
+    //    encoder.MessageEnd();
 
-    return output;;
+    //    return output;
+    ostringstream oss;
+    oss << std::hex;
+    for(int i=0; i<8; i++){
+      oss << setw(16) << setfill('0') << data[i];
+    }
+    oss << std::dec;
+    return oss.str();
+
   }
 
 private:
