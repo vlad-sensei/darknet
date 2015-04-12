@@ -31,10 +31,10 @@ public:
   void handle_chunk(const Id& bid, const Chunk& chunk);
 
   inline void add_metahead(const Metahead & metahead) {Database::add_metahead(metahead);}
-
+  bool get_metahead(const Id& mid, Metahead& metahead);
 private:
   virtual void req_chunks(const Id& bid, const unordered_set<Id>& cids) = 0; //request chunks
-  bool get_metahead(const Id& mid, Metahead& metahead);
+
 
   struct {
     unordered_map<Id, unordered_set<Id> > chunk_reqs; // chunk_req_map[mid] == set of chunks we are waiting for for that file

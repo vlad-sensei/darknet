@@ -92,6 +92,7 @@ That is why I have explicitly specified a short and full name.
   HANDLE_CMD(CMD_CONNECT,3,"connect","co") \
   HANDLE_CMD(CMD_BROADCAST,4,"broadcast","br") \
   HANDLE_CMD(CMD_EXIT,5,"exit", "quit") \
-  HANDLE_CMD(CMD_ASSEMBLE,6,"assemble", "as")
+  HANDLE_CMD(CMD_ASSEMBLE,6,"assemble", "as") \
+  HANDLE_CMD(CMD_SEARCH,8,"search", "se")
 
 #endif // COMMON_H

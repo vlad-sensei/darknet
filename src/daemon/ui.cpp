@@ -221,6 +221,30 @@ void UI::init_commands(){
   "assemble bid [filename=\"unnamed_file\"]",
   2,3);
 
+  init_command(Commands::CMD_SEARCH,
+               // Should have arg (tag1%tag2)
+               [this](const vector<string>& args){
+
+    vector<Id> mids;
+    try{
+      core->search(args[1],mids);
+      for(Id mid:mids){
+        Metahead head;
+        core->get_metahead(mid,head);
+        debug("[mid %s]\n [tags %s]\n [bid %s]\n",head.mid, head.tags,head.bid);
+        return "SEARCHING ...";
+      }
+    } catch(exception& e){
+      debug("*** error: %s",e.what());
+      handle_invalid_args(e);
+      return "Invalid arguments.";
+    }
+
+    return "SEARCH failed.";
+
+  },
+  "assemble bid [filename=\"unnamed_file\"]",
+  2,2);
 }
 
 Id to_Id(string Id_str){
