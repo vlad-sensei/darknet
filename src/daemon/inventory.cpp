@@ -2,8 +2,14 @@
 
 Inventory::Inventory(){
   //TODO: for now remove the old arena and create a new
-  remove(DEFAULT_ARENA_PATH);
-  data.arena.open(DEFAULT_ARENA_PATH);
+
+  /* Now you can overwrite existing files, even if they aren't a database
+   * Should give error if it exists (a previous arena may not exist, and
+   * if a user gives a path to another existing file, it will be overwritten).
+   * As stated by TODO, this behaviour should be changed.
+   */
+  remove(get_arena_path().c_str());
+  data.arena.open(get_arena_path());
   add_new_arena_slots(DEFAULT_ARENA_SLOT_NUM);
 }
 
@@ -11,8 +17,10 @@ bool Inventory::get_file(const Id& bid, const string& dest_path){
 
   Chunk chunk;
   Metabody metabody(bid);
+
   //TODO: get more then one chunk to metabody
   if(!get_chunk(bid,bid,chunk)) return false;
+
   metabody.append_from_chunk(chunk);
 
   const string tmp_dest_path = dest_path + ".part";
@@ -99,18 +107,17 @@ bool Inventory::upload_file(const string& filename, Metahead& metahead){
     }
   }
 
-
   //once added to arena, add to database.
   //TODO: use BEGIN; .. COMMIT;
-  for(size_t i = 0; i<metabody_chunks.size(); i++){
+  for(size_t i = 0; i<metabody_chunks.size(); i++){    
     const Id& cid = metabody_chunks[i].cid;
     Database::add_chunk(metabody.bid, cid, cids[cid].second, cids[cid].first);
   }
-  for(size_t i = 0; i < metabody.cids.size(); i++){
+  for(size_t i = 0; i < metabody.cids.size(); i++){    
     const Id& cid = metabody.cids[i];
     Database::add_chunk(metabody.bid, cid, cids[cid].second, cids[cid].first);
   }
-  metahead.bid = metabody_chunks[0].cid;
+  metahead.bid = metabody_chunks[0].cid;  
   return true;
 }
 

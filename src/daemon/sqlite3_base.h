@@ -15,7 +15,7 @@
 
 class Sqlite3_base {
   Sqlite3_base();
-  const string DATABASE_PATH;
+  const string SQLITE3_PATH;
 protected:
   Sqlite3_base(const string& db_path);
   ~Sqlite3_base();
@@ -79,7 +79,7 @@ private:
   template<typename Tr, typename ...Ts>
   inline Tr exec_sql(const string& sql, const Ts&...args){
     sqlite3* db;
-    sqlite3_open_v2(DATABASE_PATH.c_str(),&db,SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE|SQLITE_OPEN_NOMUTEX, NULL);
+    sqlite3_open_v2(SQLITE3_PATH.c_str(),&db,SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE|SQLITE_OPEN_NOMUTEX, NULL);
     sqlite3_stmt * stmt;
     sqlite3_busy_timeout(db,SQLITE3_MAX_SLEEP_MS);
     sqlite3_prepare_v2(db,sql.c_str(),(unsigned)sql.size(),&stmt,NULL);
@@ -97,8 +97,8 @@ protected:
   template <typename ...Ts>
   inline Result_ptr exec_q(const string& sql, const Ts&...args){return exec_sql<Result_ptr>(sql, args...);}
 
-  inline int remove_db(){return remove(DATABASE_PATH.c_str());}
-  inline bool exists(){ifstream f(DATABASE_PATH.c_str()); return f.good();}
+  inline int remove_db(){return remove(SQLITE3_PATH.c_str());}
+  inline bool exists(){ifstream f(SQLITE3_PATH.c_str()); return f.good();}
 
 };
 

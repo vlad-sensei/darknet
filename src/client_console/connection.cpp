@@ -13,6 +13,7 @@ void Connection::process_msg(const Msg_ptr &msg){
     debug("unknown message type : %d", msg->get_type());
     break;
   }
+//  cv.notify_one(); //notify_all()?
 }
 
 void Connection::handle_echo(const Msg_ptr &msg){

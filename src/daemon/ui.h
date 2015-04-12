@@ -28,7 +28,7 @@ typedef unique_ptr<UI> UI_ptr;
 class UI : Connection_initiator_base {
 public:
   UI();
-  void run();
+  void run(uint16_t ui_port);
   string process_text_input(const string& text_input);
 private:
 
@@ -37,13 +37,13 @@ private:
 
   void init_commands();
 
-#define HANDLE_CMD(cmd_enum, cmd_full_name, cmd_short_name) cmd_enum,
+#define HANDLE_CMD(cmd_enum, enum_val, cmd_full_name, cmd_short_name) cmd_enum=enum_val,
   enum Commands {
     CMD_LIST
   };
 #undef HANDLE_CMD
 
-#define HANDLE_CMD(cmd_enum, cmd_full_name, cmd_short_name) \
+#define HANDLE_CMD(cmd_enum, enum_val, cmd_full_name, cmd_short_name) \
   {cmd_full_name, Commands::cmd_enum }, {cmd_short_name, Commands::cmd_enum },
   unordered_map<string,Commands> command_map {
     CMD_LIST
@@ -80,5 +80,7 @@ private:
   } data;
   rw_mutex commands_mtx, clients_mtx;
 };
+
+Id to_Id(string Id_str);
 
 #endif // UI_H

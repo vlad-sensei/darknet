@@ -7,9 +7,8 @@
 
 UI_ptr ui;
 
-
-void UI::run(){
-  Connection_initiator_base::connect("localhost",DEFAULT_UI_LISTEN_PORT);
+void UI::run(uint16_t ui_port){
+  Connection_initiator_base::connect("localhost",ui_port);
 
   thread input_thread([this](){
     get_text_input();
@@ -59,11 +58,11 @@ void UI::get_text_input(){
 
       free(line);
 
-      /*
+/*
       //wait for return message of sent command
       unique_lock<mutex> lk(connection->m);
       connection->cv.wait(lk);
-      */
+*/
 
       //handle properly with ncurses
     }else{

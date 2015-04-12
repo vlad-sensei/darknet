@@ -79,7 +79,7 @@ struct Metahead {
   string tags;
   Metahead() = default;
   Metahead(const Id& bid_,const string& tags_):
-     mid(string((char*)&bid_, sizeof(bid_))+tags_),  bid(bid_), tags(tags_){}
+    mid(string((char*)&bid_, sizeof(bid_))+tags_),  bid(bid_), tags(tags_){}
 };
 
 /* List contains (enum name,full command name, short command name)
@@ -87,10 +87,11 @@ I thought that it's not neccessary with more than two names per command
 That is why I have explicitly specified a short and full name.
 */
 #define CMD_LIST \
-HANDLE_CMD(CMD_DOWNLOAD,"download","do") \
-HANDLE_CMD(CMD_UPLOAD,"upload","up") \
-HANDLE_CMD(CMD_CONNECT,"connect","co") \
-HANDLE_CMD(CMD_BROADCAST,"broadcast","br") \
-HANDLE_CMD(CMD_EXIT,"exit", "quit")
+  HANDLE_CMD(CMD_DOWNLOAD,1,"download","do") \
+  HANDLE_CMD(CMD_UPLOAD,2,"upload","up") \
+  HANDLE_CMD(CMD_CONNECT,3,"connect","co") \
+  HANDLE_CMD(CMD_BROADCAST,4,"broadcast","br") \
+  HANDLE_CMD(CMD_EXIT,5,"exit", "quit") \
+  HANDLE_CMD(CMD_ASSEMBLE,6,"assemble", "as")
 
 #endif // COMMON_H

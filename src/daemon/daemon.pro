@@ -6,6 +6,7 @@ CONFIG -= qt
 QMAKE_CXXFLAGS += -std=c++14
 
 LIBS += -lboost_system
+LIBS += -lboost_filesystem
 LIBS += -lboost_thread
 LIBS += -lpthread
 LIBS += -lsqlite3
