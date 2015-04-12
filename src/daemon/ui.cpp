@@ -14,7 +14,7 @@ UI::UI() {
 
 void UI::run(uint16_t ui_port){
   Connection_initiator_base::set_port(ui_port);
-//  Connection_initiator_base::set_port(DEFAULT_UI_LISTEN_PORT);
+  //  Connection_initiator_base::set_port(DEFAULT_UI_LISTEN_PORT);
   Connection_initiator_base::start_listen();
   Connection_initiator_base::run();
 }
@@ -190,15 +190,15 @@ void UI::init_commands(){
 
   init_command(Commands::CMD_SYNCH,
                [this](const vector<string>& args){
-      int status = 0;
-      int period = SYNC_PERIOD;
-      try{
-        status = stoi(args[1]);
-        if(args.size()>2) period = stoi(args[2]);
-      } catch(exception& e){
-        handle_invalid_args(e);
-        return "Invalid arguments.";
-      }
+    int status = 0;
+    int period = SYNC_PERIOD;
+    try{
+      status = stoi(args[1]);
+      if(args.size()>2) period = stoi(args[2]);
+    } catch(exception& e){
+      handle_invalid_args(e);
+      return "Invalid arguments.";
+    }
 
     if(status){
       core->start_synch(period);
@@ -270,22 +270,22 @@ void UI::init_commands(){
   "assemble bid [filename=\"unnamed_file\"]",
   2,2);
 }
-
+#include "cryptopp/hex.h"
+#include <cryptopp/filters.h>
 Id to_Id(string Id_str){
   if(Id_str.length() == 128){
     Id id;
     try{
-      for(unsigned i=0; i < 8; ++i){
-        string substr = Id_str.substr(i*16,16);
+      string decoded;
 
-        uint64_t result;
-        result = strtoull(substr.c_str(), NULL, 16);
-        if(!id.set_data(result,i)){
-          debug("*** couldn't set data [res=%s,i=%d]",result,i);
-          return Id();
-        }
-      }
+      CryptoPP::HexDecoder decoder;
 
+      decoder.Attach( new CryptoPP::StringSink( decoded ) );
+      decoder.Put( (byte*)Id_str.data(), Id_str.size() );
+      decoder.MessageEnd();
+
+      memcpy(&id,decoded.data(),sizeof(Id));
+      debug("decode %s",decoded);
     }catch (exception& e){
       debug("*** couldn't convert string to Id");
       debug("*** error:[%s]",e.what());

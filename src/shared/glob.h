@@ -47,14 +47,14 @@ struct hash512_t{
     }
   }
 
-  inline string to_string(){
-    ostringstream oss;
-    oss << std::hex;
-    for(int i=0; i<8; i++){
-      oss << setw(16) << setfill('0') << data[i];
-    }
-    oss << std::dec;
-    return oss.str();
+  inline string to_string() const{
+    CryptoPP::HexEncoder encoder;
+    string output;
+    encoder.Attach( new CryptoPP::StringSink( output ) );
+    encoder.Put( (unsigned char*) data, sizeof(data) );
+    encoder.MessageEnd();
+
+    return output;;
   }
 
 private:
@@ -62,13 +62,7 @@ private:
 };
 
 inline void operator << (ostream& os, const hash512_t& h){
-  CryptoPP::HexEncoder encoder;
-  std::string output;
-  encoder.Attach( new CryptoPP::StringSink( output ) );
-  encoder.Put( (unsigned char*) h.data, sizeof(h.data) );
-  encoder.MessageEnd();
-
-  os << output;
+  os << h.to_string();
 }
 
 namespace std {
