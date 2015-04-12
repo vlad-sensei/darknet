@@ -5,15 +5,14 @@ Core_ptr core;
 // -------- Constructors ----
 Core::Core(){}
 
-// -------- user interaction ----
-void Core::run(){
+void Core::run(uint16_t ui_port){
  thread network_thread([this](){
    Connection_initiator_base::start_listen();
    Connection_initiator_base::run();
  });
- thread ui_thread([this](){
+ thread ui_thread([this,ui_port](){
    ui = make_unique<UI>();
-   ui->run();
+   ui->run(ui_port);
  });
 
  network_thread.join();

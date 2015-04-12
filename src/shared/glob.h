@@ -20,7 +20,7 @@ using namespace std;
 
 //TODO: actually make glob.cpp to not include cryptopp?
 struct hash512_t{
-  inline hash512_t(){}
+  inline hash512_t() : data {0,0,0,0,0,0,0,0} {}
   explicit inline hash512_t(const string& value){CryptoPP::SHA512().CalculateDigest((byte*)data, (byte*)value.data(), value.size());}
   inline hash512_t(byte value[]){memcpy(data, value, sizeof(uint64_t)*8);}
   inline bool operator== (const hash512_t& other)const {return  !memcmp(data, other.data, sizeof(data));}
@@ -36,6 +36,25 @@ struct hash512_t{
     data[5]=0x90f7e6119de2e6b6;
     data[6]=0xccea4b7e1e87931a;
     data[7]=0x0c09fee3b9001ee5;
+  }
+
+  inline bool set_data(uint64_t d, unsigned pos){
+    if(pos <= 7){
+      data[pos] = d;
+      return true;
+    }else{
+      return false;
+    }
+  }
+
+  inline string to_string(){
+    ostringstream oss;
+    oss << std::hex;
+    for(int i=0; i<8; i++){
+      oss << setw(16) << setfill('0') << data[i];
+    }
+    oss << std::dec;
+    return oss.str();
   }
 
 private:
@@ -58,6 +77,9 @@ template<> struct hash<hash512_t>{
 };
 }
 
+const hash512_t NULL_ID = hash512_t();
+
+
 //typedef string hash_t;
 typedef hash512_t Id;
 typedef int64_t ts_t; //time_t, different on different platforms
@@ -72,9 +94,23 @@ typedef uint64_t file_size_t;
 #define SYNC false
 #define SYNC_PERIOD 30
 #define N_SHARED_METAHEADS 100
-#define DEFAULT_DATABASE_PATH "test.db"
+#define DEFAULT_DATABASE_PATH "database.db"
 #define DEFAULT_ARENA_PATH "/tmp/arena"
 #define DEFAULT_ARENA_SLOT_NUM 200
+
+#ifdef __GNUC__
+#define VARIABLE_IS_NOT_USED __attribute__ ((unused))
+#else
+#define VARIABLE_IS_NOT_USED
+#endif
+
+
+//static uint16_t PORT=DEFAULT_LISTEN_PORT;
+static string DATABASE_PATH=DEFAULT_DATABASE_PATH;
+static string ARENA_PATH=DEFAULT_ARENA_PATH;
+
+static uint16_t VARIABLE_IS_NOT_USED PORT=DEFAULT_LISTEN_PORT;
+//static uint16_t VARIABLE_IS_NOT_USED UI_PORT=DEFAULT_UI_LISTEN_PORT;
 
 // c++14
 #include <shared_mutex>
@@ -154,5 +190,18 @@ array<char, size> debug_str(const string& str){
   memcpy(arr.data(), str.data(), size);
   return arr;
 }
+
+inline uint16_t get_port(){
+  return PORT;
+}
+
+inline string get_database_path(){
+  return DATABASE_PATH;
+}
+
+inline string get_arena_path(){
+  return ARENA_PATH;
+}
+
 
 #endif // GLOB_H

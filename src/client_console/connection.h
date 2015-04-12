@@ -36,6 +36,6 @@ private:
 public:
   mutex m;
   condition_variable cv;
-  */
+*/
 };
 #endif // CONNECTION_H

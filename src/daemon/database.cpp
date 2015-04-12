@@ -1,7 +1,8 @@
 #include "database.h"
 
-Database::Database(): Sqlite3_base(DEFAULT_DATABASE_PATH){
-  debug("creating database..");
+Database::Database(): Sqlite3_base(get_database_path()){
+//Database::Database(): Sqlite3_base(DEFAULT_DATABASE_PATH){
+  debug("creating database [%s]..",get_database_path());
   init_db();
 }
 

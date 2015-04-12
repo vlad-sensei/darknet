@@ -1,23 +1,20 @@
-//TODO: !!!!!! deprecate readline with something more c++:ish
-
 #include "ui.h"
+
 #include <sstream>
 #include <iostream>
 #include <fstream>
 #include <iterator>
-#include <stdlib.h>
-#include <stdio.h>
 
 #include "core.h"
-
 
 UI::UI() {
   init_commands();
 }
 
 
-void UI::run(){
-  Connection_initiator_base::set_port(DEFAULT_UI_LISTEN_PORT);
+void UI::run(uint16_t ui_port){
+  Connection_initiator_base::set_port(ui_port);
+//  Connection_initiator_base::set_port(DEFAULT_UI_LISTEN_PORT);
   Connection_initiator_base::start_listen();
   Connection_initiator_base::run();
 }
@@ -68,10 +65,10 @@ string UI::Command::exec(const vector<string> &args){
 
 //TODO: make sure there are no copies
 void UI::init_command(const Commands cmd_enum, const cmd_lambda_t &execute, const string &help_text, const unsigned &minargc, const unsigned &maxargc){
-Command_ptr cmd = Command_ptr(new Command(execute, help_text, minargc, maxargc));
-w_lock w(commands_mtx);
-data.commands[cmd_enum] = cmd;
-// for(const string& key_word : key_words) data.commands[key_word]=cmd;
+  Command_ptr cmd = Command_ptr(new Command(execute, help_text, minargc, maxargc));
+  w_lock w(commands_mtx);
+  data.commands[cmd_enum] = cmd;
+  // for(const string& key_word : key_words) data.commands[key_word]=cmd;
 }
 
 //TODO: check if that this does not lead to any race condition when "this" (UI/Core) is destroyed
@@ -127,6 +124,7 @@ void UI::init_commands(){
   1,1);
 
   init_command(Commands::CMD_UPLOAD,
+               // Should have args (filename (or file_path later),[tags])
                [this](const vector<string>& args){
     string filename;
     try{
@@ -135,27 +133,59 @@ void UI::init_commands(){
       handle_invalid_args(e);
       return "Invalid arguments.";
     }
-   // core->run_test_uploader();
-    return "upload done.";
+    string tags;
+    if(args.size() > 2){
+      try{
+        tags = args[2];
+      } catch(exception& e){
+        handle_invalid_args(e);
+        return "Invalid arguments.";
+      }
+    }else{
+      tags = filename+":"+filename;
+    }
 
+    Id mid = core->upload_file(filename, tags);
+    if(mid == NULL_ID){
+      return "Upload failed.";
+    }else{
+      string ret_str = "Upload successful: mid[" + mid.to_string() +"]";
+      return ret_str.c_str();
+    }
   },
-  "upload filname",
-  2,2);
+  "upload filename [tags]",
+  2,3);
 
   init_command(Commands::CMD_DOWNLOAD,
+               // Should have args (mid)
                [this](const vector<string>& args){
-    string filename;
+
+    Id mid;
     try{
-      filename = args[1];
+      mid = to_Id(args[1]);
+      debug("MID:[%s]",mid);
+      if(mid == NULL_ID){
+        return "Download failed: Invalid mid";
+      }else{
+        Id bid = core->req_file(mid);
+        if(bid == NULL_ID){
+          debug("Metahead for mid [%s] doesn't exist",mid);
+          return "Invalid mid: Not found";
+        }else{
+          string ret_str = "Download succeded. File bid:["+bid.to_string()+"]";
+          return ret_str.c_str();
+        }
+      }
     } catch(exception& e){
+      debug("*** error: %s",e.what());
       handle_invalid_args(e);
       return "Invalid arguments.";
     }
-    //core->run_test_downloader();
-    return "download done.";
+
+    return "download failed.";
 
   },
-  "download filname",
+  "download mid",
   2,2);
 
   init_command(Commands::CMD_SYNCH,
@@ -181,4 +211,65 @@ void UI::init_commands(){
   },
   "synch 1|0 [sync_period]",
   2,3);
+
+  init_command(Commands::CMD_ASSEMBLE,
+               // Should have args (bid,[file_path="~/Downloads"(eller annat lämpligt val)])
+               [this](const vector<string>& args){
+
+    Id bid;
+    try{
+      bid = to_Id(args[1]);
+      debug("BID:[%s]",bid);
+      if(bid == NULL_ID){
+        return "Assemble failed: Invalid bid";
+      }else{
+        string filename("unnamed_file");
+        if(args.size() == 3){
+          filename = args[2];
+        }
+        //TODO: filename checking
+        if(!core->get_file(bid,filename)){
+          return "Assembly failed: couldn't find file";
+        }
+        return "Assembly complete!";
+      }
+    } catch(exception& e){
+      debug("*** error: %s",e.what());
+      handle_invalid_args(e);
+      return "Invalid arguments.";
+    }
+
+    return "Assembly failed.";
+
+  },
+  "assemble bid [filename=\"unnamed_file\"]",
+  2,3);
+
+}
+
+Id to_Id(string Id_str){
+  if(Id_str.length() == 128){
+    Id id;
+    try{
+      for(unsigned i=0; i < 8; ++i){
+        string substr = Id_str.substr(i*16,16);
+
+        uint64_t result;
+        result = strtoull(substr.c_str(), NULL, 16);
+        if(!id.set_data(result,i)){
+          debug("*** couldn't set data [res=%s,i=%d]",result,i);
+          return Id();
+        }
+      }
+
+    }catch (exception& e){
+      debug("*** couldn't convert string to Id");
+      debug("*** error:[%s]",e.what());
+      return Id();
+    }
+    return id;
+  }else{
+    debug("*** Wrong Id length [%s != 128]",Id_str.length());
+    return Id();
+  }
 }

@@ -19,7 +19,7 @@ extern UI_ptr ui; //might need to rename due to overload
 class UI: Connection_initiator_base {
 public:
   UI(){}
-  void run();
+  void run(uint16_t ui_port);
   void echo(const string& msg);
 private:
   void handle_new_connection(tcp::socket socket);
@@ -28,7 +28,7 @@ private:
   Connection_ptr connection;
 };
 
-#define HANDLE_CMD(cmd_enum, cmd_full_name, cmd_short_name) cmd_full_name, cmd_short_name,
+#define HANDLE_CMD(cmd_enum, enum_val, cmd_full_name, cmd_short_name) cmd_full_name, cmd_short_name,
 static vector<string> command_list {
 CMD_LIST
 };
