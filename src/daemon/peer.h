@@ -40,7 +40,8 @@ public:
   void init();
   inline void echo(const string& echo_msg = "echo_msg") {send(Message::echo(echo_msg));}
   inline void req_chunks(const Id& bid, const unordered_set<Id>& cids) {send(Message::chunk_req(bid,cids));}
-
+  inline void req_metaheads(){send(Message::meta_req());}
+  inline void send_metaheads(const vector<Metahead>& metaheads){send(Message::meta_reply(metaheads));}
 private:
   Peer();
   void terminate();
@@ -50,6 +51,8 @@ private:
   void process_msg(const Msg_ptr& msg);
   void handle_echo(const Msg_ptr& msg);
   void handle_chunk_req(const Msg_ptr& msg);
+  void handle_meta_req(const Msg_ptr& msg);
+  void handle_meta_reply(const Msg_ptr& msg);
   void handle_chunk(const Msg_ptr& msg);
 
   struct Data{

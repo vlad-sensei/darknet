@@ -40,12 +40,14 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <array>
 
 #include <boost/asio.hpp>
 
 namespace ba = boost::asio;
 
 #include "glob.h"
+#include "common.h"
 
 class Message_base;
 typedef shared_ptr<Message_base> Msg_base_ptr;
@@ -111,6 +113,10 @@ protected:
   unordered_map<Key_type_t, string> h;
 
 private:
+  const size_t MID_SIZE = binary_size<Id>();
+  const size_t BID_SIZE = binary_size<Id>();
+  const size_t TAGS_SIZE = METAHEAD_SIZE - MID_SIZE - BID_SIZE;
+
   template<typename T>
   inline T get(const Key_type_t& key){
     T res = T();
@@ -121,6 +127,9 @@ private:
     memcpy(&res, h[key].data(), sizeof(T));
     return res;
   }
+
+  Metahead get(const Key_type_t &key);
+
 
   //TODO: more trollchecks
   template<typename T>
@@ -135,6 +144,30 @@ private:
     for(size_t i = 0; i<size; i++)
       memcpy(&res[i],&bin[0]+i*sizeof(T),sizeof(T));
     return res;
+  }
+
+  /*
+   * Retrieves a vector of type T from the message for the given key. Use this
+   * in conjunction with the template function to_data_struct.
+   */
+  template<typename T>
+  inline vector<T> get_vector_(const Key_type_t& key){
+    if(!has_key(key)){
+      handle_troll_input();
+      return vector<T>();
+    }
+    const string& bin = h[key];
+
+    size_t offset = 0;
+    size_t elem_size = binary_size<T>();
+    size_t vec_size = bin.size()/elem_size;
+    vector<T> vec(vec_size);
+
+    for(auto&  e: vec){
+      e = from_binary<T>(bin, offset);
+      offset += elem_size;
+    }
+    return vec;
   }
 
   template<typename T>
@@ -163,9 +196,13 @@ public:
   inline vector<Id> get_vector_id(const Key_type_t& key){return get_vector<Id>(key);}
   inline unordered_set<Id> get_unordered_set_id(const Key_type_t& key){return get_unordered_set<Id>(key);}
   inline Id get_id(const Key_type_t& key){return get<Id>(key);}
+  inline vector<Metahead> get_vector_metahead(const Key_type_t& key){return get_vector_<Metahead>(key);}
 
 protected:
 
+  //Can't be used directly on user defined structs, because data struct
+  //alignment is implementation defined and may differ depending on compiler
+  //and plattform
   template<typename T>
   const string to_binary_container(const T& container){
     string res(container.size()*sizeof(typename T::value_type),0);
@@ -186,7 +223,61 @@ protected:
   inline string to_binary(const Id& value){return to_binary_base<Id>(value);}
   inline string to_binary(const vector<Id>& value){return to_binary_container<vector<Id> >(value);}
   inline string to_binary(const unordered_set<Id>& value){return to_binary_container<unordered_set<Id> >(value);}
+  string to_binary(const Metahead& metahead);
+  inline string to_binary(const vector<Metahead>& metaheads){return to_binary_container_(metaheads);}
 
+  /*
+   * Creates a binary string representing a serialized vector of type T. Uses
+   * to_binary to serialize each element.
+   */
+  template<typename T>
+  const string to_binary_container_(const T& container){
+    string res;
+    for(const auto& e : container){
+        res.append(to_binary(e));
+    }
+    return res;
+  }
+
+  /*
+   * Takes a binary string that represents a serialized instance of type T,
+   * and deserializes it back to a instance of type T. Specilazations of the
+   * template is declared outside the class
+   */
+  template<typename T>
+  T from_binary(const string& bin, size_t offset){
+    T res;
+    if (offset + binary_size<T>() > bin.size())
+      return res;
+    memcpy(&res, &bin[offset], binary_size<T>());
+    return res;
+  }
+
+  /*
+   * Returns the length in bytes of the serialized binary string of type T.
+   * Specializations lies outside the class.
+   */
+  template <typename T>
+  inline size_t binary_size(){return sizeof(T);}
 };
+
+template<>
+inline size_t Message_base::binary_size<Metahead>(){return METAHEAD_SIZE;}
+
+template<>
+inline Metahead Message_base::from_binary(const string& bin, size_t start){
+  Metahead metahead;
+  if(start + binary_size<Metahead>() > bin.size())
+    return metahead;
+
+  const size_t BID_OFFSET = start + MID_SIZE;
+  const size_t TAGS_OFFSET = BID_OFFSET + BID_SIZE;
+
+  memcpy(&metahead.mid, &bin[start],          MID_SIZE);
+  memcpy(&metahead.bid, &bin[BID_OFFSET], BID_SIZE);
+  metahead.tags = string(&bin[TAGS_OFFSET], TAGS_SIZE);
+
+  return metahead;
+ }
 
 #endif // MESSAGE_BASE_H

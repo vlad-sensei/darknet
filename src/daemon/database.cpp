@@ -53,3 +53,10 @@ bool Database::get_chunk(const Id &bid, const Id &cid, size_t &size, size_t &slo
   slot = res->get_size_t(1);
   return true;
 }
+
+void Database::get_random_metaheads(const int n, vector<Metahead>& metaheads){
+  Result_ptr res = exec_q(Q_RANDOM_METAHEADS, n);
+  while(res->next()) {
+    metaheads.emplace_back(res->get_id(2), res->get_string(1));
+  }
+}

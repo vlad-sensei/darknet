@@ -27,6 +27,8 @@
 #include "ui.h"
 #include "library.h"
 
+#define DEBUG
+
 class Core;
 typedef unique_ptr<Core> Core_ptr;
 class UI;
@@ -36,7 +38,7 @@ extern Core_ptr core;
 
 class Core : Connection_initiator_base, public Library {
 public:
-  Core(){}
+  Core();
   inline void set_port(const uint16_t& port){Connection_initiator_base::set_port(port);}
   void run(uint16_t ui_port);
   bool remove_peer(const peer_id_t& pid);
@@ -44,10 +46,14 @@ public:
   // user interaction (UI)
   void connect(const string& addr, const uint16_t& port);
   void broadcast_echo(const string& msg);
+  //start syncing at regular intervalls
+  void start_synch(int period);
+  //stop syncing after the next syncing is completed
+  void stop_synch();
 
 private:
   void req_chunks(const Id& bid, const unordered_set<Id>& cids);
-
+  void synch_all();
   void spawn_peer(tcp::socket& socket);
   void handle_new_connection(tcp::socket socket);
 
@@ -60,6 +66,9 @@ private:
   rw_mutex peers_mtx, pid_mtx;
 
   UI_ptr ui;
+  thread sync_thread;
+  bool should_sync = SYNC;
+  bool sync_thread_exists = false;
 };
 
 #endif // CORE_H

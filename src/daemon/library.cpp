@@ -29,7 +29,11 @@ bool Library::get_metahead(const Id& mid, Metahead& metahead){
   return Database::get_metahead(mid,metahead);
 }
 
-
+vector<Metahead> Library::publish_metaheads(){
+  vector<Metahead> res;
+  Database::get_random_metaheads(N_SHARED_METAHEADS, res);
+  return res;
+}
 
 void Library::handle_chunk(const Id& bid, const Chunk& chunk){
   w_lock l(chunk_reqs_mtx);

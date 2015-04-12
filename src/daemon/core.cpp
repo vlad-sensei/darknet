@@ -1,8 +1,9 @@
 #include "core.h"
-
+#include <ratio>
 Core_ptr core;
 
-// -------- user interaction ----
+// -------- Constructors ----
+Core::Core(){}
 
 void Core::run(uint16_t ui_port){
  thread network_thread([this](){
@@ -13,6 +14,7 @@ void Core::run(uint16_t ui_port){
    ui = make_unique<UI>();
    ui->run(ui_port);
  });
+
  network_thread.join();
  ui_thread.join();
 }
@@ -44,6 +46,35 @@ void Core::req_chunks(const Id &bid, const unordered_set<Id> &cids){
   for(const auto& it:data.peers){
     const Peer_ptr& peer = it.second;
     peer->req_chunks(bid, cids);
+  }
+}
+
+//TODO fix starting after stopping
+void Core::start_synch(int period){
+    //Capturing this might lead to a dangling pointer if core is destroyed
+    should_sync = true;
+
+    if (!sync_thread_exists){
+      sync_thread = thread([this, period](void){
+          while(should_sync){
+            this_thread::sleep_for(chrono::seconds(period));
+            core->synch_all();
+          }
+      });
+      sync_thread_exists = true;
+    }
+}
+
+void Core::stop_synch(){
+    should_sync = false;
+}
+
+//-------- syncing ----
+void Core::synch_all(){
+  r_lock l(peers_mtx);
+  for(const auto& it:data.peers){
+    const Peer_ptr& peer = it.second;
+    peer->req_metaheads();
   }
 }
 

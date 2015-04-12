@@ -19,6 +19,7 @@
 #include "common.h"
 #include "inventory.h"
 
+
 class Library: public Inventory {
 public:
 
@@ -29,9 +30,10 @@ public:
   Id upload_file(const string& file_path, const string& tags = "");
   Id req_file(const Id& mid);
   void handle_chunk(const Id& bid, const Chunk& chunk);
-
   inline void add_metahead(const Metahead & metahead) {Database::add_metahead(metahead);}
   bool get_metahead(const Id& mid, Metahead& metahead);
+  vector<Metahead> publish_metaheads();
+
 private:
   virtual void req_chunks(const Id& bid, const unordered_set<Id>& cids) = 0; //request chunks
 
@@ -46,8 +48,16 @@ private:
     }
     inline bool chunk_req_exists(const Id& bid,const Id& cid){ return (file_req_exists(bid) && chunk_reqs[bid].find(cid) != chunk_reqs[bid].end() );}
     inline bool has_metabody(const Id& bid){return has_metabody_.find(bid) !=has_metabody_.end();}
+
+    Metahead m = Metahead(Id("a"), "Batman");
+    Metahead m1 = Metahead(Id("b"), "Spiderman");
+    Metahead m2 = Metahead(Id("c"), "Pop eye");
+    vector<Metahead> published_metaheads = { m, m1, m2 };
+
   } data;
-  rw_mutex chunk_reqs_mtx;
+
+
+  rw_mutex chunk_reqs_mtx, metaheads_mtx;
 
 };
 

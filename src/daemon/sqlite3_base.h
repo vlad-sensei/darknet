@@ -47,6 +47,7 @@ private:
 
   inline void set_prep_var(sqlite3_stmt* stmt, const int& pos, const string& var){sqlite3_bind_blob(stmt,pos,var.data(),var.size(),SQLITE_STATIC);}
   inline void set_prep_var(sqlite3_stmt* stmt, const int& pos, const uint64_t& var){sqlite3_bind_int64(stmt,pos,var);}
+  inline void set_prep_var(sqlite3_stmt* stmt, const int& pos, const int& var){sqlite3_bind_int(stmt,pos,var);}
 
   template <size_t ARG_NUM>
   inline void bind_args(sqlite3 *db, sqlite3_stmt *stmt){(void)db;(void)stmt;}

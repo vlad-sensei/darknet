@@ -188,6 +188,30 @@ void UI::init_commands(){
   "download mid",
   2,2);
 
+  init_command(Commands::CMD_SYNCH,
+               [this](const vector<string>& args){
+      int status = 0;
+      int period = SYNC_PERIOD;
+      try{
+        status = stoi(args[1]);
+        if(args.size()>2) period = stoi(args[2]);
+      } catch(exception& e){
+        handle_invalid_args(e);
+        return "Invalid arguments.";
+      }
+
+    if(status){
+      core->start_synch(period);
+      return string("synching started with period: " + to_string(period)).c_str();
+    }
+    else{
+      core->stop_synch();
+      return "syncing stopped";
+    }
+  },
+  "synch 1|0 [sync_period]",
+  2,3);
+
   init_command(Commands::CMD_ASSEMBLE,
                // Should have args (bid,[file_path="~/Downloads"(eller annat lämpligt val)])
                [this](const vector<string>& args){

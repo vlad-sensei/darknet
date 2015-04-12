@@ -32,6 +32,12 @@ void Peer::process_msg(const Msg_ptr& msg){
   case Message::T_CHUNK_REQ:
     handle_chunk_req(msg);
     break;
+  case Message::T_META_REQ:
+    handle_meta_req(msg);
+    break;
+  case Message::T_META_REPLY:
+    handle_meta_reply(msg);
+    break;
   case Message::T_CHUNK:
     handle_chunk(msg);
     break;
@@ -68,3 +74,15 @@ void Peer::handle_chunk_req(const Msg_ptr &msg){
   }
 }
 
+void Peer::handle_meta_req(const Msg_ptr &msg){
+  debug("SYNCH_REQ: %s", msg->get_string(Message::K_BODY));
+  send_metaheads(core->publish_metaheads());
+}
+
+void Peer::handle_meta_reply(const Msg_ptr &msg){
+  debug("META_LIST_REPLY:");
+  vector<Metahead> v = msg->get_vector_metahead(Message::K_META_LIST);
+   for (const auto& e: v){
+       core->add_metahead(e);
+     }
+}

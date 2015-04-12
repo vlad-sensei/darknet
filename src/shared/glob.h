@@ -9,6 +9,7 @@ using namespace std;
 #include <cinttypes>
 #include <iostream>
 #include "cryptopp/sha.h"
+#include "cryptopp/hex.h"
 #include <iomanip>
 
 /* Example usage:
@@ -21,6 +22,7 @@ using namespace std;
 struct hash512_t{
   inline hash512_t() : data {0,0,0,0,0,0,0,0} {}
   explicit inline hash512_t(const string& value){CryptoPP::SHA512().CalculateDigest((byte*)data, (byte*)value.data(), value.size());}
+  inline hash512_t(byte value[]){memcpy(data, value, sizeof(uint64_t)*8);}
   inline bool operator== (const hash512_t& other)const {return  !memcmp(data, other.data, sizeof(data));}
   inline size_t std_hash() const {return data[0]^data[1]^data[2]^data[3]^data[4]^data[5]^data[6]^data[7];}
   friend void operator << (ostream& os, const hash512_t& h);
@@ -60,11 +62,13 @@ private:
 };
 
 inline void operator << (ostream& os, const hash512_t& h){
-  os << std::hex;
-  for(int i=0; i<8;i++){
-    os << setw(16) << setfill('0') << h.data[i];
-  }
-  os << std::dec;
+  CryptoPP::HexEncoder encoder;
+  std::string output;
+  encoder.Attach( new CryptoPP::StringSink( output ) );
+  encoder.Put( (unsigned char*) h.data, sizeof(h.data) );
+  encoder.MessageEnd();
+
+  os << output;
 }
 
 namespace std {
@@ -80,11 +84,16 @@ const hash512_t NULL_ID = hash512_t();
 typedef hash512_t Id;
 typedef int64_t ts_t; //time_t, different on different platforms
 typedef uint64_t peer_id_t;
+typedef unsigned char byte;
 typedef uint64_t file_size_t;
 
 #define DEFAULT_LISTEN_PORT 8453
 #define DEFAULT_UI_LISTEN_PORT 8888
-
+#define ID_SIZE 64
+#define METAHEAD_SIZE 1024
+#define SYNC false
+#define SYNC_PERIOD 30
+#define N_SHARED_METAHEADS 100
 #define DEFAULT_DATABASE_PATH "database.db"
 #define DEFAULT_ARENA_PATH "/tmp/arena"
 #define DEFAULT_ARENA_SLOT_NUM 200
@@ -171,6 +180,15 @@ void debug(const std::string& fmt, const Ts&...args){
   safe_printf(fmt.c_str(),args...);
   cout << "\n";
 #endif //DEBUG_ON
+
+}
+
+//Temporary debug function used for inspecting long strings
+template<size_t size>
+array<char, size> debug_str(const string& str){
+  array<char, size> arr;
+  memcpy(arr.data(), str.data(), size);
+  return arr;
 }
 
 inline uint16_t get_port(){

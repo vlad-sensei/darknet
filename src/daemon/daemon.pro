@@ -11,7 +11,6 @@ LIBS += -lboost_thread
 LIBS += -lpthread
 LIBS += -lsqlite3
 LIBS += -lcryptopp
-LIBS += -lreadline
 
 INCLUDEPATH += $$PWD/../shared
 

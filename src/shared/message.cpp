@@ -34,3 +34,18 @@ Msg_ptr Message::chunk(const Id& bid,const Chunk& chunk){
 Msg_ptr Message::ui_text_command(const string& msg){
   return make(T_UI_TEXT_COMMAND, K_BODY, msg);
 }
+
+Msg_ptr Message::meta_req(){
+  return make(T_META_REQ);
+}
+
+Msg_ptr Message::meta_reply(const vector<Metahead> &metaheads){
+  return make(T_META_REPLY, K_META_LIST, metaheads);
+}
+
+/*
+void f(){
+  vector<Metahead> m;
+  to_binary_container(m);
+}
+*/
