@@ -12,6 +12,7 @@ INCLUDEPATH += \
 LIBS += -lboost_system
 LIBS += -lboost_filesystem
 LIBS += -lboost_thread
+LIBS += -lboost_filesystem
 LIBS += -lpthread
 LIBS += -lsqlite3
 LIBS += -lunittest++

@@ -91,25 +91,3 @@ void Message_base::handle_troll_input(){
 void Message_base::print(){
   debug("message [type:%u;body_size:%llu;keynum:%u]",type,body_size,key_num);
 }
-
-// ----------- Binary conversion --------------
-
-/* Serialization format of metahead:
- *
- * +----------+----------+------------+
- * | MID [64] | BID [64] | TAGS [896] |
- * +----------+----------+------------+
- * 0        63|64     127|128        1024
- */
-string Message_base::to_binary(const Metahead& metahead){
-  const size_t BID_OFFSET = MID_SIZE;
-  const size_t TAGS_OFFSET = BID_OFFSET + BID_SIZE;
-  const size_t tags_size = metahead.tags.size() >= TAGS_SIZE ? TAGS_SIZE : metahead.tags.size();
-  string buffer(METAHEAD_SIZE, 0);
-
-  memcpy(&buffer[0],           &metahead.mid,     MID_SIZE);
-  memcpy(&buffer[BID_OFFSET],  &metahead.bid,     BID_SIZE);
-  memcpy(&buffer[TAGS_OFFSET], &metahead.tags[0], tags_size);
-
-  return buffer;
-}

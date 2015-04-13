@@ -199,39 +199,23 @@ public:
   inline vector<Metahead> get_vector_metahead(const Key_type_t& key){return get_vector_<Metahead>(key);}
 
 protected:
-
-  //Can't be used directly on user defined structs, because data struct
-  //alignment is implementation defined and may differ depending on compiler
-  //and plattform
   template<typename T>
-  const string to_binary_container(const T& container){
-    string res(container.size()*sizeof(typename T::value_type),0);
-    size_t offset = 0;
-    for(const auto& e : container){
-      memcpy(&res[0]+offset, &e, sizeof(e));
-      offset+=sizeof(e);
-    }
-    return res;
-  }
-
-  template<typename T>
-  inline string to_binary_base(const T& value){return string((char*)&value,sizeof(T));}
+  inline string to_binary(const T& value){return string((char*)&value,sizeof(T));}
   inline string to_binary(const string& value) {return value;}
-  inline string to_binary(const time_t& value){return to_binary_base<time_t>(value);}
-  inline string to_binary(const bool& value){return to_binary_base<bool>(value);}
-  inline string to_binary(const peer_id_t& value){return to_binary_base<peer_id_t>(value);}
-  inline string to_binary(const Id& value){return to_binary_base<Id>(value);}
-  inline string to_binary(const vector<Id>& value){return to_binary_container<vector<Id> >(value);}
-  inline string to_binary(const unordered_set<Id>& value){return to_binary_container<unordered_set<Id> >(value);}
-  string to_binary(const Metahead& metahead);
-  inline string to_binary(const vector<Metahead>& metaheads){return to_binary_container_(metaheads);}
+  inline string to_binary(const Metahead& metahead);
+  inline string to_binary(const vector<Id>& value){
+    return to_binary_container<vector<Id> >(value);}
+  inline string to_binary(const unordered_set<Id>& value){
+    return to_binary_container<unordered_set<Id> >(value);}
+  inline string to_binary(const vector<Metahead>& metaheads){
+    return to_binary_container<vector<Metahead> >(metaheads);}
 
   /*
    * Creates a binary string representing a serialized vector of type T. Uses
    * to_binary to serialize each element.
    */
   template<typename T>
-  const string to_binary_container_(const T& container){
+  const string to_binary_container(const T& container){
     string res;
     for(const auto& e : container){
         res.append(to_binary(e));
@@ -264,6 +248,18 @@ protected:
 template<>
 inline size_t Message_base::binary_size<Metahead>(){return METAHEAD_SIZE;}
 
+
+
+// ----------- Binary conversion --------------
+
+/* Serialization format of metahead:
+ *
+ * +----------+----------+------------+
+ * | MID [64] | BID [64] | TAGS [896] |
+ * +----------+----------+------------+
+ * 0        63|64     127|128        1024
+ */
+
 template<>
 inline Metahead Message_base::from_binary(const string& bin, size_t start){
   Metahead metahead;
@@ -279,5 +275,19 @@ inline Metahead Message_base::from_binary(const string& bin, size_t start){
 
   return metahead;
  }
+
+string Message_base::to_binary(const Metahead& metahead){
+  const size_t BID_OFFSET = MID_SIZE;
+  const size_t TAGS_OFFSET = BID_OFFSET + BID_SIZE;
+  const size_t tags_size = metahead.tags.size() >= TAGS_SIZE ? TAGS_SIZE : metahead.tags.size();
+  string buffer(METAHEAD_SIZE, 0);
+
+  memcpy(&buffer[0],           &metahead.mid,     MID_SIZE);
+  memcpy(&buffer[BID_OFFSET],  &metahead.bid,     BID_SIZE);
+  memcpy(&buffer[TAGS_OFFSET], &metahead.tags[0], tags_size);
+
+  return buffer;
+}
+
 
 #endif // MESSAGE_BASE_H
