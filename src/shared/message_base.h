@@ -130,28 +130,13 @@ private:
 
   Metahead get(const Key_type_t &key);
 
-
   //TODO: more trollchecks
-  template<typename T>
-  inline vector<T> get_vector(const Key_type_t& key){
-    if(!has_key(key)){
-      handle_troll_input();
-      return vector<T>();
-    }
-    const string& bin = h[key];
-    size_t size = bin.size()/sizeof(T);
-    vector<T> res(size);
-    for(size_t i = 0; i<size; i++)
-      memcpy(&res[i],&bin[0]+i*sizeof(T),sizeof(T));
-    return res;
-  }
-
   /*
    * Retrieves a vector of type T from the message for the given key. Use this
    * in conjunction with the template function to_data_struct.
    */
   template<typename T>
-  inline vector<T> get_vector_(const Key_type_t& key){
+  inline vector<T> get_vector(const Key_type_t& key){
     if(!has_key(key)){
       handle_troll_input();
       return vector<T>();
@@ -196,7 +181,7 @@ public:
   inline vector<Id> get_vector_id(const Key_type_t& key){return get_vector<Id>(key);}
   inline unordered_set<Id> get_unordered_set_id(const Key_type_t& key){return get_unordered_set<Id>(key);}
   inline Id get_id(const Key_type_t& key){return get<Id>(key);}
-  inline vector<Metahead> get_vector_metahead(const Key_type_t& key){return get_vector_<Metahead>(key);}
+  inline vector<Metahead> get_vector_metahead(const Key_type_t& key){return get_vector<Metahead>(key);}
 
 protected:
   template<typename T>
