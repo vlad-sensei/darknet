@@ -201,6 +201,7 @@ public:
 protected:
   template<typename T>
   inline string to_binary(const T& value){return string((char*)&value,sizeof(T));}
+  inline string to_binary(const string& value) {return value;}
   inline string to_binary(const Metahead& metahead);
   inline string to_binary(const vector<Id>& value){
     return to_binary_container<vector<Id> >(value);}
