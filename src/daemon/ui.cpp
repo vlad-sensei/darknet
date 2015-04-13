@@ -276,29 +276,15 @@ Id to_Id(string Id_str){
   if(Id_str.length() == 128){
     Id id;
     try{
-//      string decoded;
+      string decoded;
 
-//      CryptoPP::HexDecoder decoder;
+      CryptoPP::HexDecoder decoder;
 
-//      decoder.Attach( new CryptoPP::StringSink( decoded ) );
-//      decoder.Put( (byte*)Id_str.data(), Id_str.size() );
-//      decoder.MessageEnd();
+      decoder.Attach( new CryptoPP::StringSink( decoded ) );
+      decoder.Put( (byte*)Id_str.data(), Id_str.size() );
+      decoder.MessageEnd();
 
-//      memcpy(&id,decoded.data(),sizeof(Id));
-//      debug("decode %s",decoded);
-      for(unsigned i=0; i < 8; ++i){
-      string substr = Id_str.substr(i*16,16);
-      uint64_t result;
-      result = strtoull(substr.c_str(), NULL, 16);
-      if(!id.set_data(result,i)){
-      debug("*** couldn't set data [res=%s,i=%d]",result,i);
-      return Id();
-      }
-      }
-
-
-
-
+      memcpy(&id,decoded.data(),sizeof(Id));
     }catch (exception& e){
       debug("*** couldn't convert string to Id");
       debug("*** error:[%s]",e.what());
