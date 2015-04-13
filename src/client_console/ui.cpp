@@ -3,6 +3,7 @@
 #include <thread>
 #include <mutex>
 #include <ncurses.h>
+#include <boost/algorithm/string.hpp>
 
 UI_ptr ui;
 
@@ -32,10 +33,16 @@ void UI::handle_new_connection(tcp::socket socket){
 
 
 void UI::echo(const string &msg){
-    terminal_content.insert(terminal_content.begin()+2,msg);
+
+    vector <string> strings;
+
+    boost::split(strings,msg,boost::is_any_of("\n"));
+
+    for(string str: strings){
+        terminal_content.insert(terminal_content.begin()+2,str);
+    }
     print_terminal_content(terminal_content, content_index);
     refresh();
-    //safe_printf("%s\n", msg);
 }
 
 // ~~~~~~~~~~~~ text input ~~~~~~~~~~~~
