@@ -23,8 +23,10 @@ public:
   void echo(const string& msg);
 private:
   void handle_new_connection(tcp::socket socket);
-  void init_readline();
+  string find_match(string input); //autofill funktion
+  void print_terminal_content(vector<string> terminal_content, int content_index);
   void get_text_input();
+  void init_window();
   Connection_ptr connection;
 };
 

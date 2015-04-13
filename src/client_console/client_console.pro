@@ -8,10 +8,11 @@ QMAKE_CXXFLAGS += -std=c++14
 INCLUDEPATH += $$PWD/../shared
 
 LIBS += -lboost_system
+LIBS += -lboost_filesystem
 LIBS += -lboost_thread
 LIBS += -lpthread
 LIBS += -lcryptopp
-LIBS += -lreadline
+LIBS += -lncurses
 
 SOURCES += main.cpp \
     ui.cpp \

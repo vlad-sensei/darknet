@@ -2,157 +2,178 @@
 
 #include <thread>
 #include <mutex>
-#include <readline/readline.h>
-#include <readline/history.h>
+#include <ncurses.h>
 
 UI_ptr ui;
 
+vector<string> terminal_content; //all the terminal content to be printed
+vector<string> old_commands; //all old used commands
+uint32_t content_index = 0;
+
+
 void UI::run(uint16_t ui_port){
-  Connection_initiator_base::connect("localhost",ui_port);
+    Connection_initiator_base::connect("localhost",ui_port);
 
-  thread input_thread([this](){
-    get_text_input();
-  });
+    thread input_thread([this](){
+        get_text_input();
+    });
 
-  thread network_thread([this](){
-    Connection_initiator_base::run();
-  });
-  network_thread.join();
-  input_thread.join();
+    thread network_thread([this](){
+        Connection_initiator_base::run();
+    });
+    network_thread.join();
+    input_thread.join();
 }
 
 void UI::handle_new_connection(tcp::socket socket){
-  connection = Connection_ptr(new Connection(socket));
-  connection->init();
+    connection = Connection_ptr(new Connection(socket));
+    connection->init();
 }
 
+
 void UI::echo(const string &msg){
-  safe_printf("%s\n", msg);
+    terminal_content.insert(terminal_content.begin()+2,msg);
+    print_terminal_content(terminal_content, content_index);
+    refresh();
+    //safe_printf("%s\n", msg);
 }
 
 // ~~~~~~~~~~~~ text input ~~~~~~~~~~~~
 
+
 void UI::get_text_input(){
 
-  init_readline();
 
-  safe_printf(" ~~~ welcome to darknet ~~~\n");
+    init_window();
+    string line("");
+    uint32_t c,x,y,max_x,max_y,history_index = 0;
 
-  while(1){
-    /*
-     * Uncomment the line below and 'rl_bind_key' line in
-     * 'my_completion' to disable 'ls' behavior of auto-complete.
-     * 'ls'-behavior is shown when there is a space to the left in cmd-line.
-     */
-    //    rl_bind_key('\t',rl_complete);
+    while(1){
+        c = 0;
+        c = wgetch(stdscr); // Wait for user input
+        getyx(stdscr,y,x);
+        getmaxyx(stdscr,max_y,max_x);
+        line.clear();
+        line = terminal_content[1];
+        string cmd = "";
+        switch(c){
+        case KEY_BACKSPACE:
+            if(x > 2){
+                terminal_content[1].pop_back();
+                move(y,x-1);
+                delch();
+            }
+            break;
+        case '\n'://ENTER
+            if(line.size()>0) old_commands.insert(old_commands.begin(),terminal_content[1]);
+            terminal_content.insert(terminal_content.begin()+1,"> ");
+            cmd = line.substr(2);
+            if(!cmd.empty()){
+                connection->text_command(cmd);
+            }
+            break;
+        case KEY_UP:
+            if(history_index == old_commands.size()){
+                terminal_content[1] = "> ";
+                history_index = 0;
+            }
+            else{
+                terminal_content[1] = old_commands[history_index];
+                history_index++;
+            }
+            break;
+        case KEY_DOWN:
+            if(history_index > 0 ){
+                history_index--;
+                terminal_content[1] = old_commands[history_index];
+            }
+            break;
+        case KEY_PPAGE://page up
+            if(content_index > 0)content_index--;
+            break;
+        case KEY_NPAGE://page down
+            if(max_y < terminal_content.size() && content_index < terminal_content.size() - max_y)content_index++;
+            break;
+        case '\t':
+            terminal_content[1] = find_match(terminal_content[1]);
+            break;
+        case KEY_RESIZE: //prevents resize character from being printed in terminal
+            break;
+        default:
+            terminal_content[1] += c;
+        }
 
-    char* line = readline("> ");
+        //reset the history index if c not arrow up/down
+        if(c != KEY_UP && c != KEY_DOWN)history_index = 0;
 
-    if(!line) break;
-    if(*line){
-      add_history(line);
+        //clear print area and print new text
+        print_terminal_content(terminal_content, content_index);
+        refresh();
 
-      string input(line);
-
-      connection->text_command(input);
-
-      free(line);
-
-/*
-      //wait for return message of sent command
-      unique_lock<mutex> lk(connection->m);
-      connection->cv.wait(lk);
-*/
-
-      //handle properly with ncurses
-    }else{
-      free(line);
     }
-  }
+    endwin();
 }
 
 
-static char** my_completion(const char*, int ,int);
-char* my_generator(const char*,int);
-char* dupstr (char*);
-void* xmalloc (int);
-
-char** cmd_list;
-vector<char*> command_keys;
-
-void UI::init_readline(){
-
-
-  for(const auto& key : command_list) {
-    char* a = new char[key.size()+1];
-    a[key.size()] = '\0';
-    memcpy(a,key.c_str(),key.size());
-    command_keys.push_back(a);
-  }
-
-  //Might be better way to build 'cmd_list'
-  cmd_list = &command_keys[0];
-  // Used for custom auto-complete with 'readline'
-  rl_attempted_completion_function = my_completion;
-  rl_bind_key('\t',rl_complete);
+string UI::find_match(string input){
+    string temp = input.substr(2);
+    for(string str:command_list){
+        if(temp.size() > 0 && str.find(temp) == 0) return "> "+str+" ";
+    }
+    return input;
 }
 
-static char** my_completion( const char * text , int start,  int end)
-{
-  (void)end;
-  char** matches;
-
-  matches = (char**)NULL;
-
-  if (start == 0){
-    matches = rl_completion_matches ((char*)text, &my_generator);
-  }else{
-    //        rl_bind_key('\t',rl_insert); //Disables 'ls'-behavior
-  }
-
-  return (matches);
-
+void UI::print_terminal_content(vector<string>terminal_content, int content_index){
+    uint32_t x,y,max_x,max_y,row=0,terminal_index = 0;
+    string line = "";
+    getyx(stdscr,y,x);
+    getmaxyx(stdscr,max_y,max_x);
+    erase(); //clear entire terminal
+    bool scroll_set = FALSE;
+    while(row < max_y){
+        if(terminal_index >= terminal_content.size()-1)break;
+        if(terminal_index > 1 && !scroll_set){
+            terminal_index += content_index;
+            scroll_set = TRUE;
+        }
+        if(line.size() < 1) line = terminal_content[terminal_index]; // 1 line per content row
+        else if(line.size() < max_x){
+            printw(line.c_str(),row);
+            line.clear();
+            terminal_index++;
+            row++;
+            move(row,0);
+        }
+        else if(line.size() >= max_x){
+            string temp = line.substr(0,max_x);
+            printw(temp.c_str(),row);
+            line = line.substr(max_x);
+            if(line.size() < 1)terminal_index++;
+            row++;
+            move(row,0);
+        }
+    }
+    // move cursor to correct position
+    int temp1 = 1+terminal_content[1].size()/max_x;
+    int temp2 = terminal_content[1].size() % max_x;
+    move(temp1,temp2);
+    refresh();
 }
 
-char* my_generator(const char* text, int state)
-{
-  static int list_index, len;
-  char *name;
 
-  if (!state) {
-    list_index = 0;
-    len = strlen (text);
-  }
+void UI::init_window(){
+    //initiate curse window
+    initscr();
+    noecho();
+    cbreak(); //disables input buffering
+    keypad(stdscr, TRUE); //allow special keys like arrow up etc
 
-  while ((name = cmd_list[list_index])) {
-    list_index++;
-
-    if (strncmp (name, text, len) == 0)
-      return (dupstr(name));
-  }
-
-  /* If no names matched, then return NULL. */
-  return ((char *)NULL);
-
+    terminal_content.push_back(" ~~~ welcome to darknet ~~~ ");
+    terminal_content.push_back("> ");
+    terminal_content.push_back("");
+    printw(terminal_content[0].c_str(),0);
+    move(1,0);
+    printw(terminal_content[1].c_str(),1);
 }
 
-char* dupstr (char* s) {
-  char* r;
 
-  r = (char*) xmalloc((strlen (s) + 1));
-  strcpy (r, s);
-  return (r);
-}
-
-void* xmalloc (int size)
-{
-  void* buf;
-
-  buf = malloc (size);
-  if (!buf) {
-    fprintf (stderr, "Error: Out of memory. Exiting.\n");
-    exit (1);
-  }
-
-  return buf;
-}

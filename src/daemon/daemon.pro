@@ -5,14 +5,14 @@ CONFIG -= qt
 
 QMAKE_CXXFLAGS += -std=c++14
 
+INCLUDEPATH += $$PWD/../shared
+
 LIBS += -lboost_system
 LIBS += -lboost_filesystem
 LIBS += -lboost_thread
 LIBS += -lpthread
 LIBS += -lsqlite3
 LIBS += -lcryptopp
-
-INCLUDEPATH += $$PWD/../shared
 
 SOURCES += main.cpp \
     core.cpp \
