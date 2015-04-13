@@ -56,9 +56,11 @@ void Core::start_synch(int period){
 
     if (!sync_thread_exists){
       sync_thread = thread([this, period](void){
-          while(should_sync){
+          while(true){
             this_thread::sleep_for(chrono::seconds(period));
-            core->synch_all();
+            if (should_sync){
+                core->synch_all();
+              }
           }
       });
       sync_thread_exists = true;
