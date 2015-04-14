@@ -25,18 +25,7 @@ struct hash512_t{
   inline hash512_t(byte value[]){memcpy(data, value, sizeof(uint64_t)*8);}
   inline bool operator== (const hash512_t& other)const {return  !memcmp(data, other.data, sizeof(data));}
   inline size_t std_hash() const {return data[0]^data[1]^data[2]^data[3]^data[4]^data[5]^data[6]^data[7];}
-  friend void operator << (ostream& os, const hash512_t& h);
-  //TODO: remove this tmp_set_data
-  void tmp_set_data(){
-    data[0]=0xf628a784c8a4b793;
-    data[1]=0x4be0e3e91d528b43;
-    data[2]=0x237126807c4810a6;
-    data[3]=0xc306f3ff061eba46;
-    data[4]=0x7c77f583687c7637;
-    data[5]=0x90f7e6119de2e6b6;
-    data[6]=0xccea4b7e1e87931a;
-    data[7]=0x0c09fee3b9001ee5;
-  }
+  friend ostream& operator << (ostream& os, const hash512_t& h);
 
   inline bool set_data(uint64_t d, unsigned pos){
     if(pos <= 7){
@@ -60,8 +49,9 @@ private:
   uint64_t data[8];
 };
 
-inline void operator << (ostream& os, const hash512_t& h){
+inline ostream& operator << (ostream& os, const hash512_t& h){
   os << h.to_string();
+  return os;
 }
 
 namespace std {
@@ -188,11 +178,11 @@ inline uint16_t get_port(){
   return PORT;
 }
 
-inline string get_database_path(){
+static inline string get_database_path(){
   return DATABASE_PATH;
 }
 
-inline string get_arena_path(){
+static inline string get_arena_path(){
   return ARENA_PATH;
 }
 

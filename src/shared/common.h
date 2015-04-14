@@ -82,6 +82,16 @@ struct Metahead {
     mid(string((char*)&bid_, sizeof(bid_)) + tags_ ),  bid(bid_), tags(tags_){}
 };
 
+inline ostream& operator << (ostream& os, const Metahead& m){
+  os << "Metahead: -Mid[" << m.mid << "]" << endl;
+  os << "-Bid [" << m.bid << "]" << endl;
+  os << "-Tags [" << m.tags << "]" << endl;
+  return os;
+}
+inline bool operator==(const Metahead& m1, const Metahead& m2){
+  return m1.mid==m2.mid && m1.bid==m2.bid && m1.tags==m2.tags;
+}
+
 /* List contains (enum name,full command name, short command name)
 I thought that it's not neccessary with more than two names per command
 That is why I have explicitly specified a short and full name.

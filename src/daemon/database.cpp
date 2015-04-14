@@ -6,6 +6,14 @@ Database::Database(): Sqlite3_base(get_database_path()){
   init_db();
 }
 
+//Needed by unitests to work
+Database::Database(const string& path): Sqlite3_base(path){
+//Database::Database(): Sqlite3_base(DEFAULT_DATABASE_PATH){
+  debug("creating database [%s]..",path);
+  init_db();
+}
+
+
 Database::~Database(){
   debug("destroying database..");
 }
