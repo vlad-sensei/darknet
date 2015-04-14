@@ -10,10 +10,9 @@ void Connection::process_msg(const Msg_ptr &msg){
     handle_echo(msg);
     break;
   default:
-    debug("unknown message type : %d", msg->get_type());
     break;
   }
-//  cv.notify_one(); //notify_all()?
+  cv.notify_one();
 }
 
 void Connection::handle_echo(const Msg_ptr &msg){

@@ -12,18 +12,32 @@ vector<string> old_commands; //all old used commands
 uint32_t content_index = 0;
 
 
-void UI::run(uint16_t ui_port){
+void UI::run(uint16_t ui_port, string cmd){
+    is_interactive = cmd.empty();
     Connection_initiator_base::connect("localhost",ui_port);
-
-    thread input_thread([this](){
-        get_text_input();
-    });
 
     thread network_thread([this](){
         Connection_initiator_base::run();
     });
+
+    if(is_interactive){
+      thread input_thread([this](){
+          get_text_input();
+      });
+
+      input_thread.join();
+    }else{
+      while(connection==NULL);
+      connection->text_command(cmd);
+
+      //wait for return message of sent command
+      unique_lock<mutex> lk(connection->m);
+      connection->cv.wait(lk);
+
+      exit(0);
+    }
+
     network_thread.join();
-    input_thread.join();
 }
 
 void UI::handle_new_connection(tcp::socket socket){
@@ -34,15 +48,19 @@ void UI::handle_new_connection(tcp::socket socket){
 
 void UI::echo(const string &msg){
 
+  if(is_interactive){
     vector <string> strings;
 
     boost::split(strings,msg,boost::is_any_of("\n"));
 
     for(string str: strings){
-        terminal_content.insert(terminal_content.begin()+2,str);
+      terminal_content.insert(terminal_content.begin()+2,str);
     }
     print_terminal_content(terminal_content, content_index);
     refresh();
+  }else{
+    safe_printf("%s\n",msg);
+  }
 }
 
 // ~~~~~~~~~~~~ text input ~~~~~~~~~~~~
@@ -76,7 +94,10 @@ void UI::get_text_input(){
             terminal_content.insert(terminal_content.begin()+1,"> ");
             cmd = line.substr(2);
             if(!cmd.empty()){
-                connection->text_command(cmd);
+              connection->text_command(cmd);
+              //wait for return message of sent command
+              unique_lock<mutex> lk(connection->m);
+              connection->cv.wait(lk);
             }
             break;
         case KEY_UP:

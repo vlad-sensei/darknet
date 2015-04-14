@@ -1,15 +1,16 @@
+#include <boost/algorithm/string.hpp>
 #include "glob.h"
 #include "ui.h"
 
 
-bool process_args(int argc, char* argv[],uint16_t& ui_port){
-  if(argc>2){
-    printf("clientconsole [PORT=%d]\n",DEFAULT_UI_LISTEN_PORT);
+bool process_args(int argc, char* argv[],uint16_t& ui_port, string& cmd){
+  if(argc>3){
+    safe_printf("clientconsole [PORT=%d]\n",DEFAULT_UI_LISTEN_PORT);
     return false;
   }
 
   uint16_t port = DEFAULT_UI_LISTEN_PORT;
-  if(argc==2) {
+  if(argc>=2) {
     istringstream ss(argv[1]);
     if(!(ss >> port)){
       printf("clientconsole [PORT=%d]\n",DEFAULT_UI_LISTEN_PORT);
@@ -18,9 +19,12 @@ bool process_args(int argc, char* argv[],uint16_t& ui_port){
 
     ui_port = port;
 
-    debug("has set UI_PORT: [%d]",ui_port);
+    if (argc==3){
+      string argv_cmd = argv[2];
+      boost::replace_all(argv_cmd, "\"","");
+      cmd = argv_cmd;
+      }
   }else{
-    debug("wrong arg count");
     printf("clientconsole [PORT=%d]\n",DEFAULT_UI_LISTEN_PORT);
   }
   return true;
@@ -29,14 +33,14 @@ bool process_args(int argc, char* argv[],uint16_t& ui_port){
 
 int main(int argc, char* argv[]) {
   try{
-    uint16_t tmp_port = DEFAULT_UI_LISTEN_PORT;
-    uint16_t& ui_port = tmp_port;
+    uint16_t ui_port = DEFAULT_UI_LISTEN_PORT;
+    string cmd = "";
 
-    if(!process_args(argc, argv,ui_port)) return 0;
+    if(!process_args(argc, argv,ui_port, cmd)) return 0;
 
 
     ui = UI_ptr(new UI);
-    ui->run(ui_port);
+    ui->run(ui_port, cmd);
   } catch (exception& e){
     debug(" *** exception : %s", e.what());
   }
