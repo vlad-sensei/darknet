@@ -167,7 +167,7 @@ bool Inventory::read_from_arena_slot(const size_t &idx, const size_t &chunk_size
     debug(" *** idx>=data.arena_slots_size");
     return false;
   }
-  ifstream arena(DEFAULT_ARENA_PATH);
+  ifstream arena(get_arena_path());
   //TODO: overflow on 32bit systems for large files!!!
   arena.seekg(idx*CHUNK_SIZE);
 

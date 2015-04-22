@@ -178,11 +178,11 @@ inline uint16_t get_port(){
   return PORT;
 }
 
-static inline string get_database_path(){
+inline string get_database_path(){
   return DATABASE_PATH;
 }
 
-static inline string get_arena_path(){
+inline string get_arena_path(){
   return ARENA_PATH;
 }
 
