@@ -70,7 +70,7 @@ bool process_args(int argc, char* argv[],uint16_t& ui_port){
      */
 
 
-    PORT = port;
+    DAEMON_PORT = port;
     ui_port = tmp_ui_port;
     DATABASE_PATH = database_path.string();
     ARENA_PATH = arena_path.string();
@@ -89,7 +89,7 @@ int main(int argc, char* argv[]){
     //debug("listening at port %u", port);
 
     core.reset(new Core);
-    core->set_port(PORT);
+    core->set_port(DAEMON_PORT);
 
     // These debug messages make it work, but I don't know why...
     debug("Main database path : [%s]",get_database_path());
