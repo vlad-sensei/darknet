@@ -44,6 +44,9 @@ void Peer::process_msg(const Msg_ptr& msg){
   case Message::T_LISTEN_PORT:
     handle_listen_port(msg);
     break;
+  case Message::T_CONNECT:
+    handle_connect(msg);
+    break;
   default:
     debug("unknown messape type");
   }
@@ -64,6 +67,12 @@ void Peer::handle_chunk(const Msg_ptr &msg){
 void Peer::handle_listen_port(const Msg_ptr &msg){
   const uint16_t& port=msg->get_uint16_t(Message::K_PORT);
   set_listen_port(port);
+}
+
+void Peer::handle_connect(const Msg_ptr &msg){
+  const string& addr=msg->get_string(Message::K_IP);
+  const uint16_t& port=msg->get_uint16_t(Message::K_PORT);
+  core->connect(addr,port);
 }
 
 

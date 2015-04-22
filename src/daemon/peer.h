@@ -63,6 +63,7 @@ private:
   void handle_meta_reply(const Msg_ptr& msg);
   void handle_chunk(const Msg_ptr& msg);
   void handle_listen_port(const Msg_ptr& msg);
+  void handle_connect(const Msg_ptr &msg);
 
   struct Data{
     Data(const peer_id_t& pid_):pid(pid_){}
