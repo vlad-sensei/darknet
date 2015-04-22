@@ -43,10 +43,17 @@ public:
   inline void req_metaheads(){send(Message::meta_req());}
   inline void send_metaheads(const vector<Metahead>& metaheads){send(Message::meta_reply(metaheads));}
   inline void send_listen_port(const uint16_t& port){send(Message::port(port));}
+
+  inline ip_t get_ip() const {return remote_ip;}
+  bool get_listen_port(uint16_t& listen_port);
 private:
   Peer();
   void terminate();
   inline Peer_ptr shared_from_this(){return enable_shared_from_this<Peer>::shared_from_this();}
+
+  //data
+  void set_listen_port(const uint16_t& listen_port);
+
 
   //process messages
   void process_msg(const Msg_ptr& msg);
@@ -60,9 +67,11 @@ private:
   struct Data{
     Data(const peer_id_t& pid_):pid(pid_){}
     const peer_id_t pid;
+    uint16_t listen_port = 0;
   private:
     Data();
   } data;
+  rw_mutex listen_port_mtx;
 };
 
 #endif // PEER_H

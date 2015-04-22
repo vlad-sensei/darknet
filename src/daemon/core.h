@@ -54,14 +54,18 @@ public:
 private:
   void req_chunks(const Id& bid, const unordered_set<Id>& cids);
   void synch_all();
-  void spawn_peer(tcp::socket& socket);
+  bool spawn_peer(tcp::socket& socket);
   void handle_new_connection(tcp::socket socket);
+
+  bool merge_peers(const peer_id_t& pid1, const peer_id_t& pid2);
 
   //all data&methods in data must be synchronized
   struct {
     peer_id_t current_peer_id = 0;
     unordered_map<peer_id_t,Peer_ptr> peers;
+    unordered_map<ip_t, peer_id_t> peer_ips;
     inline bool peer_exists(const peer_id_t& pid) {return peers.find(pid)!=peers.end();}
+    inline bool peer_ip_exists(const ip_t& ip_v4){return peer_ips.find(ip_v4)!=peer_ips.end();}
   } data;
   rw_mutex peers_mtx, pid_mtx;
 

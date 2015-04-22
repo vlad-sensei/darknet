@@ -153,6 +153,7 @@ string UI::find_match(string input){
 
 void UI::print_terminal_content(vector<string>terminal_content, int content_index){
     uint32_t x,y,max_x,max_y,row=0,terminal_index = 0;
+    (void)y;
     string line = "";
     getyx(stdscr,y,x);
     getmaxyx(stdscr,max_y,max_x);

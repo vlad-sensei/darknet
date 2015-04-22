@@ -69,6 +69,7 @@ typedef int64_t ts_t; //time_t, different on different platforms
 typedef uint64_t peer_id_t;
 typedef unsigned char byte;
 typedef uint64_t file_size_t;
+typedef uint32_t ip_t;
 
 #define DEFAULT_LISTEN_PORT 8453
 #define DEFAULT_UI_LISTEN_PORT 8888
@@ -92,7 +93,7 @@ typedef uint64_t file_size_t;
 static string DATABASE_PATH=DEFAULT_DATABASE_PATH;
 static string ARENA_PATH=DEFAULT_ARENA_PATH;
 
-static uint16_t VARIABLE_IS_NOT_USED PORT=DEFAULT_LISTEN_PORT;
+static uint16_t VARIABLE_IS_NOT_USED DAEMON_PORT=DEFAULT_LISTEN_PORT;
 //static uint16_t VARIABLE_IS_NOT_USED UI_PORT=DEFAULT_UI_LISTEN_PORT;
 
 // c++14
@@ -174,8 +175,8 @@ array<char, size> debug_str(const string& str){
   return arr;
 }
 
-inline uint16_t get_port(){
-  return PORT;
+inline uint16_t get_daemon_port(){
+  return DAEMON_PORT;
 }
 
 inline string get_database_path(){

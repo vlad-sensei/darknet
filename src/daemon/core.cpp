@@ -34,10 +34,16 @@ void Core::broadcast_echo(const string &msg){
 
 
 void Core::handle_new_connection(tcp::socket socket){
-  debug("new peer..");
+  debug("new peer [%s]..", socket.remote_endpoint());
   //TODO:check if we are already connected by MAC/IP parameters
+  if(!socket.is_open()) {debug(" *** socket is not open"); return;}
+  if(!socket.remote_endpoint().address().is_v4()){
+    debug(" *** only accepting ipv4 clients at this moment");
+    return;
+  }
+
   //maybe cache those in the future
-  spawn_peer(socket);
+  if(!spawn_peer(socket)) {debug(" *** could not spawn new peer");};
 }
 
 void Core::req_chunks(const Id &bid, const unordered_set<Id> &cids){
@@ -49,6 +55,7 @@ void Core::req_chunks(const Id &bid, const unordered_set<Id> &cids){
   }
 }
 
+//-------- syncing ----
 //TODO fix starting after stopping
 void Core::start_synch(int period){
     //Capturing this might lead to a dangling pointer if core is destroyed
@@ -71,7 +78,6 @@ void Core::stop_synch(){
     should_sync = false;
 }
 
-//-------- syncing ----
 void Core::synch_all(){
   r_lock l(peers_mtx);
   for(const auto& it:data.peers){
@@ -80,17 +86,38 @@ void Core::synch_all(){
   }
 }
 
+
+// ----------- Routing ---------
+
+bool Core::merge_peers(const peer_id_t &pid1, const peer_id_t &pid2){
+  //verify they exist
+  r_lock l(peers_mtx);
+  if(!data.peer_exists(pid1)||data.peer_exists(pid2)) return false;
+  const Peer_ptr& peer1 = data.peers[pid1];
+  const Peer_ptr& peer2 = data.peers[pid2];
+  uint16_t port1, port2;
+  if(!peer1->get_listen_port(port1) && !peer2->get_listen_port(port2)) return false;
+
+  return true;
+}
+
 // ----------- Data -----------
-void Core::spawn_peer(tcp::socket &socket){
+//TODO: consider diabling/tweaking for testing
+bool Core::spawn_peer(tcp::socket &socket){
   w_lock l(peers_mtx);
+  const ip_t& ip = socket.remote_endpoint().address().to_v4().to_ulong();
+  if(data.peer_ip_exists(ip)) return false;
   const peer_id_t&  pid = ++data.current_peer_id;
+  data.peer_ips[ip]=pid;
   data.peers[pid] = Peer_ptr(new Peer(socket, pid));
   data.peers[pid]->init();
+  return true;
 }
 
 bool Core::remove_peer(const peer_id_t &pid){
   w_lock l(peers_mtx);
   if(!data.peer_exists(pid)) return false;
+  data.peer_ips.erase(data.peers[pid]->get_ip());
   data.peers.erase(pid);
   return true;
 }

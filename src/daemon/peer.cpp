@@ -4,7 +4,7 @@
 //typedef Network_base<Peer> Peer_network;
 
 Peer::Peer(socket_t &sock_, const peer_id_t& pid): Peer_connection(sock_),
-  data(pid) {
+  data(pid){
   debug("creating peer [id:%u]..", pid);
   //do_read_header();
 }
@@ -99,4 +99,18 @@ void Peer::handle_meta_reply(const Msg_ptr &msg){
    for (const auto& e: v){
        core->add_metahead(e);
      }
+}
+
+// ----------------- peer data -----------
+
+void Peer::set_listen_port(const uint16_t& listen_port){
+  w_lock l(listen_port_mtx);
+  data.listen_port = listen_port;
+}
+
+bool Peer::get_listen_port(uint16_t &listen_port){
+  r_lock l(listen_port_mtx);
+  if(data.listen_port == 0) return false;
+  listen_port = data.listen_port;
+  return true;
 }

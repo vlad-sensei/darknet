@@ -25,6 +25,7 @@ protected:
   void send(Msg_ptr msg);
   void close();
 
+  const ip_t remote_ip;
 private:
   virtual void process_msg(const Msg_ptr& msg)=0;
   virtual void terminate(){}
@@ -46,7 +47,10 @@ private:
 };
 
 template<typename Tderived> inline
-Connection_base<Tderived>::Connection_base(tcp::socket &socket): socket_(move(socket)){}
+Connection_base<Tderived>::Connection_base(tcp::socket &socket):
+  remote_ip(socket.remote_endpoint().address().to_v4().to_ulong()),
+  socket_(move(socket))
+{}
 
 template<typename Tderived> inline
 void Connection_base<Tderived>::run(){
