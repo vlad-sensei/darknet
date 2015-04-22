@@ -41,6 +41,9 @@ void Peer::process_msg(const Msg_ptr& msg){
   case Message::T_CHUNK:
     handle_chunk(msg);
     break;
+  case Message::T_LISTEN_PORT:
+    handle_listen_port(msg);
+    break;
   default:
     debug("unknown messape type");
   }
@@ -57,6 +60,12 @@ void Peer::handle_chunk(const Msg_ptr &msg){
   Chunk chunk(data);
   core->handle_chunk(bid,chunk);
 }
+
+void Peer::handle_listen_port(const Msg_ptr &msg){
+  const uint16_t& port=msg->get_uint16_t(Message::K_PORT);
+  set_listen_port(port);
+}
+
 
 void Peer::handle_chunk_req(const Msg_ptr &msg){
   const Id& bid = msg->get_id(Message::K_BID);

@@ -39,6 +39,10 @@ Msg_ptr Message::meta_req(){
   return make(T_META_REQ);
 }
 
+Msg_ptr Message::port(uint16_t port){
+  return make(T_LISTEN_PORT,K_PORT,port);
+}
+
 Msg_ptr Message::meta_reply(const vector<Metahead> &metaheads){
   return make(T_META_REPLY, K_META_LIST, metaheads);
 }
