@@ -97,7 +97,8 @@ bool Core::merge_peers(const peer_id_t &pid1, const peer_id_t &pid2){
   const Peer_ptr& peer2 = data.peers[pid2];
   uint16_t port1, port2;
   if(!peer1->get_listen_port(port1) && !peer2->get_listen_port(port2)) return false;
-
+  peer1->merge_peer(peer2->get_ip(),port2);
+  peer2->merge_peer(peer1->get_ip(),port1);
   return true;
 }
 
