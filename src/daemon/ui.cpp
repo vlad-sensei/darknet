@@ -269,6 +269,29 @@ void UI::init_commands(){
   },
   "assemble bid [filename=\"unnamed_file\"]",
   2,2);
+
+  init_command(Commands::CMD_MERGE,
+               // Should have arg (tag1%tag2)
+               [this](const vector<string>& args){
+
+    try{
+      peer_id_t pid1=stoull(args[1]),pid2=stoull(args[2]);
+      if(!core->merge_peers(pid1,pid2)) return "merge faild";
+      return "merging...";
+    } catch(exception& e){
+      debug("*** error: %s",e.what());
+      handle_invalid_args(e);
+      return "Invalid arguments.";
+    }
+
+
+
+  },
+  "assemble bid [filename=\"unnamed_file\"]",
+  3,3);
+
+
+
 }
 #include "cryptopp/hex.h"
 #include <cryptopp/filters.h>

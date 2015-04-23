@@ -107,7 +107,9 @@ bool Core::merge_peers(const peer_id_t &pid1, const peer_id_t &pid2){
 bool Core::spawn_peer(tcp::socket &socket){
   w_lock l(peers_mtx);
   const ip_t& ip = socket.remote_endpoint().address().to_v4().to_ulong();
-  if(data.peer_ip_exists(ip)) return false;
+#ifndef ALLOW_PEER_FROM_SAME_IP
+  //if(data.peer_ip_exists(ip)) return false;
+#endif
   const peer_id_t&  pid = ++data.current_peer_id;
   data.peer_ips[ip]=pid;
   data.peers[pid] = Peer_ptr(new Peer(socket, pid));
@@ -118,7 +120,9 @@ bool Core::spawn_peer(tcp::socket &socket){
 bool Core::remove_peer(const peer_id_t &pid){
   w_lock l(peers_mtx);
   if(!data.peer_exists(pid)) return false;
-  data.peer_ips.erase(data.peers[pid]->get_ip());
+#ifndef ALLOW_PEER_FROM_SAME_IP
+  //data.peer_ips.erase(data.peers[pid]->get_ip());
+#endif
   data.peers.erase(pid);
   return true;
 }

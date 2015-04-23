@@ -50,14 +50,14 @@ public:
   void start_synch(int period);
   //stop syncing after the next syncing is completed
   void stop_synch();
-
+  bool merge_peers(const peer_id_t& pid1, const peer_id_t& pid2);
 private:
   void req_chunks(const Id& bid, const unordered_set<Id>& cids);
   void synch_all();
   bool spawn_peer(tcp::socket& socket);
   void handle_new_connection(tcp::socket socket);
 
-  bool merge_peers(const peer_id_t& pid1, const peer_id_t& pid2);
+
 
   //all data&methods in data must be synchronized
   struct {

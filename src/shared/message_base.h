@@ -173,6 +173,7 @@ private:
   }
 
 public:
+  inline ip_t get_ip_t(const Key_type_t& key){return get<ip_t>(key);}
   inline string get_string(const Key_type_t& key){return move(h[key]);}
   inline uint16_t get_uint16_t(const Key_type_t& key){return get<uint16_t>(key);}
   inline time_t get_ts_t(const Key_type_t& key){return get<ts_t>(key);}

@@ -15,6 +15,8 @@ Peer::~Peer(){
 
 void Peer::init(){
   Peer_connection::run();
+  debug("sending list port [%s]",get_daemon_port());
+  send_listen_port(get_daemon_port());
 }
 
 void Peer::terminate(){
@@ -65,14 +67,18 @@ void Peer::handle_chunk(const Msg_ptr &msg){
 }
 
 void Peer::handle_listen_port(const Msg_ptr &msg){
+
   const uint16_t& port=msg->get_uint16_t(Message::K_PORT);
+  debug("seting listen port [%s]",port);
   set_listen_port(port);
 }
 
 void Peer::handle_connect(const Msg_ptr &msg){
-  const string& addr=msg->get_string(Message::K_IP);
+  const ip_t& addr=msg->get_ip_t(Message::K_IP);
   const uint16_t& port=msg->get_uint16_t(Message::K_PORT);
-  core->connect(addr,port);
+  const string addr_str=ba::ip::address_v4(addr).to_string();
+  debug("handle connect [%s:%s]",addr_str,port);
+  core->connect(addr_str,port);
 }
 
 

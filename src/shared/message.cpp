@@ -43,7 +43,7 @@ Msg_ptr Message::port(uint16_t port){
   return make(T_LISTEN_PORT,K_PORT,port);
 }
 
-Msg_ptr Message::merge_peer_req(const string& addr,const uint16_t& port){
+Msg_ptr Message::merge_peer_req(const ip_t& addr,const uint16_t& port){
   return make(T_CONNECT,K_IP,addr,K_PORT,port);
 }
 

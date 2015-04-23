@@ -104,7 +104,8 @@ That is why I have explicitly specified a short and full name.
   HANDLE_CMD(CMD_EXIT,5,"exit", "quit") \
   HANDLE_CMD(CMD_ASSEMBLE,6,"assemble", "as") \
   HANDLE_CMD(CMD_SYNCH,7,"synch", "sy") \
-  HANDLE_CMD(CMD_SEARCH,8,"search", "se")
+  HANDLE_CMD(CMD_SEARCH,8,"search", "se")\
+  HANDLE_CMD(CMD_MERGE,9,"merge", "me")
 
 
 

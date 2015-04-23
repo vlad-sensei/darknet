@@ -52,7 +52,7 @@ public:
   static Msg_ptr port(uint16_t port);
   static Msg_ptr meta_reply(const vector<Metahead> &meta_list);
   static Msg_ptr chunk(const Id& bid,const Chunk& chunk);
-  static Msg_ptr merge_peer_req(const string& addr, const uint16_t &);
+  static Msg_ptr merge_peer_req(const ip_t &addr, const uint16_t &);
 };
 
 #endif // MESSAGE_H
