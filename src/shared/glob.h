@@ -8,7 +8,7 @@ using namespace std;
 #include <cstring>
 #include <cinttypes>
 #include <iostream>
-#include "cryptopp/sha.h"
+#include <cryptopp/sha.h>
 #include <iomanip>
 
 /* Example usage:
