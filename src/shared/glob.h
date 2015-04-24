@@ -173,19 +173,4 @@ array<char, size> debug_str(const string& str){
   return arr;
 }
 
-/*
-inline uint16_t get_daemon_port(){
-  return DAEMON_PORT;
-}
-
-inline string get_database_path(){
-  return DATABASE_PATH;
-}
-
-inline string get_arena_path(){
-  return ARENA_PATH;
-}
-*/
-
-
 #endif // GLOB_H

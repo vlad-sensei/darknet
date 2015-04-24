@@ -24,17 +24,17 @@ bool get_args(int argc, char* argv[], uint16_t& daemon_port, uint16_t& client_po
         break;
       }
 
-      if(arg=="-p_d" || arg == "--port_d"){
+      if(arg=="-c" || arg == "--client_port"){
         try{ client_port = stoul(val);} catch(const exception&){}
         break;
       }
 
-      if(arg=="-path" || arg == "--path_database"){
+      if(arg=="-d" || arg == "--database"){
         database_path = move(val);
         break;
       }
 
-      if(arg=="-path_a" || arg == "--path_arena"){
+      if(arg=="-a" || arg == "--arena"){
         arena_path = move(val);
         break;
       }
