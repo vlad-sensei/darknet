@@ -1,6 +1,9 @@
 #ifndef GLOB_H
 #define GLOB_H
 
+
+#define LINUX
+
 // me no like 'using' from header files (especially not std) -R
 using namespace std;
 
