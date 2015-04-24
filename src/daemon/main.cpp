@@ -10,6 +10,7 @@ using namespace std;
 typedef boost::filesystem::path path;
 
 
+/*
 // Should have 'printf' argument as variable probably
 bool process_args(int argc, char* argv[],uint16_t& ui_port){
 
@@ -69,13 +70,34 @@ bool process_args(int argc, char* argv[],uint16_t& ui_port){
      * so I leave it without checking for now.
      */
 
-
+/*
     DAEMON_PORT = port;
     ui_port = tmp_ui_port;
     DATABASE_PATH = database_path.string();
     ARENA_PATH = arena_path.string();
   }else{
     printf("darknet [PORT=%d,UI_PORT=%d,DATABASE_PATH=\"%s\",ARENA_PATH=\"%s\"]\n",DEFAULT_LISTEN_PORT,DEFAULT_UI_LISTEN_PORT,DEFAULT_DATABASE_PATH,DEFAULT_ARENA_PATH);
+  }
+  return true;
+}
+*/
+
+bool get_args(int argc, char* argv[], uint16_t& daemon_port, uint16_t& client_port, string& database_path, string& arena_path){
+  for(int i = 0; i<argc; ++i){
+    do{
+      string arg = string(argv[i]);
+      if(arg=="-h" || arg =="--help"){
+        safe_printf("TODO: ADD HELP_MSG HERE\n");
+        break;
+      }
+      if(++i == argc) return false;
+      string val = argv[i];
+      if(arg=="-p" || arg == "--port") {
+        try{ daemon_port = stoul(val);} catch(const exception&){}
+        break;
+      }
+      return false;
+    } while(false);
   }
   return true;
 }

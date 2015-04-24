@@ -94,18 +94,19 @@ typedef uint32_t ip_t;
 #define DEFAULT_ARENA_PATH "/tmp/arena"
 #define DEFAULT_ARENA_SLOT_NUM 200
 
+/*
 #ifdef __GNUC__
 #define VARIABLE_IS_NOT_USED __attribute__ ((unused))
 #else
 #define VARIABLE_IS_NOT_USED
 #endif
-
+*/
 
 //static uint16_t PORT=DEFAULT_LISTEN_PORT;
-static string DATABASE_PATH=DEFAULT_DATABASE_PATH;
-static string ARENA_PATH=DEFAULT_ARENA_PATH;
+//static string DATABASE_PATH=DEFAULT_DATABASE_PATH;
+//static string ARENA_PATH=DEFAULT_ARENA_PATH;
 
-static uint16_t VARIABLE_IS_NOT_USED DAEMON_PORT=DEFAULT_LISTEN_PORT;
+//static uint16_t VARIABLE_IS_NOT_USED DAEMON_PORT=DEFAULT_LISTEN_PORT;
 //static uint16_t VARIABLE_IS_NOT_USED UI_PORT=DEFAULT_UI_LISTEN_PORT;
 
 // c++14
@@ -187,6 +188,7 @@ array<char, size> debug_str(const string& str){
   return arr;
 }
 
+/*
 inline uint16_t get_daemon_port(){
   return DAEMON_PORT;
 }
@@ -198,6 +200,7 @@ inline string get_database_path(){
 inline string get_arena_path(){
   return ARENA_PATH;
 }
+*/
 
 
 #endif // GLOB_H
