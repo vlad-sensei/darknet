@@ -5,7 +5,7 @@ CONFIG -= qt
 
 QMAKE_CXXFLAGS += -std=c++14
 
-win{
+win32{
     QMAKE_LFLAGS += -static-libgcc
 
     INCLUDEPATH += $$PWD/../../libs/cryptopp
@@ -18,11 +18,11 @@ win{
 
     LIBS += -lwsock32
     LIBS += -lws2_32
-    LIBS += $$PWD/../../libs/libcryptopp.a
+    LIBS += $$PWD/../../libs/cryptopp.dll
     LIBS += $$PWD/../../libs/sqlite3.dll
-    LIBS += $$PWD/../../libs/libboost_system-mgw49-1_58.a
-    LIBS += $$PWD/../../libs/libboost_filesystem-mgw49-1_58.dll.a
-    LIBS += $$PWD/../../libs/libboost_thread-mgw49-mt-1_58.a
+    LIBS += $$PWD/../../libs/libboost_system-mgw49-1_58.dll
+    LIBS += $$PWD/../../libs/libboost_filesystem-mgw49-1_58.dll
+    LIBS += $$PWD/../../libs/libboost_thread-mgw49-mt-1_58.dll
 
 }
 unix{
