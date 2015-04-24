@@ -71,15 +71,14 @@ private:
     inline bool peer_exists(const peer_id_t& pid) {return peers.find(pid)!=peers.end();}
     inline bool peer_ip_exists(const ip_t& ip_v4){return peer_ips.find(ip_v4)!=peer_ips.end();}
 
-    bool should_sync = true;
+    bool should_sync = SYNC;
+    bool sync_thread_exists = false;
     thread sync_thread;
 
   } data;
-  rw_mutex peers_mtx, pid_mtx, synch_mtx;
+  rw_mutex peers_mtx, pid_mtx, sync_mtx;
 
   UI_ptr ui;
-  bool should_sync = SYNC;
-  bool sync_thread_exists = false;
 };
 
 #endif // CORE_H

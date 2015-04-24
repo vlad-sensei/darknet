@@ -6,17 +6,17 @@ Core_ptr core;
 Core::Core() : ui(make_unique<UI>()){}
 
 void Core::run(){
- Inventory::init();
- thread network_thread([this](){
-   Connection_initiator_base::start_listen();
-   Connection_initiator_base::run();
- });
- thread ui_thread([this](){
-   ui->run();
- });
+  Inventory::init();
+  thread network_thread([this](){
+    Connection_initiator_base::start_listen();
+    Connection_initiator_base::run();
+  });
+  thread ui_thread([this](){
+    ui->run();
+  });
 
- network_thread.join();
- ui_thread.join();
+  network_thread.join();
+  ui_thread.join();
 }
 
 void Core::connect(const string &addr, const uint16_t &port){
@@ -47,7 +47,7 @@ void Core::handle_new_connection(tcp::socket socket){
 }
 
 void Core::req_chunks(const Id &bid, const unordered_set<Id> &cids){
-   debug("req_chunks");
+  debug("req_chunks");
   r_lock l(peers_mtx);
   for(const auto& it:data.peers){
     const Peer_ptr& peer = it.second;
@@ -58,24 +58,29 @@ void Core::req_chunks(const Id &bid, const unordered_set<Id> &cids){
 //-------- syncing ----
 //TODO fix starting after stopping
 void Core::start_synch(int period){
-    //Capturing this might lead to a dangling pointer if core is destroyed
-    should_sync = true;
+  //Capturing this might lead to a dangling pointer if core is destroyed
 
-    if (!sync_thread_exists){
-      sync_thread = thread([this, period](void){
-          while(true){
-            this_thread::sleep_for(chrono::seconds(period));
-            if (should_sync){
-                core->synch_all();
-              }
-          }
-      });
-      sync_thread_exists = true;
+  w_lock l(sync_mtx);
+  data.should_sync = true;
+
+  if (data.sync_thread_exists) return;
+  data.sync_thread = thread([this, period](void){
+    r_lock l(sync_mtx, std::defer_lock_t());
+    while(true){
+      this_thread::sleep_for(chrono::seconds(period));
+      l.lock();
+      if (data.should_sync){
+        l.unlock();
+        core->synch_all();
+      } else l.unlock();
     }
+  });
+  data.sync_thread_exists = true;
 }
 
 void Core::stop_synch(){
-    should_sync = false;
+  w_lock l(sync_mtx);
+  data.should_sync = false;
 }
 
 void Core::synch_all(){
