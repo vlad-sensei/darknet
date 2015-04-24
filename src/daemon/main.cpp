@@ -22,18 +22,23 @@ bool get_args(int argc, char* argv[], uint16_t& daemon_port, uint16_t& client_po
       if(arg=="-p" || arg == "--port") {
         try{ daemon_port = stoul(val);} catch(const exception&){}
         break;
-      }else  if(arg=="-p_d" || arg == "--port_d"){
+      }
+
+      if(arg=="-p_d" || arg == "--port_d"){
         try{ client_port = stoul(val);} catch(const exception&){}
         break;
       }
-      else  if(arg=="-path" || arg == "--path_database"){
+
+      if(arg=="-path" || arg == "--path_database"){
         database_path = move(val);
         break;
       }
-      else  if(arg=="-path_a" || arg == "--path_arena"){
+
+      if(arg=="-path_a" || arg == "--path_arena"){
         arena_path = move(val);
         break;
       }
+
       return false;
     } while(false);
   }
