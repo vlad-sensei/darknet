@@ -6,7 +6,16 @@ Core_ptr core;
 Core::Core() : ui(make_unique<UI>()){}
 
 void Core::run(){
-  Inventory::init();
+  thread Inventory_thread([this](){
+    init_inventory();
+  });
+  thread Database_thread([this](){
+    init_db();
+  });
+
+  Inventory_thread.join();
+  Database_thread.join();
+
   thread network_thread([this](){
     Connection_initiator_base::start_listen();
     Connection_initiator_base::run();

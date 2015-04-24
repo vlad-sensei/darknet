@@ -27,7 +27,7 @@ public:
   void set_arena_path(const string& path){arena_path=move(path);}
 protected:
 
-  void init();
+  void init_inventory();
   /*
    * interate through the file adding chunks sequentially to arena
    * and building metabody in progress. Then add metabody to arena.

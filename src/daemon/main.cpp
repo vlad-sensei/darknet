@@ -51,7 +51,7 @@ int main(int argc, char* argv[]){
     uint16_t client_port = DEFAULT_UI_LISTEN_PORT;
     string arena_path = DEFAULT_ARENA_PATH;
     string database_path = DEFAULT_DATABASE_PATH;
-    if(!get_args(argc, argv,daemon_port, client_port, arena_path, database_path)) {
+    if(!get_args(argc, argv,daemon_port, client_port, database_path,arena_path)) {
       safe_printf("%s\n", HELP_MSG);
       return 0;
     }

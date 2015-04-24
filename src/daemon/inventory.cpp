@@ -1,7 +1,7 @@
 #include "inventory.h"
 
 Inventory::Inventory(){}
-void Inventory::init(){
+void Inventory::init_inventory(){
   //TODO: for now remove the old arena and create a new
 
   /* Now you can overwrite existing files, even if they aren't a database
@@ -9,6 +9,7 @@ void Inventory::init(){
    * if a user gives a path to another existing file, it will be overwritten).
    * As stated by TODO, this behaviour should be changed.
    */
+  debug("initializing arena [%s]..", arena_path);
   remove(arena_path.c_str());
   data.arena.open(arena_path);
   add_new_arena_slots(DEFAULT_ARENA_SLOT_NUM);

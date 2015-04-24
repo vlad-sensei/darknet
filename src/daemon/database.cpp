@@ -2,8 +2,7 @@
 
 Database::Database(){
 //Database::Database(): Sqlite3_base(DEFAULT_DATABASE_PATH){
-  debug("creating database [%s]..",database_path);
-  init_db();
+  debug("creating database");
 }
 
 
@@ -12,7 +11,7 @@ Database::~Database(){
 }
 
 void Database::init_db(){
-  debug("initializing database..");
+  debug("initializing database [%s]..",Sqlite3_base::get_database_path());
   remove_db(); // for clear for testing
 
   //create tables
