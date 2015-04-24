@@ -15,8 +15,8 @@ Peer::~Peer(){
 
 void Peer::init(){
   Peer_connection::run();
-  debug("sending list port [%s]",get_daemon_port());
-  send_listen_port(get_daemon_port());
+  debug("sending listeing port [%s]",core->get_daemon_port());
+  send_listen_port(core->get_daemon_port());
 }
 
 void Peer::terminate(){

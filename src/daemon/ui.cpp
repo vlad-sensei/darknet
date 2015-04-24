@@ -12,9 +12,7 @@ UI::UI() {
 }
 
 
-void UI::run(uint16_t ui_port){
-  Connection_initiator_base::set_port(ui_port);
-  //  Connection_initiator_base::set_port(DEFAULT_UI_LISTEN_PORT);
+void UI::run(){
   Connection_initiator_base::start_listen();
   Connection_initiator_base::run();
 }

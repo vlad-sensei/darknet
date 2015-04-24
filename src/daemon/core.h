@@ -39,8 +39,10 @@ extern Core_ptr core;
 class Core : Connection_initiator_base, public Library {
 public:
   Core();
-  inline void set_port(const uint16_t& port){Connection_initiator_base::set_port(port);}
-  void run(uint16_t ui_port);
+  inline void set_daemon_port(const uint16_t& port){Connection_initiator_base::set_port(port);}
+  inline uint16_t get_daemon_port() const {return Connection_initiator_base::get_port();}
+  inline void set_client_port(const uint16_t& port){ui->set_port(port);}
+  void run();
   bool remove_peer(const peer_id_t& pid);
 
   // user interaction (UI)

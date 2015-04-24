@@ -3,16 +3,15 @@
 Core_ptr core;
 
 // -------- Constructors ----
-Core::Core(){}
+Core::Core() : ui(make_unique<UI>()){}
 
-void Core::run(uint16_t ui_port){
+void Core::run(){
  thread network_thread([this](){
    Connection_initiator_base::start_listen();
    Connection_initiator_base::run();
  });
- thread ui_thread([this,ui_port](){
-   ui = make_unique<UI>();
-   ui->run(ui_port);
+ thread ui_thread([this](){
+   ui->run();
  });
 
  network_thread.join();

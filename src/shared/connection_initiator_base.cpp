@@ -68,7 +68,7 @@ void Connection_initiator_base::set_port(const uint16_t &port){
   data.port = port;
 }
 
-uint16_t Connection_initiator_base::get_port(){
+uint16_t Connection_initiator_base::get_port() const{
  r_lock l(port_mtx);
  return data.port;
 }

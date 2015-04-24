@@ -28,7 +28,8 @@ typedef unique_ptr<UI> UI_ptr;
 class UI : Connection_initiator_base {
 public:
   UI();
-  void run(uint16_t ui_port);
+  inline void set_port(const uint16_t& port){Connection_initiator_base::set_port(port);}
+  void run();
   string process_text_input(const string& text_input);
 private:
 
