@@ -22,28 +22,12 @@ using namespace std;
 struct hash512_t{
   inline hash512_t() : data {0,0,0,0,0,0,0,0} {}
   explicit inline hash512_t(const string& value){CryptoPP::SHA512().CalculateDigest((byte*)data, (byte*)value.data(), value.size());}
-  inline hash512_t(byte value[]){memcpy(data, value, sizeof(uint64_t)*8);}
   inline bool operator== (const hash512_t& other)const {return  !memcmp(data, other.data, sizeof(data));}
   inline size_t std_hash() const {return data[0]^data[1]^data[2]^data[3]^data[4]^data[5]^data[6]^data[7];}
   friend ostream& operator << (ostream& os, const hash512_t& h);
 
-  inline bool set_data(uint64_t d, unsigned pos){
-    if(pos <= 7){
-      data[pos] = d;
-      return true;
-    }else{
-      return false;
-    }
-  }
-
-  inline string to_string() const{
-    CryptoPP::HexEncoder encoder;
-   string output;
-   encoder.Attach( new CryptoPP::StringSink( output ) );
-   encoder.Put( (unsigned char*) data, sizeof(data) );
-   encoder.MessageEnd();
-   return output;
-  }
+  inline string to_string() const;
+  bool from_string(const string& id_str);
 
 private:
   uint64_t data[8];
@@ -54,13 +38,41 @@ inline ostream& operator << (ostream& os, const hash512_t& h){
   return os;
 }
 
+inline string hash512_t::to_string() const{
+  CryptoPP::HexEncoder encoder;
+  string output;
+  encoder.Attach( new CryptoPP::StringSink( output ) );
+  encoder.Put( (unsigned char*) data, sizeof(data) );
+  encoder.MessageEnd();
+  return output;
+}
+
+inline bool hash512_t::from_string(const string &id_str){
+  if(id_str.size() != sizeof(hash512_t)*2) return false;
+  try{
+    string decoded;
+
+    CryptoPP::HexDecoder decoder;
+
+    decoder.Attach( new CryptoPP::StringSink( decoded ) );
+    decoder.Put( (byte*)id_str.data(), id_str.size() );
+    decoder.MessageEnd();
+
+    memcpy(&data,decoded.data(),sizeof(hash512_t));
+  } catch (const exception&) {
+    return false;
+  }
+  return true;
+}
+
+
 namespace std {
 template<> struct hash<hash512_t>{
   inline size_t operator()(const hash512_t& value) const{ return value.std_hash();}
 };
 }
 
-const hash512_t NULL_ID = hash512_t();
+//const hash512_t NULL_ID = hash512_t();
 
 
 //typedef string hash_t;

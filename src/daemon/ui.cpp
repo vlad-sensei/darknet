@@ -145,13 +145,10 @@ void UI::init_commands(){
       tags = filename+":"+filename;
     }
 
-    Id mid = core->upload_file(filename, tags);
-    if(mid == NULL_ID){
-      return "Upload failed.";
-    }else{
-      string ret_str = "Upload successful: mid[" + mid.to_string() +"]";
-      return ret_str.c_str();
-    }
+    Id mid;
+    if(!core->upload_file(filename, tags, mid)) return "Upload failed.";
+    string ret_str = "Upload successful: mid[" + mid.to_string() +"]";
+    return ret_str.c_str();
   },
   "upload filename [tags]",
   2,3);
@@ -162,20 +159,19 @@ void UI::init_commands(){
 
     Id mid;
     try{
-      mid = to_Id(args[1]);
+      //mid = to_Id(args[1]);
+
       debug("MID:[%s]",mid);
-      if(mid == NULL_ID){
-        return "Download failed: Invalid mid";
-      }else{
-        Id bid = core->req_file(mid);
-        if(bid == NULL_ID){
-          debug("Metahead for mid [%s] doesn't exist",mid);
-          return "Invalid mid: Not found";
-        }else{
-          string ret_str = "Download succeded. File bid:["+bid.to_string()+"]";
-          return ret_str.c_str();
-        }
+      if(!mid.from_string(args[1])) return "Download failed: Invalid mid";
+
+      Id bid;
+      if(!core->req_file(mid,bid)){
+        debug("Metahead for mid [%s] doesn't exist",mid);
+        return "Invalid mid: Not found";
       }
+      string ret_str = "Download succeded. File bid:["+bid.to_string()+"]";
+      return ret_str.c_str();
+
     } catch(exception& e){
       debug("*** error: %s",e.what());
       handle_invalid_args(e);
@@ -218,21 +214,16 @@ void UI::init_commands(){
 
     Id bid;
     try{
-      bid = to_Id(args[1]);
+      if(!bid.from_string(args[1])) return "Assemble failed: Invalid bid";
       debug("BID:[%s]",bid);
-      if(bid == NULL_ID){
-        return "Assemble failed: Invalid bid";
-      }else{
-        string filename("unnamed_file");
-        if(args.size() == 3){
-          filename = args[2];
-        }
-        //TODO: filename checking
-        if(!core->get_file(bid,filename)){
-          return "Assembly failed: couldn't find file";
-        }
-        return "Assembly complete!";
+      string filename("unnamed_file");
+      if(args.size() == 3){
+        filename = args[2];
       }
+      //TODO: filename checking
+      if(!core->get_file(bid,filename)) return "Assembly failed: couldn't find file";
+
+      return "Assembly complete!";
     } catch(exception& e){
       debug("*** error: %s",e.what());
       handle_invalid_args(e);
@@ -290,32 +281,4 @@ void UI::init_commands(){
   "assemble bid [filename=\"unnamed_file\"]",
   3,3);
 
-
-
-}
-#include "cryptopp/hex.h"
-#include <cryptopp/filters.h>
-Id to_Id(string Id_str){
-  if(Id_str.length() == 128){
-    Id id;
-    try{
-      string decoded;
-
-      CryptoPP::HexDecoder decoder;
-
-      decoder.Attach( new CryptoPP::StringSink( decoded ) );
-      decoder.Put( (byte*)Id_str.data(), Id_str.size() );
-      decoder.MessageEnd();
-
-      memcpy(&id,decoded.data(),sizeof(Id));
-    }catch (exception& e){
-      debug("*** couldn't convert string to Id");
-      debug("*** error:[%s]",e.what());
-      return Id();
-    }
-    return id;
-  }else{
-    debug("*** Wrong Id length [%s != 128]",Id_str.length());
-    return Id();
-  }
 }
