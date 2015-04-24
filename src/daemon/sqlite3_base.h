@@ -14,11 +14,13 @@
 #include "common.h"
 
 class Sqlite3_base {
-  Sqlite3_base();
-  const string SQLITE3_PATH;
+
+  string SQLITE3_PATH=DEFAULT_DATABASE_PATH;
 protected:
-  Sqlite3_base(const string& db_path);
+  Sqlite3_base();
   ~Sqlite3_base();
+  void set_database_path(const string& path){SQLITE3_PATH=move(path);}
+  string get_database_path(){return SQLITE3_PATH;}
 
   //Result wrapper
   class Result {

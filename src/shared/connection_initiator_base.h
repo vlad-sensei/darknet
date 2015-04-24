@@ -34,7 +34,7 @@ private:
   struct Data {
     uint16_t port = DEFAULT_LISTEN_PORT;
   } data;
-  rw_mutex port_mtx;
+  mutable rw_mutex port_mtx;
 
   ba::io_service io_service_;
   ba::signal_set signals_;

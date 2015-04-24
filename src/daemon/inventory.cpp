@@ -1,6 +1,7 @@
 #include "inventory.h"
 
-Inventory::Inventory(){
+Inventory::Inventory(){}
+void Inventory::init(){
   //TODO: for now remove the old arena and create a new
 
   /* Now you can overwrite existing files, even if they aren't a database

@@ -24,8 +24,10 @@ public:
 
   //TODO: (optimization) queue ~1000 cids in memory before putting them into database
   bool get_chunk(const Id& bid, const Id& cid, Chunk &chunk);
+  void set_arena_path(const string& path){arena_path=move(path);}
 protected:
 
+  void init();
   /*
    * interate through the file adding chunks sequentially to arena
    * and building metabody in progress. Then add metabody to arena.
@@ -52,7 +54,9 @@ protected:
   //write chunk to file, chunk_map and database
   bool add_chunk(const Id& bid, const Chunk& chunk);  //take size into account
 
+
 private:
+
   bool add_new_arena_slots(const size_t& num = 1);
   bool write_to_arena_slot(const string& data, size_t& idx);
   bool read_from_arena_slot(const size_t& idx, const size_t& chunk_size, Chunk& chunk);

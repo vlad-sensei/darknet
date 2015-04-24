@@ -59,8 +59,8 @@ int main(int argc, char* argv[]){
     core.reset(new Core);
     core->set_daemon_port(daemon_port);
     core->set_client_port(client_port);
-  //  core->set_arena_path(arena_path);
-  //  core->set_database_path(database_path);
+    core->set_arena_path(arena_path);
+    core->set_database_path(database_path);
 
     core->run();
   } catch(std::exception& e){

@@ -25,7 +25,6 @@
 class Database:protected Sqlite3_base {
 public:
   Database();
-  Database(const string& path);
   ~Database();
 
 private:
