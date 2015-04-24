@@ -64,7 +64,7 @@ bool process_args(int argc, char* argv[],uint16_t& ui_port){
      * not overwriting some other type of file (than .db)
      */
 
-    /*
+/*
      * Could use boost::filesystem::exists() or something to check
      * if file exists, but it could be leftovers from earlier runs,
      * so I leave it without checking for now.
@@ -94,6 +94,17 @@ bool get_args(int argc, char* argv[], uint16_t& daemon_port, uint16_t& client_po
       string val = argv[i];
       if(arg=="-p" || arg == "--port") {
         try{ daemon_port = stoul(val);} catch(const exception&){}
+        break;
+      }else  if(arg=="-p_d" || arg == "--port_d"){
+        try{ client_port = stoul(val);} catch(const exception&){}
+        break;
+      }
+      else  if(arg=="-path" || arg == "--path_database"){
+        database_path = move(val);
+        break;
+      }
+      else  if(arg=="-path_a" || arg == "--path_arena"){
+        arena_path = move(val);
         break;
       }
       return false;
