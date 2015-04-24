@@ -10,7 +10,7 @@ using namespace std;
 #define HELP_MSG "TODO: ADD HELP_MSG HERE"
 
 bool get_args(int argc, char* argv[], uint16_t& daemon_port, uint16_t& client_port, string& database_path, string& arena_path){
-  for(int i = 0; i<argc; ++i){
+  for(int i = 1; i<argc; ++i){
     do{
       string arg = string(argv[i]);
       if(arg=="-h" || arg =="--help"){
