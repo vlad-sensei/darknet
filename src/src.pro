@@ -1,7 +1,6 @@
 TEMPLATE = subdirs
 
-SUBDIRS=\
-  daemon #\
-  #client_console
+SUBDIRS += daemon
+unix:SUBDIRS += client_console
 
 CONFIG += ordered

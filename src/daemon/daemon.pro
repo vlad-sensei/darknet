@@ -4,10 +4,10 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 QMAKE_CXXFLAGS += -std=c++14
-QMAKE_LFLAGS += -static-libgcc
 
+win{
+    QMAKE_LFLAGS += -static-libgcc
 
-#win{
     INCLUDEPATH += $$PWD/../../libs/cryptopp
     INCLUDEPATH += $$PWD/../../libs/sqlite
     INCLUDEPATH += $$PWD/../../libs
@@ -16,7 +16,6 @@ QMAKE_LFLAGS += -static-libgcc
 
     CONFIG += staticlib static
 
-    #LIBS += -L$$PWD/../../libs
     LIBS += -lwsock32
     LIBS += -lws2_32
     LIBS += $$PWD/../../libs/libcryptopp.a
@@ -25,20 +24,16 @@ QMAKE_LFLAGS += -static-libgcc
     LIBS += $$PWD/../../libs/libboost_filesystem-mgw49-1_58.dll.a
     LIBS += $$PWD/../../libs/libboost_thread-mgw49-mt-1_58.a
 
-    #LIBS += -llibboost_system-mgw49-1_58
-    #LIBS += -llibboost_filesystem-mgw49-1_58.dll
-    #LIBS += -llibboost_thread-mgw49-mt-1_58
-
-#}
-#unix{
-#    LIBS += -lboost_system
-#    LIBS += -lboost_filesystem
-#    LIBS += -lboost_thread
-#    LIBS += -lpthread
-#    LIBS += -lsqlite3
-#    LIBS += -lcryptopp
-#    LIBS += -lreadline
-#}
+}
+unix{
+    LIBS += -lboost_system
+    LIBS += -lboost_filesystem
+    LIBS += -lboost_thread
+    LIBS += -lpthread
+    LIBS += -lsqlite3
+    LIBS += -lcryptopp
+    LIBS += -lreadline
+}
 
 INCLUDEPATH += $$PWD/../shared
 
