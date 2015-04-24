@@ -53,6 +53,13 @@ public:
   //stop syncing after the next syncing is completed
   void stop_synch();
   bool merge_peers(const peer_id_t& pid1, const peer_id_t& pid2);
+
+  void set_arena_path(const string& path);
+
+  void set_database_path(const string path){
+    database::set_database_path(path);
+  }
+
 private:
   void req_chunks(const Id& bid, const unordered_set<Id>& cids);
   void synch_all();

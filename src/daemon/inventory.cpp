@@ -8,8 +8,8 @@ Inventory::Inventory(){
    * if a user gives a path to another existing file, it will be overwritten).
    * As stated by TODO, this behaviour should be changed.
    */
-  remove(get_arena_path().c_str());
-  data.arena.open(get_arena_path());
+  remove(arena_path.c_str());
+  data.arena.open(arena_path);
   add_new_arena_slots(DEFAULT_ARENA_SLOT_NUM);
 }
 
@@ -167,7 +167,7 @@ bool Inventory::read_from_arena_slot(const size_t &idx, const size_t &chunk_size
     debug(" *** idx>=data.arena_slots_size");
     return false;
   }
-  ifstream arena(get_arena_path());
+  ifstream arena(arena_path);
   //TODO: overflow on 32bit systems for large files!!!
   arena.seekg(idx*CHUNK_SIZE);
 

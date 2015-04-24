@@ -64,6 +64,7 @@ private:
     ofstream arena; //for writing only
   } data;
   rw_mutex arena_mtx;
+  string arena_path=DEFAULT_ARENA_PATH;
 };
 
 #endif // INVENTORY_H

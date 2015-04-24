@@ -70,6 +70,7 @@ private:
 
   EMPTY_STRING ="";
 
+  string database_path=DEFAULT_DATABASE_PATH;
 protected:
   void init_db();
 
@@ -79,6 +80,7 @@ protected:
 public:
   //write
   //void add_data(const string& value1, const uint64_t& value2) {exec_s(i_items,value1,value2);}
+  void set_database_path(const string& path){database_path=move(path);}
 protected:
 
   void add_chunk(const Id& bid, const Id& cid, const size_t& size, const size_t& slot){exec_s(I_CHUNK,bid,cid,size,slot);}
