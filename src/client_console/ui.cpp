@@ -2,10 +2,11 @@
 
 #include <thread>
 #include <mutex>
+#include <boost/algorithm/string.hpp>
+
 #ifdef NCURSES
 #include <ncurses.h>
 #endif
-#include <boost/algorithm/string.hpp>
 
 UI_ptr ui;
 
@@ -35,28 +36,12 @@ void UI::handle_new_connection(tcp::socket socket){
   connection->init();
 }
 
+// ~~~~~~~~~~~~ text UI ~~~~~~~~~~~~
 
 void UI::echo(const string &msg){
-
-#ifdef NCURSES
-
-  vector <string> strings;
-
-  boost::split(strings,msg,boost::is_any_of("\n"));
-
-  for(string str: strings){
-    terminal_content.insert(terminal_content.begin()+2,str);
-  }
-  print_terminal_content(terminal_content, content_index);
-  refresh();
-
-#else
   safe_printf("%s\n",msg);
-#endif
-
 }
 
-// ~~~~~~~~~~~~ text input ~~~~~~~~~~~~
 
 void UI::get_text_input(){
 
@@ -155,6 +140,22 @@ void UI::get_text_input(){
 }
 
 #ifdef NCURSES
+
+void UI::init_window(){
+  //initiate curse window
+  initscr();
+  noecho();
+  cbreak(); //disables input buffering
+  keypad(stdscr, TRUE); //allow special keys like arrow up etc
+
+  terminal_content.push_back(" ~~~ welcome to darknet ~~~ ");
+  terminal_content.push_back("> ");
+  terminal_content.push_back("");
+  printw(terminal_content[0].c_str(),0);
+  move(1,0);
+  printw(terminal_content[1].c_str(),1);
+}
+
 string UI::find_match(string input){
   string temp = input.substr(2);
   for(string str:command_list){
@@ -202,20 +203,18 @@ void UI::print_terminal_content(vector<string>terminal_content, int content_inde
   (void)y;
 }
 
+void UI::echo(const string &msg){
+  vector <string> strings;
 
-void UI::init_window(){
-  //initiate curse window
-  initscr();
-  noecho();
-  cbreak(); //disables input buffering
-  keypad(stdscr, TRUE); //allow special keys like arrow up etc
+  boost::split(strings,msg,boost::is_any_of("\n"));
 
-  terminal_content.push_back(" ~~~ welcome to darknet ~~~ ");
-  terminal_content.push_back("> ");
-  terminal_content.push_back("");
-  printw(terminal_content[0].c_str(),0);
-  move(1,0);
-  printw(terminal_content[1].c_str(),1);
+  for(string str: strings){
+    terminal_content.insert(terminal_content.begin()+2,str);
+  }
+  print_terminal_content(terminal_content, content_index);
+  refresh();
 }
+
+
 
 #endif
