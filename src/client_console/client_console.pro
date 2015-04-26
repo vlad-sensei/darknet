@@ -3,6 +3,9 @@ CONFIG += console
 CONFIG -= app_bundle
 CONFIG -= qt
 
+LINUX: DEFINES += NCURSES
+
+
 QMAKE_CXXFLAGS += -std=c++14
 
 INCLUDEPATH += $$PWD/../shared
@@ -12,7 +15,7 @@ LIBS += -lboost_filesystem
 LIBS += -lboost_thread
 LIBS += -lpthread
 LIBS += -lcryptopp
-LIBS += -lncurses
+NCURSES: LIBS += -lncurses
 
 SOURCES += main.cpp \
     ui.cpp \

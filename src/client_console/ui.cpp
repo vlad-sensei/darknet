@@ -36,7 +36,7 @@ void UI::handle_new_connection(tcp::socket socket){
 
 void UI::echo(const string &msg){
 
-#ifdef LINUX
+#ifdef NCURSES
 
   vector <string> strings;
 
@@ -58,7 +58,7 @@ void UI::echo(const string &msg){
 
 void UI::get_text_input(){
 
-#ifdef LINUX
+#ifdef NCURSES
 
   init_window();
   string line("");
@@ -152,7 +152,7 @@ void UI::get_text_input(){
 
 }
 
-#ifdef LINUX
+#ifdef NCURSES
 string UI::find_match(string input){
   string temp = input.substr(2);
   for(string str:command_list){

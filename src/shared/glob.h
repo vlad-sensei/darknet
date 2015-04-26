@@ -2,8 +2,6 @@
 #define GLOB_H
 
 
-#define LINUX
-
 // me no like 'using' from header files (especially not std) -R
 using namespace std;
 
@@ -85,6 +83,12 @@ typedef uint64_t peer_id_t;
 typedef unsigned char byte;
 typedef uint64_t file_size_t;
 typedef uint32_t ip_t;
+
+#ifdef TEST
+#ifdef NCURSES
+#undef NCURSES
+#endif //for NCURSES
+#endif //for TEST
 
 #define DEFAULT_LISTEN_PORT 8453
 #define DEFAULT_UI_LISTEN_PORT 8888

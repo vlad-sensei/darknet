@@ -24,7 +24,7 @@ public:
 private:
   void handle_new_connection(tcp::socket socket);
 
-#ifdef LINUX
+#ifdef NCURSES
   string find_match(string input); //autofill funktion
   void print_terminal_content(vector<string> terminal_content, int content_index);
   void init_window();
