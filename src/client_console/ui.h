@@ -25,7 +25,7 @@ private:
   void handle_new_connection(tcp::socket socket);
 
 #ifdef NCURSES
-  string find_match(string input); //autofill funktion
+  string find_match(const string& input); //autofill funktion
   void print_terminal_content(vector<string> terminal_content, int content_index);
   void init_window();
 #endif
