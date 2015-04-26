@@ -1,12 +1,9 @@
 #include "ui.h"
-
 #include <thread>
 #include <mutex>
 #include <boost/algorithm/string.hpp>
 
-#ifdef NCURSES
-#include <ncurses.h>
-#endif
+
 
 UI_ptr ui;
 
@@ -39,7 +36,7 @@ void UI::handle_new_connection(tcp::socket socket){
 // ~~~~~~~~~~~~ text UI ~~~~~~~~~~~~
 
 #ifdef NCURSES
-
+#include <ncurses.h>
 void UI::init_window(){
   //initiate curse window
   initscr();
@@ -189,7 +186,7 @@ void UI::echo(const string &msg){
   refresh();
 }
 
-#elif //not NCURSES
+#else //not NCURSES
 
 void UI::echo(const string &msg){
   safe_printf("%s\n",msg);
