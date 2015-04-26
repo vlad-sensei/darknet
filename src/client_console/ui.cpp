@@ -2,7 +2,9 @@
 
 #include <thread>
 #include <mutex>
+#ifdef NCURSES
 #include <ncurses.h>
+#endif
 #include <boost/algorithm/string.hpp>
 
 UI_ptr ui;
