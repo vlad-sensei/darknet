@@ -1,7 +1,7 @@
 #ifndef GLOB_H
 #define GLOB_H
 
-#define TEST
+
 // me no like 'using' from header files (especially not std) -R
 using namespace std;
 
@@ -105,6 +105,7 @@ typedef uint32_t ip_t;
 #define DEFAULT_DATABASE_PATH "database.db"
 #define DEFAULT_ARENA_PATH "/tmp/arena"
 #define DEFAULT_ARENA_SLOT_NUM 200
+#define DEAFULT_PEER_REQ_COUNT 10
 
 // c++14
 #include <shared_mutex>

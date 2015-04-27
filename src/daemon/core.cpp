@@ -107,18 +107,44 @@ bool Core::merge_peers(const peer_id_t &pid1, const peer_id_t &pid2){
   //verify they exist
   r_lock l(peers_mtx);
   if(!data.peer_exists(pid1)||!data.peer_exists(pid2)) {
-      //debug("*** peers did not exist [%s] [%s]",pid1 ,pid2);
-      return false;
+    //debug("*** peers did not exist [%s] [%s]",pid1 ,pid2);
+    return false;
   }
   const Peer_ptr& peer1 = data.peers[pid1];
   const Peer_ptr& peer2 = data.peers[pid2];
   uint16_t port1, port2;
   if(!peer1->get_listen_port(port1) && !peer2->get_listen_port(port2)) {
-      //debug("*** no listen port from the peer",pid1 ,pid2);
-      return false;
+    //debug("*** no listen port from the peer",pid1 ,pid2);
+    return false;
   }
   peer1->merge_peer(peer2->get_ip(),port2);
   peer2->merge_peer(peer1->get_ip(),port1);
+  return true;
+}
+
+void Core::share_peers(uint16_t max_count,const peer_id_t& pid){
+  int counter=0;
+  r_lock l(peers_mtx);
+  vector<peer_id_t> peer_list;
+  for(const auto& iterator:data.peers){
+    if (pid == iterator.first) continue;
+    peer_list.emplace_back(iterator.first);
+    if (++counter == max_count) break;
+  }
+  l.unlock();
+  for(auto i:peer_list){
+    core->merge_peers(i,pid);
+  }
+}
+
+bool Core::make_peer_req(const peer_id_t &pid){
+  r_lock l(peers_mtx);
+  if(!data.peer_exists(pid)) {
+    //debug("*** peers did not exist [%s] [%s]",pid1 ,pid2);
+    return false;
+  }
+  const Peer_ptr& peer = data.peers[pid];
+  peer->req_peers();
   return true;
 }
 
