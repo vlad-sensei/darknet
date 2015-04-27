@@ -1,7 +1,7 @@
 #ifndef GLOB_H
 #define GLOB_H
 
-
+#define TEST
 // me no like 'using' from header files (especially not std) -R
 using namespace std;
 
