@@ -42,6 +42,9 @@ public:
   inline void req_chunks(const Id& bid, const unordered_set<Id>& cids) {send(Message::chunk_req(bid,cids));}
   inline void req_metaheads(){send(Message::meta_req());}
   inline void send_metaheads(const vector<Metahead>& metaheads){send(Message::meta_reply(metaheads));}
+  inline void req_peers(){
+    send(Message::peer_req(DEAFULT_PEER_REQ_COUNT));
+  }
   inline void send_listen_port(const uint16_t& port){send(Message::port(port));}
   inline void merge_peer(const ip_t& ip, const uint16_t& port){send(Message::merge_peer_req(ip,port));}
 
@@ -65,6 +68,7 @@ private:
   void handle_chunk(const Msg_ptr& msg);
   void handle_listen_port(const Msg_ptr& msg);
   void handle_connect(const Msg_ptr &msg);
+  void handle_peer_req(const Msg_ptr &msg);
 
   struct Data{
     Data(const peer_id_t& pid_):pid(pid_){}

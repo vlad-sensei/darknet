@@ -279,4 +279,27 @@ void Ui::init_commands(){
   "assemble bid [filename=\"unnamed_file\"]",
   3,3);
 
+  init_command(Commands::CMD_REQ_PEERS,
+               // Should have arg (tag1%tag2)
+               [this](const vector<string>& args){
+
+    try{
+      peer_id_t pid1=stoull(args[1]);
+      if(!core->make_peer_req(pid1)) return "reqest faild";
+      return "reqesting...";
+    } catch(exception& e){
+      debug("*** error: %s",e.what());
+      handle_invalid_args(e);
+      return "Invalid arguments.";
+    }
+
+
+
+  },
+  "assemble bid [filename=\"unnamed_file\"]",
+  2,2);
+
+
+
+
 }

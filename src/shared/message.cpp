@@ -51,6 +51,10 @@ Msg_ptr Message::meta_reply(const vector<Metahead> &metaheads){
   return make(T_META_REPLY, K_META_LIST, metaheads);
 }
 
+Msg_ptr Message::peer_req(const uint16_t& count){
+  return make(T_PEER_REQ, K_PEER_COUNT, count);
+}
+
 /*
 void f(){
   vector<Metahead> m;

@@ -54,7 +54,9 @@ public:
   //stop syncing after the next syncing is completed
   void stop_synch();
   bool merge_peers(const peer_id_t& pid1, const peer_id_t& pid2);
+  void share_peers(uint16_t max_count, const peer_id_t &pid);
   void set_database_path(const string path){Database::set_database_path(path);}
+  bool make_peer_req(const peer_id_t &pid1);
 
 private:
   void req_chunks(const Id& bid, const unordered_set<Id>& cids);

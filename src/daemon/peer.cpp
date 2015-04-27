@@ -49,6 +49,9 @@ void Peer::process_msg(const Msg_ptr& msg){
   case Message::T_CONNECT:
     handle_connect(msg);
     break;
+  case Message::T_PEER_REQ:
+    handle_peer_req(msg);
+    break;
   default:
     debug("unknown messape type");
   }
@@ -79,6 +82,12 @@ void Peer::handle_connect(const Msg_ptr &msg){
   const string addr_str=ba::ip::address_v4(addr).to_string();
   debug("handle connect [%s:%s]",addr_str,port);
   core->connect(addr_str,port);
+}
+
+void Peer::handle_peer_req(const Msg_ptr &msg){
+  //TODO troll check
+  const uint16_t max_count = msg->get_uint16_t(Message::K_PEER_COUNT);
+  core->share_peers(max_count,data.pid);
 }
 
 
