@@ -113,9 +113,10 @@ void UI::init_commands(){
 
   init_command(Commands::CMD_EXIT,
                [this](const vector<string>& args){
-    safe_printf("Exiting darknet...");
-    exit(0);
-    return "";
+    debug("Daemon client exit return");
+//    safe_printf("Exiting darknet...");
+//    exit(0);
+    return "exit";
     (void)args;
   },
   "'exit' or 'quit'",

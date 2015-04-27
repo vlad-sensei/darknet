@@ -85,15 +85,17 @@ typedef uint64_t file_size_t;
 typedef uint32_t ip_t;
 
 
+#define TEST
+
 #ifdef __linux__
 #define NCURSES
-#endif //__linux__[
+#endif //__linux__
 
 #ifdef TEST
 #ifdef NCURSES
 #undef NCURSES
 #endif //NCURSES
-#endif //fTEST
+#endif //TEST
 
 #define DEFAULT_LISTEN_PORT 8453
 #define DEFAULT_UI_LISTEN_PORT 8888
