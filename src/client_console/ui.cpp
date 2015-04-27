@@ -5,14 +5,14 @@
 
 
 
-UI_ptr ui;
+Ui_ptr ui;
 
 vector<string> terminal_content; //all the terminal content to be printed
 vector<string> old_commands; //all old used commands
 uint32_t content_index = 0;
 
 
-void UI::run(uint16_t ui_port){
+void Ui::run(uint16_t ui_port){
     Connection_initiator_base::connect("localhost",ui_port);
 
     thread network_thread([this](){
@@ -28,16 +28,16 @@ void UI::run(uint16_t ui_port){
     network_thread.join();
 }
 
-void UI::handle_new_connection(tcp::socket socket){
+void Ui::handle_new_connection(socket_ptr socket){
     connection = Connection_ptr(new Connection(socket));
     connection->init();
 }
 
-// ~~~~~~~~~~~~ text UI ~~~~~~~~~~~~
+// ~~~~~~~~~~~~ text Ui ~~~~~~~~~~~~
 
 #ifdef NCURSES
 #include <ncurses.h>
-void UI::init_window(){
+void Ui::init_window(){
   //initiate curse window
   initscr();
   noecho();
@@ -52,7 +52,7 @@ void UI::init_window(){
   printw(terminal_content[1].c_str(),1);
 }
 
-void UI::get_text_input(){
+void Ui::get_text_input(){
     init_window();
     string line("");
     uint32_t c,x,y,max_x,max_y,history_index = 0;
@@ -127,7 +127,7 @@ void UI::get_text_input(){
 }
 
 
-string UI::find_match(const string& input){
+string Ui::find_match(const string& input){
     string temp = input.substr(2);
     for(string str:command_list){
         if(temp.size() > 0 && str.find(temp) == 0) return "> "+str+" ";
@@ -135,7 +135,7 @@ string UI::find_match(const string& input){
     return input;
 }
 
-void UI::print_terminal_content(const vector<string>& terminal_content, int content_index){
+void Ui::print_terminal_content(const vector<string>& terminal_content, int content_index){
     uint32_t x,y,max_x,max_y,row=0,terminal_index = 0;
     string line = "";
     getyx(stdscr,y,x);
@@ -174,7 +174,7 @@ void UI::print_terminal_content(const vector<string>& terminal_content, int cont
     (void)y;
 }
 
-void UI::echo(const string &msg){
+void Ui::echo(const string &msg){
   vector <string> strings;
 
   boost::split(strings,msg,boost::is_any_of("\n"));
@@ -188,11 +188,11 @@ void UI::echo(const string &msg){
 
 #else //not NCURSES
 
-void UI::echo(const string &msg){
+void Ui::echo(const string &msg){
   safe_printf("%s\n",msg);
 }
 
-void UI::get_text_input(){
+void Ui::get_text_input(){
     string cmd="";
 
     while(true){

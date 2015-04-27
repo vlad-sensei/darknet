@@ -35,7 +35,7 @@ typedef Connection_base<Peer> Peer_connection;
 
 class Peer: public enable_shared_from_this<Peer>, Peer_connection {
 public:
-  Peer(socket_t& sock_, const peer_id_t& pid);
+  Peer(socket_ptr& sock_, const peer_id_t& pid);
   ~Peer();
   void init();
   inline void echo(const string& echo_msg = "echo_msg") {send(Message::echo(echo_msg));}

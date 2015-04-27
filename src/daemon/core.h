@@ -31,8 +31,9 @@
 
 class Core;
 typedef unique_ptr<Core> Core_ptr;
-class UI;
-typedef unique_ptr<UI> UI_ptr;
+
+class Ui;
+typedef unique_ptr<Ui> Ui_ptr;
 
 extern Core_ptr core;
 
@@ -58,8 +59,8 @@ public:
 private:
   void req_chunks(const Id& bid, const unordered_set<Id>& cids);
   void synch_all();
-  bool spawn_peer(tcp::socket& socket);
-  void handle_new_connection(tcp::socket socket);
+  bool spawn_peer(socket_ptr& socket);
+  void handle_new_connection(socket_ptr socket);
 
 
 
@@ -78,7 +79,7 @@ private:
   } data;
   rw_mutex peers_mtx, pid_mtx, sync_mtx;
 
-  UI_ptr ui;
+  Ui_ptr ui;
 };
 
 #endif // CORE_H

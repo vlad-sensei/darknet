@@ -12,6 +12,9 @@ LIBS += -lboost_filesystem
 LIBS += -lboost_thread
 LIBS += -lpthread
 LIBS += -lcryptopp
+LIBS += -lssl
+LIBS += -lcrypto
+
 linux: LIBS += -lncurses
 
 SOURCES += main.cpp \

@@ -3,7 +3,7 @@
 Core_ptr core;
 
 // -------- Constructors ----
-Core::Core() : ui(make_unique<UI>()){}
+Core::Core() : ui(make_unique<Ui>()){}
 
 void Core::run(){
   thread Inventory_thread([this](){
@@ -42,11 +42,11 @@ void Core::broadcast_echo(const string &msg){
 }
 
 
-void Core::handle_new_connection(tcp::socket socket){
-  debug("new peer [%s]..", socket.remote_endpoint());
+void Core::handle_new_connection(socket_ptr socket){
+  debug("new peer [%s]..", socket->lowest_layer().remote_endpoint());
   //TODO:check if we are already connected by MAC/IP parameters
-  if(!socket.is_open()) {debug(" *** socket is not open"); return;}
-  if(!socket.remote_endpoint().address().is_v4()){
+  if(!socket->lowest_layer().is_open()) {debug(" *** socket is not open"); return;}
+  if(!socket->lowest_layer().remote_endpoint().address().is_v4()){
     debug(" *** only accepting ipv4 clients at this moment");
     return;
   }
@@ -124,9 +124,9 @@ bool Core::merge_peers(const peer_id_t &pid1, const peer_id_t &pid2){
 
 // ----------- Data -----------
 //TODO: consider diabling/tweaking for testing
-bool Core::spawn_peer(tcp::socket &socket){
+bool Core::spawn_peer(socket_ptr &socket){
   w_lock l(peers_mtx);
-  const ip_t& ip = socket.remote_endpoint().address().to_v4().to_ulong();
+  const ip_t& ip = socket->lowest_layer().remote_endpoint().address().to_v4().to_ulong();
 #ifndef ALLOW_PEER_FROM_SAME_IP
   //if(data.peer_ip_exists(ip)) return false;
 #endif

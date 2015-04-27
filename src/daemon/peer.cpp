@@ -3,7 +3,7 @@
 
 //typedef Network_base<Peer> Peer_network;
 
-Peer::Peer(socket_t &sock_, const peer_id_t& pid): Peer_connection(sock_),
+Peer::Peer(socket_ptr &sock_, const peer_id_t& pid): Peer_connection(sock_),
   data(pid){
   debug("creating peer [id:%u]..", pid);
   //do_read_header();
