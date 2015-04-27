@@ -43,7 +43,7 @@ string UI::process_text_input(const string& text_input){
 
   r_lock(commands_mtx);
   if(!data.command_exists(cmd_enum)){
-    safe_printf("No such command: %s\n", cmd_args[0]);
+    //safe_printf("No such command: %s\n", cmd_args[0]);
     return "No such command: "+ cmd_args[0]+"\n";
   }
   return data.commands[cmd_enum]->exec(cmd_args);

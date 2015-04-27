@@ -1,0 +1,27 @@
+#!/bin/bash
+
+#for ((i=0; i<$1; i++))
+#do#
+#./start_daemon $i
+#done
+#
+#read -p "wait for daemon"
+#
+#
+#for ((i=0; i<$1; i++))
+#do
+#./start_client $i "up tjena client_$1"
+#done
+#
+
+
+gnome-terminal -e "./start_daemon2 1"
+gnome-terminal -e "./start_daemon2 2"
+gnome-terminal -e "./start_daemon2 3"
+
+read -p "tjena"
+
+#./start_client 1 "co localhost 8002"
+#./start_client 1 "co localhost 8003"
+
+
