@@ -1,6 +1,7 @@
 #ifndef GLOB_H
 #define GLOB_H
 
+
 // me no like 'using' from header files (especially not std) -R
 using namespace std;
 
@@ -8,7 +9,8 @@ using namespace std;
 #include <cstring>
 #include <cinttypes>
 #include <iostream>
-#include <cryptopp/sha.h>
+#include "cryptopp/sha.h"
+#include "cryptopp/hex.h"
 #include <iomanip>
 
 /* Example usage:
@@ -23,49 +25,47 @@ struct hash512_t{
   explicit inline hash512_t(const string& value){CryptoPP::SHA512().CalculateDigest((byte*)data, (byte*)value.data(), value.size());}
   inline bool operator== (const hash512_t& other)const {return  !memcmp(data, other.data, sizeof(data));}
   inline size_t std_hash() const {return data[0]^data[1]^data[2]^data[3]^data[4]^data[5]^data[6]^data[7];}
-  friend void operator << (ostream& os, const hash512_t& h);
-  //TODO: remove this tmp_set_data
-  void tmp_set_data(){
-    data[0]=0xf628a784c8a4b793;
-    data[1]=0x4be0e3e91d528b43;
-    data[2]=0x237126807c4810a6;
-    data[3]=0xc306f3ff061eba46;
-    data[4]=0x7c77f583687c7637;
-    data[5]=0x90f7e6119de2e6b6;
-    data[6]=0xccea4b7e1e87931a;
-    data[7]=0x0c09fee3b9001ee5;
-  }
+  friend ostream& operator << (ostream& os, const hash512_t& h);
 
-  inline bool set_data(uint64_t d, unsigned pos){
-    if(pos <= 7){
-      data[pos] = d;
-      return true;
-    }else{
-      return false;
-    }
-  }
-
-  inline string to_string(){
-    ostringstream oss;
-    oss << std::hex;
-    for(int i=0; i<8; i++){
-      oss << setw(16) << setfill('0') << data[i];
-    }
-    oss << std::dec;
-    return oss.str();
-  }
+  inline string to_string() const;
+  bool from_string(const string& id_str);
 
 private:
   uint64_t data[8];
 };
 
-inline void operator << (ostream& os, const hash512_t& h){
-  os << std::hex;
-  for(int i=0; i<8;i++){
-    os << setw(16) << setfill('0') << h.data[i];
-  }
-  os << std::dec;
+inline ostream& operator << (ostream& os, const hash512_t& h){
+  os << h.to_string();
+  return os;
 }
+
+inline string hash512_t::to_string() const{
+  CryptoPP::HexEncoder encoder;
+  string output;
+  encoder.Attach( new CryptoPP::StringSink( output ) );
+  encoder.Put( (unsigned char*) data, sizeof(data) );
+  encoder.MessageEnd();
+  return output;
+}
+
+inline bool hash512_t::from_string(const string &id_str){
+  if(id_str.size() != sizeof(hash512_t)*2) return false;
+  try{
+    string decoded;
+
+    CryptoPP::HexDecoder decoder;
+
+    decoder.Attach( new CryptoPP::StringSink( decoded ) );
+    decoder.Put( (byte*)id_str.data(), id_str.size() );
+    decoder.MessageEnd();
+
+    memcpy(&data,decoded.data(),sizeof(hash512_t));
+  } catch (const exception&) {
+    return false;
+  }
+  return true;
+}
+
 
 namespace std {
 template<> struct hash<hash512_t>{
@@ -73,35 +73,38 @@ template<> struct hash<hash512_t>{
 };
 }
 
-const hash512_t NULL_ID = hash512_t();
+//const hash512_t NULL_ID = hash512_t();
 
 
 //typedef string hash_t;
 typedef hash512_t Id;
 typedef int64_t ts_t; //time_t, different on different platforms
 typedef uint64_t peer_id_t;
+typedef unsigned char byte;
 typedef uint64_t file_size_t;
+typedef uint32_t ip_t;
+
+
+#ifdef __linux__
+#define NCURSES
+#endif //__linux__[
+
+#ifdef TEST
+#ifdef NCURSES
+#undef NCURSES
+#endif //NCURSES
+#endif //fTEST
 
 #define DEFAULT_LISTEN_PORT 8453
 #define DEFAULT_UI_LISTEN_PORT 8888
-
+#define ID_SIZE 64
+#define METAHEAD_SIZE 1024
+#define SYNC false
+#define SYNC_PERIOD 30
+#define N_SHARED_METAHEADS 100
 #define DEFAULT_DATABASE_PATH "database.db"
 #define DEFAULT_ARENA_PATH "/tmp/arena"
 #define DEFAULT_ARENA_SLOT_NUM 200
-
-#ifdef __GNUC__
-#define VARIABLE_IS_NOT_USED __attribute__ ((unused))
-#else
-#define VARIABLE_IS_NOT_USED
-#endif
-
-
-//static uint16_t PORT=DEFAULT_LISTEN_PORT;
-static string DATABASE_PATH=DEFAULT_DATABASE_PATH;
-static string ARENA_PATH=DEFAULT_ARENA_PATH;
-
-static uint16_t VARIABLE_IS_NOT_USED PORT=DEFAULT_LISTEN_PORT;
-//static uint16_t VARIABLE_IS_NOT_USED UI_PORT=DEFAULT_UI_LISTEN_PORT;
 
 // c++14
 #include <shared_mutex>
@@ -171,19 +174,15 @@ void debug(const std::string& fmt, const Ts&...args){
   safe_printf(fmt.c_str(),args...);
   cout << "\n";
 #endif //DEBUG_ON
+
 }
 
-inline uint16_t get_port(){
-  return PORT;
+//Temporary debug function used for inspecting long strings
+template<size_t size>
+array<char, size> debug_str(const string& str){
+  array<char, size> arr;
+  memcpy(arr.data(), str.data(), size);
+  return arr;
 }
-
-inline string get_database_path(){
-  return DATABASE_PATH;
-}
-
-inline string get_arena_path(){
-  return ARENA_PATH;
-}
-
 
 #endif // GLOB_H

@@ -1,6 +1,7 @@
 #include "inventory.h"
 
-Inventory::Inventory(){
+Inventory::Inventory(){}
+void Inventory::init_inventory(){
   //TODO: for now remove the old arena and create a new
 
   /* Now you can overwrite existing files, even if they aren't a database
@@ -8,8 +9,9 @@ Inventory::Inventory(){
    * if a user gives a path to another existing file, it will be overwritten).
    * As stated by TODO, this behaviour should be changed.
    */
-  remove(get_arena_path().c_str());
-  data.arena.open(get_arena_path());
+  debug("initializing arena [%s]..", arena_path);
+  remove(arena_path.c_str());
+  data.arena.open(arena_path, ios::out | ios::binary);
   add_new_arena_slots(DEFAULT_ARENA_SLOT_NUM);
 }
 
@@ -19,7 +21,10 @@ bool Inventory::get_file(const Id& bid, const string& dest_path){
   Metabody metabody(bid);
 
   //TODO: get more then one chunk to metabody
-  if(!get_chunk(bid,bid,chunk)) return false;
+  if(!get_chunk(bid,bid,chunk)){
+    debug("couldnt find metabody chunk");
+    return false;
+  }
 
   metabody.append_from_chunk(chunk);
 
@@ -27,7 +32,7 @@ bool Inventory::get_file(const Id& bid, const string& dest_path){
 
   // Create our output file
   //TODO: check whether file exists already
-  ofstream out_file(tmp_dest_path);
+  ofstream out_file(tmp_dest_path, ios::out| ios::binary);
   if(!out_file.is_open()){
     debug("could not open output file");
     return false;
@@ -52,9 +57,12 @@ bool Inventory::get_file(const Id& bid, const string& dest_path){
 
 bool Inventory::get_chunk(const Id &bid, const Id &cid, Chunk &chunk){
   size_t size, slot;
-  if(!Database::get_chunk(bid,cid,size,slot)||
-     !read_from_arena_slot(slot,size,chunk) ||
-     !chunk.verify(cid)) return false;
+  if(!Database::get_chunk(bid,cid,size,slot)) return false;
+  debug("get_chunk");
+  if(!read_from_arena_slot(slot,size,chunk)) return false;
+  debug("read_from");
+  if(!chunk.verify(cid)) return false;
+  debug("get_chunck successful");
   return true;
 }
 bool Inventory::add_chunk(const Id &bid, const Chunk &chunk){
@@ -66,7 +74,7 @@ bool Inventory::add_chunk(const Id &bid, const Chunk &chunk){
 }
 
 //TODO: hadle case where the upload is canceled before finised. Enable to cancel uploads
-bool Inventory::upload_file(const string& filename, Metahead& metahead){
+bool Inventory::upload_file(const string& filename, Metahead& metahead, const string tags){
   //open file and calculating its size
   Metabody metabody;
   ifstream file;
@@ -76,6 +84,8 @@ bool Inventory::upload_file(const string& filename, Metahead& metahead){
   file.seekg(0,ios::end);
   file_size_t file_size = file.tellg();
   file.seekg(0,ios::beg);
+
+  debug("file_size: %s", file_size);
 
   unordered_map<Id, pair<size_t, size_t> > cids; // cids[Id] = {slot, size} to ensure to not to write chunks twice
 
@@ -89,7 +99,7 @@ bool Inventory::upload_file(const string& filename, Metahead& metahead){
     Chunk chunk(data);
     size_t idx;
     if(cids.find(chunk.cid)==cids.end()){
-      write_to_arena_slot(chunk.data, idx);
+      write_to_arena_slot(chunk.data, idx);//
       cids[chunk.cid]=make_pair(idx, chunk.size());
     }
 
@@ -117,7 +127,9 @@ bool Inventory::upload_file(const string& filename, Metahead& metahead){
     const Id& cid = metabody.cids[i];
     Database::add_chunk(metabody.bid, cid, cids[cid].second, cids[cid].first);
   }
-  metahead.bid = metabody_chunks[0].cid;  
+  metahead.bid = metabody_chunks[0].cid;
+  metahead.tags = tags;
+  metahead.mid=Id(string((char*)&metahead.bid, sizeof(metahead.bid)) + metahead.tags );
   return true;
 }
 
@@ -165,7 +177,7 @@ bool Inventory::read_from_arena_slot(const size_t &idx, const size_t &chunk_size
     debug(" *** idx>=data.arena_slots_size");
     return false;
   }
-  ifstream arena(DEFAULT_ARENA_PATH);
+  ifstream arena(arena_path, ios::in | ios::binary);
   //TODO: overflow on 32bit systems for large files!!!
   arena.seekg(idx*CHUNK_SIZE);
 
@@ -174,4 +186,3 @@ bool Inventory::read_from_arena_slot(const size_t &idx, const size_t &chunk_size
   //debug("read from arena:\n[arena %s]\n[size %s]\n[substring %s]",idx,chunk_size,raw_data);
   return chunk.set_data(raw_data);
 }
-

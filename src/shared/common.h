@@ -79,8 +79,18 @@ struct Metahead {
   string tags;
   Metahead() = default;
   Metahead(const Id& bid_,const string& tags_):
-    mid(string((char*)&bid_, sizeof(bid_))+tags_),  bid(bid_), tags(tags_){}
+    mid(string((char*)&bid_, sizeof(bid_)) + tags_ ),  bid(bid_), tags(tags_){}
 };
+
+inline ostream& operator << (ostream& os, const Metahead& m){
+  os << "Metahead: -Mid[" << m.mid << "]" << endl;
+  os << "-Bid [" << m.bid << "]" << endl;
+  os << "-Tags [" << m.tags << "]" << endl;
+  return os;
+}
+inline bool operator==(const Metahead& m1, const Metahead& m2){
+  return m1.mid==m2.mid && m1.bid==m2.bid && m1.tags==m2.tags;
+}
 
 /* List contains (enum name,full command name, short command name)
 I thought that it's not neccessary with more than two names per command
@@ -92,6 +102,12 @@ That is why I have explicitly specified a short and full name.
   HANDLE_CMD(CMD_CONNECT,3,"connect","co") \
   HANDLE_CMD(CMD_BROADCAST,4,"broadcast","br") \
   HANDLE_CMD(CMD_EXIT,5,"exit", "quit") \
-  HANDLE_CMD(CMD_ASSEMBLE,6,"assemble", "as")
+  HANDLE_CMD(CMD_ASSEMBLE,6,"assemble", "as") \
+  HANDLE_CMD(CMD_SYNCH,7,"synch", "sy") \
+  HANDLE_CMD(CMD_SEARCH,8,"search", "se")\
+  HANDLE_CMD(CMD_MERGE,9,"merge", "me")
+
+
+
 
 #endif // COMMON_H

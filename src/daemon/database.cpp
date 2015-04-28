@@ -1,17 +1,17 @@
 #include "database.h"
 
-Database::Database(): Sqlite3_base(get_database_path()){
+Database::Database(){
 //Database::Database(): Sqlite3_base(DEFAULT_DATABASE_PATH){
-  debug("creating database [%s]..",get_database_path());
-  init_db();
+  debug("creating database");
 }
+
 
 Database::~Database(){
   debug("destroying database..");
 }
 
 void Database::init_db(){
-  debug("initializing database..");
+  debug("initializing database [%s]..",Sqlite3_base::get_database_path());
   remove_db(); // for clear for testing
 
   //create tables
@@ -52,4 +52,11 @@ bool Database::get_chunk(const Id &bid, const Id &cid, size_t &size, size_t &slo
   size = res->get_size_t(0);
   slot = res->get_size_t(1);
   return true;
+}
+
+void Database::get_random_metaheads(const int n, vector<Metahead>& metaheads){
+  Result_ptr res = exec_q(Q_RANDOM_METAHEADS, n);
+  while(res->next()) {
+    metaheads.emplace_back(res->get_id(2), res->get_string(1));
+  }
 }

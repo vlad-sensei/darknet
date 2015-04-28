@@ -12,9 +12,7 @@ UI::UI() {
 }
 
 
-void UI::run(uint16_t ui_port){
-  Connection_initiator_base::set_port(ui_port);
-//  Connection_initiator_base::set_port(DEFAULT_UI_LISTEN_PORT);
+void UI::run(){
   Connection_initiator_base::start_listen();
   Connection_initiator_base::run();
 }
@@ -34,10 +32,9 @@ void UI::spawn_client(tcp::socket &socket){
 
 string UI::process_text_input(const string& text_input){
   istringstream ss(text_input);
-  //istream_iterator<string> begin(ss), end;
-  //vector<string> args(begin, end;
   istream_iterator<string> begin(ss), end;
   vector<string> cmd_args(begin, end);
+
   if(cmd_args.empty()){
     return "";
   }
@@ -145,13 +142,10 @@ void UI::init_commands(){
       tags = filename+":"+filename;
     }
 
-    Id mid = core->upload_file(filename, tags);
-    if(mid == NULL_ID){
-      return "Upload failed.";
-    }else{
-      string ret_str = "Upload successful: mid[" + mid.to_string() +"]";
-      return ret_str.c_str();
-    }
+    Id mid;
+    if(!core->upload_file(filename, tags, mid)) return "Upload failed.";
+    string ret_str = "Upload successful: mid[" + mid.to_string() +"]";
+    return ret_str.c_str();
   },
   "upload filename [tags]",
   2,3);
@@ -162,20 +156,19 @@ void UI::init_commands(){
 
     Id mid;
     try{
-      mid = to_Id(args[1]);
+      //mid = to_Id(args[1]);
+
       debug("MID:[%s]",mid);
-      if(mid == NULL_ID){
-        return "Download failed: Invalid mid";
-      }else{
-        Id bid = core->req_file(mid);
-        if(bid == NULL_ID){
-          debug("Metahead for mid [%s] doesn't exist",mid);
-          return "Invalid mid: Not found";
-        }else{
-          string ret_str = "Download succeded. File bid:["+bid.to_string()+"]";
-          return ret_str.c_str();
-        }
+      if(!mid.from_string(args[1])) return "Download failed: Invalid mid";
+
+      Id bid;
+      if(!core->req_file(mid,bid)){
+        debug("Metahead for mid [%s] doesn't exist",mid);
+        return "Invalid mid: Not found";
       }
+      string ret_str = "Download succeded. File bid:["+bid.to_string()+"]";
+      return ret_str.c_str();
+
     } catch(exception& e){
       debug("*** error: %s",e.what());
       handle_invalid_args(e);
@@ -188,27 +181,46 @@ void UI::init_commands(){
   "download mid",
   2,2);
 
+  init_command(Commands::CMD_SYNCH,
+               [this](const vector<string>& args){
+    int status = 0;
+    int period = SYNC_PERIOD;
+    try{
+      status = stoi(args[1]);
+      if(args.size()>2) period = stoi(args[2]);
+    } catch(exception& e){
+      handle_invalid_args(e);
+      return "Invalid arguments.";
+    }
+
+    if(status){
+      core->start_synch(period);
+      return string("synching started with period: " + to_string(period)).c_str();
+    }
+    else{
+      core->stop_synch();
+      return "syncing stopped";
+    }
+  },
+  "synch 1|0 [sync_period]",
+  2,3);
+
   init_command(Commands::CMD_ASSEMBLE,
                // Should have args (bid,[file_path="~/Downloads"(eller annat lämpligt val)])
                [this](const vector<string>& args){
 
     Id bid;
     try{
-      bid = to_Id(args[1]);
+      if(!bid.from_string(args[1])) return "Assemble failed: Invalid bid";
       debug("BID:[%s]",bid);
-      if(bid == NULL_ID){
-        return "Assemble failed: Invalid bid";
-      }else{
-        string filename("unnamed_file");
-        if(args.size() == 3){
-          filename = args[2];
-        }
-        //TODO: filename checking
-        if(!core->get_file(bid,filename)){
-          return "Assembly failed: couldn't find file";
-        }
-        return "Assembly complete!";
+      string filename("unnamed_file");
+      if(args.size() == 3){
+        filename = args[2];
       }
+      //TODO: filename checking
+      if(!core->get_file(bid,filename)) return "Assembly failed: couldn't find file";
+
+      return "Assembly complete!";
     } catch(exception& e){
       debug("*** error: %s",e.what());
       handle_invalid_args(e);
@@ -221,31 +233,49 @@ void UI::init_commands(){
   "assemble bid [filename=\"unnamed_file\"]",
   2,3);
 
-}
+  init_command(Commands::CMD_SEARCH,
+               // Should have arg (tag1%tag2)
+               [this](const vector<string>& args){
 
-Id to_Id(string Id_str){
-  if(Id_str.length() == 128){
-    Id id;
+    vector<Id> mids;
     try{
-      for(unsigned i=0; i < 8; ++i){
-        string substr = Id_str.substr(i*16,16);
-
-        uint64_t result;
-        result = strtoull(substr.c_str(), NULL, 16);
-        if(!id.set_data(result,i)){
-          debug("*** couldn't set data [res=%s,i=%d]",result,i);
-          return Id();
-        }
+      core->search(args[1],mids);
+      for(Id mid:mids){
+        Metahead head;
+        core->get_metahead(mid,head);
+        debug("[mid %s]\n [tags %s]\n [bid %s]\n",head.mid, head.tags,head.bid);
+        return "SEARCHING ...";
       }
-
-    }catch (exception& e){
-      debug("*** couldn't convert string to Id");
-      debug("*** error:[%s]",e.what());
-      return Id();
+    } catch(exception& e){
+      debug("*** error: %s",e.what());
+      handle_invalid_args(e);
+      return "Invalid arguments.";
     }
-    return id;
-  }else{
-    debug("*** Wrong Id length [%s != 128]",Id_str.length());
-    return Id();
-  }
+
+    return "SEARCH failed.";
+
+  },
+  "assemble bid [filename=\"unnamed_file\"]",
+  2,2);
+
+  init_command(Commands::CMD_MERGE,
+               // Should have arg (tag1%tag2)
+               [this](const vector<string>& args){
+
+    try{
+      peer_id_t pid1=stoull(args[1]),pid2=stoull(args[2]);
+      if(!core->merge_peers(pid1,pid2)) return "merge faild";
+      return "merging...";
+    } catch(exception& e){
+      debug("*** error: %s",e.what());
+      handle_invalid_args(e);
+      return "Invalid arguments.";
+    }
+
+
+
+  },
+  "assemble bid [filename=\"unnamed_file\"]",
+  3,3);
+
 }

@@ -27,13 +27,20 @@ public:
     T_NONE,
     T_ECHO,
     T_CHUNK_REQ,
+    T_META_REQ, //sent by a client requesting meta heads
+    T_META_REPLY, //message contains a list of metaheads
     T_CHUNK,
-    T_UI_TEXT_COMMAND
+    T_UI_TEXT_COMMAND,
+    T_LISTEN_PORT,
+    T_CONNECT
   }; // message types
   enum msg_keys : Key_type_t {
     K_BODY,
     K_BID,
-    K_CIDS
+    K_CIDS,
+    K_META_LIST,
+    K_PORT,
+    K_IP
   }; // header keys
 
   static Msg_ptr empty();
@@ -41,7 +48,11 @@ public:
   static Msg_ptr echo(const string& msg = "");
   static Msg_ptr chunk_req(const Id& bid, const unordered_set<Id>& cids);
   static Msg_ptr ui_text_command(const string& msg = "");
+  static Msg_ptr meta_req();
+  static Msg_ptr port(uint16_t port);
+  static Msg_ptr meta_reply(const vector<Metahead> &meta_list);
   static Msg_ptr chunk(const Id& bid,const Chunk& chunk);
+  static Msg_ptr merge_peer_req(const ip_t &addr, const uint16_t &);
 };
 
 #endif // MESSAGE_H

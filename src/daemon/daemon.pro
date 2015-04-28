@@ -23,9 +23,8 @@ win32{
     LIBS += $$PWD/../../libs/libboost_system-mgw49-1_58.dll
     LIBS += $$PWD/../../libs/libboost_filesystem-mgw49-1_58.dll
     LIBS += $$PWD/../../libs/libboost_thread-mgw49-mt-1_58.dll
-
 }
-unix{
+linux{
     LIBS += -lboost_system
     LIBS += -lboost_filesystem
     LIBS += -lboost_thread

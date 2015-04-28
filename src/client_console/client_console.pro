@@ -5,30 +5,34 @@ CONFIG -= qt
 
 QMAKE_CXXFLAGS += -std=c++14
 
-INCLUDEPATH += $$PWD/../../libs/cryptopp
-INCLUDEPATH += $$PWD/../../libs/sqlite
-INCLUDEPATH += $$PWD/../../libs
-
-DEFINES += CRYPTOPP_EXPORTS
-
-CONFIG += staticlib static
-
-#LIBS += -L$$PWD/../../libs
-LIBS += -lwsock32
-LIBS += -lws2_32
-LIBS += $$PWD/../../libs/libcryptopp.a
-LIBS += $$PWD/../../libs/sqlite3.a
-LIBS += $$PWD/../../libs/libboost_system-mgw49-1_58.a
-LIBS += $$PWD/../../libs/libboost_filesystem-mgw49-1_58.dll.a
-LIBS += $$PWD/../../libs/libboost_thread-mgw49-mt-1_58.a
-
 INCLUDEPATH += $$PWD/../shared
 
-#LIBS += -lboost_system
-#LIBS += -lboost_thread
-#LIBS += -lpthread
-#LIBS += -lcryptopp
-#LIBS += -lreadline
+win32{
+    QMAKE_LFLAGS += -static-libgcc
+
+    INCLUDEPATH += $$PWD/../../libs/cryptopp
+    INCLUDEPATH += $$PWD/../../libs/sqlite
+    INCLUDEPATH += $$PWD/../../libs
+
+    DEFINES += CRYPTOPP_EXPORTS
+
+    CONFIG += staticlib static
+
+    LIBS += -lwsock32
+    LIBS += -lws2_32
+    LIBS += $$PWD/../../libs/cryptopp.dll
+    LIBS += $$PWD/../../libs/libboost_system-mgw49-1_58.dll
+    LIBS += $$PWD/../../libs/libboost_filesystem-mgw49-1_58.dll
+    LIBS += $$PWD/../../libs/libboost_thread-mgw49-mt-1_58.dll
+}
+linux{
+	LIBS += -lboost_system
+	LIBS += -lboost_filesystem
+	LIBS += -lboost_thread
+	LIBS += -lpthread
+	LIBS += -lcryptopp
+	LIBS += -lncurses
+}
 
 SOURCES += main.cpp \
     ui.cpp \
@@ -47,4 +51,3 @@ HEADERS += \
     ../shared/message_base.h \
     ../shared/connection_initiator_base.h \
     ../shared/connection_base.h
-

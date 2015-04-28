@@ -19,6 +19,7 @@
 #include "common.h"
 #include "inventory.h"
 
+
 class Library: public Inventory {
 public:
 
@@ -26,15 +27,16 @@ public:
   //pattern ex Batman%movie%...
   //TODO: right now you need to search the tags in the same order in which it was written.
   void search(const string& pattern, vector<Id>& mids);
-  Id upload_file(const string& file_path, const string& tags = "");
-  Id req_file(const Id& mid);
+  bool upload_file(const string& file_path, const string& tags, Id& mid);
+  bool req_file(const Id& mid,Id& bid);
   void handle_chunk(const Id& bid, const Chunk& chunk);
-
   inline void add_metahead(const Metahead & metahead) {Database::add_metahead(metahead);}
+  bool get_metahead(const Id& mid, Metahead& metahead);
+  vector<Metahead> publish_metaheads();
 
 private:
   virtual void req_chunks(const Id& bid, const unordered_set<Id>& cids) = 0; //request chunks
-  bool get_metahead(const Id& mid, Metahead& metahead);
+
 
   struct {
     unordered_map<Id, unordered_set<Id> > chunk_reqs; // chunk_req_map[mid] == set of chunks we are waiting for for that file
@@ -47,6 +49,8 @@ private:
     inline bool chunk_req_exists(const Id& bid,const Id& cid){ return (file_req_exists(bid) && chunk_reqs[bid].find(cid) != chunk_reqs[bid].end() );}
     inline bool has_metabody(const Id& bid){return has_metabody_.find(bid) !=has_metabody_.end();}
   } data;
+
+
   rw_mutex chunk_reqs_mtx;
 
 };

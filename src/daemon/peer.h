@@ -40,24 +40,40 @@ public:
   void init();
   inline void echo(const string& echo_msg = "echo_msg") {send(Message::echo(echo_msg));}
   inline void req_chunks(const Id& bid, const unordered_set<Id>& cids) {send(Message::chunk_req(bid,cids));}
+  inline void req_metaheads(){send(Message::meta_req());}
+  inline void send_metaheads(const vector<Metahead>& metaheads){send(Message::meta_reply(metaheads));}
+  inline void send_listen_port(const uint16_t& port){send(Message::port(port));}
+  inline void merge_peer(const ip_t& ip, const uint16_t& port){send(Message::merge_peer_req(ip,port));}
 
+  inline ip_t get_ip() const {return remote_ip;}
+  bool get_listen_port(uint16_t& listen_port);
 private:
   Peer();
   void terminate();
   inline Peer_ptr shared_from_this(){return enable_shared_from_this<Peer>::shared_from_this();}
 
+  //data
+  void set_listen_port(const uint16_t& listen_port);
+
+
   //process messages
   void process_msg(const Msg_ptr& msg);
   void handle_echo(const Msg_ptr& msg);
   void handle_chunk_req(const Msg_ptr& msg);
+  void handle_meta_req(const Msg_ptr& msg);
+  void handle_meta_reply(const Msg_ptr& msg);
   void handle_chunk(const Msg_ptr& msg);
+  void handle_listen_port(const Msg_ptr& msg);
+  void handle_connect(const Msg_ptr &msg);
 
   struct Data{
     Data(const peer_id_t& pid_):pid(pid_){}
     const peer_id_t pid;
+    uint16_t listen_port = 0;
   private:
     Data();
   } data;
+  rw_mutex listen_port_mtx;
 };
 
 #endif // PEER_H

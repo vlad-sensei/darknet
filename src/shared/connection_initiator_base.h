@@ -22,19 +22,19 @@ protected:
   virtual ~Connection_initiator_base(){}
 
   void connect(const string& addr, const uint16_t& port);
+  uint16_t get_port() const;
 
 private:
   virtual void handle_new_connection(tcp::socket socket) = 0;
 
   void await_stop();
   void listen();
-  uint16_t get_port();
 
 //maybe a bit overkill, but best to keep it standard
   struct Data {
     uint16_t port = DEFAULT_LISTEN_PORT;
   } data;
-  rw_mutex port_mtx;
+  mutable rw_mutex port_mtx;
 
   ba::io_service io_service_;
   ba::signal_set signals_;
