@@ -44,7 +44,7 @@ string UI::process_text_input(const string& text_input){
   r_lock(commands_mtx);
   if(!data.command_exists(cmd_enum)){
     safe_printf("No such command: %s\n", cmd_args[0]);
-    return "No such command: "+ cmd_args[0]+"\n";
+    return "No such command: "+ cmd_args[0];
   }
   return data.commands[cmd_enum]->exec(cmd_args);
 }
@@ -54,7 +54,10 @@ string UI::Command::exec(const vector<string> &args){
     return "Wrong argument count\n"+help();
   }
   try{
-    return execute_(args);
+    string asd = execute_(args);
+    debug("asd: [%s]",asd);
+    return asd;
+//    return execute_(args);
   } catch(exception&e){
     safe_printf(" *** error processing command : %s\n",e.what());
   }
@@ -90,8 +93,15 @@ void UI::init_commands(){
     core->connect(peer,port);
 
     // Must return 'const char*', since previous return is that type.
+
+#ifdef TEST
+    string ret_str = "(<>) Connected to '"+peer+":"+to_string(port)+"'.";
+    return ret_str.c_str();
+#else
     string ret_str = "Connected to '"+peer+":"+to_string(port)+"'.";
     return ret_str.c_str();
+#endif
+
   },
   "connect PEER_IP [PORT]",
   2,3);
@@ -106,7 +116,11 @@ void UI::init_commands(){
       return "Invalid arguments.";
     }
     core->broadcast_echo(msg);
+#ifdef TEST
+    return "done";
+#else
     return "Broadcast complete.";
+#endif
   },
   "broadcast MESSAGE",
   2,2);
@@ -146,8 +160,13 @@ void UI::init_commands(){
 
     Id mid;
     if(!core->upload_file(filename, tags, mid)) return "Upload failed.";
+#ifdef TEST
+    string ret_str = "(<>) "+mid.to_string();
+    return ret_str.c_str();
+#else
     string ret_str = "Upload successful: mid[" + mid.to_string() +"]";
     return ret_str.c_str();
+#endif
   },
   "upload filename [tags]",
   2,3);
@@ -168,8 +187,14 @@ void UI::init_commands(){
         debug("Metahead for mid [%s] doesn't exist",mid);
         return "Invalid mid: Not found";
       }
+#ifdef TEST
+    string ret_str = "(<>) "+bid.to_string();
+    debug("ret_str: [%s]",ret_str);
+    return ret_str.c_str();
+#else
       string ret_str = "Download succeded. File bid:["+bid.to_string()+"]";
       return ret_str.c_str();
+#endif
 
     } catch(exception& e){
       debug("*** error: %s",e.what());
@@ -197,7 +222,12 @@ void UI::init_commands(){
 
     if(status){
       core->start_synch(period);
+#ifdef TEST
+    string ret_str = "(<>) Synch started";
+    return ret_str.c_str();
+#else
       return string("synching started with period: " + to_string(period)).c_str();
+#endif
     }
     else{
       core->stop_synch();
@@ -222,7 +252,12 @@ void UI::init_commands(){
       //TODO: filename checking
       if(!core->get_file(bid,filename)) return "Assembly failed: couldn't find file";
 
+#ifdef TEST
+    string ret_str = "(<>) "+filename;
+    return ret_str.c_str();
+#else
       return "Assembly complete!";
+#endif
     } catch(exception& e){
       debug("*** error: %s",e.what());
       handle_invalid_args(e);
@@ -242,12 +277,28 @@ void UI::init_commands(){
     vector<Id> mids;
     try{
       core->search(args[1],mids);
+
+
+#ifdef TEST
+      string search_results = "";
+      for(Id mid:mids){
+        Metahead head;
+        core->get_metahead(mid,head);
+//        debug("[mid %s]\n [tags %s]\n [bid %s]\n",head.mid, head.tags,head.bid);
+        search_results += "[mid "+head.bid.to_string()+"] [tags "+head.tags+"] [bid "+head.bid.to_string()+"]";
+//        search_results += "[mid "+head.bid.to_string()+"]\n [tags "+head.tags+"]\n [bid "+head.bid.to_string()+"]\n";
+      }
+    string ret_str = "(<>) "+search_results;
+    return ret_str.c_str();
+#else
       for(Id mid:mids){
         Metahead head;
         core->get_metahead(mid,head);
         debug("[mid %s]\n [tags %s]\n [bid %s]\n",head.mid, head.tags,head.bid);
-        return "SEARCHING ...";
       }
+          return "SEARCHING ...";
+#endif
+
     } catch(exception& e){
       debug("*** error: %s",e.what());
       handle_invalid_args(e);
@@ -267,7 +318,13 @@ void UI::init_commands(){
     try{
       peer_id_t pid1=stoull(args[1]),pid2=stoull(args[2]);
       if(!core->merge_peers(pid1,pid2)) return "merge faild";
-      return "merging...";
+#ifdef TEST
+    string ret_str = "(<>) Merging...";
+    return ret_str.c_str();
+#else
+      return "Merging...";
+#endif
+
     } catch(exception& e){
       debug("*** error: %s",e.what());
       handle_invalid_args(e);
