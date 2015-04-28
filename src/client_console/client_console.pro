@@ -24,14 +24,18 @@ win32{
     LIBS += $$PWD/../../libs/libboost_system-mgw49-1_58.dll
     LIBS += $$PWD/../../libs/libboost_filesystem-mgw49-1_58.dll
     LIBS += $$PWD/../../libs/libboost_thread-mgw49-mt-1_58.dll
+    LIBS += $$PWD/../../libs/ssleay32.dll
+    LIBS += $$PWD/../../libs/libeay32.dll
 }
 linux{
-	LIBS += -lboost_system
-	LIBS += -lboost_filesystem
-	LIBS += -lboost_thread
-	LIBS += -lpthread
-	LIBS += -lcryptopp
-	LIBS += -lncurses
+    LIBS += -lboost_system
+    LIBS += -lboost_filesystem
+    LIBS += -lboost_thread
+    LIBS += -lpthread
+    LIBS += -lcryptopp
+    LIBS += -lncurses
+    LIBS += -lssl
+    LIBS += -lcrypto
 }
 
 SOURCES += main.cpp \

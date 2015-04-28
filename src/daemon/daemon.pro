@@ -23,6 +23,8 @@ win32{
     LIBS += $$PWD/../../libs/libboost_system-mgw49-1_58.dll
     LIBS += $$PWD/../../libs/libboost_filesystem-mgw49-1_58.dll
     LIBS += $$PWD/../../libs/libboost_thread-mgw49-mt-1_58.dll
+    LIBS += $$PWD/../../libs/ssleay32.dll
+    LIBS += $$PWD/../../libs/libeay32.dll
 }
 linux{
     LIBS += -lboost_system
@@ -32,6 +34,8 @@ linux{
     LIBS += -lsqlite3
     LIBS += -lcryptopp
     LIBS += -lreadline
+    LIBS += -lssl
+    LIBS += -lcrypto
 }
 
 INCLUDEPATH += $$PWD/../shared

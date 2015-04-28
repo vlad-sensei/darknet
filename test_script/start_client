@@ -1,0 +1,11 @@
+#!/bin/sh 
+build=$(cat ../noxnet.pro.user | grep ProjectExplorer.BuildConfiguration.BuildDirectory |grep Debug |cut -f2 -d'>' | cut -f1 -d'<')
+cd $build/src/client_console
+
+if [ $# -eq 0 ]
+  then
+    echo "No arguments supplied"
+    exit
+fi
+./client_console $((9000 - $1))
+

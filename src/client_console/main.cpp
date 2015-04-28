@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
 
     if(!process_args(argc, argv,ui_port)) return 0;
 
-    ui = UI_ptr(new UI);
+    ui = Ui_ptr(new Ui);
     ui->run(ui_port);
   } catch (exception& e){
     debug(" *** exception : %s", e.what());

@@ -1,5 +1,5 @@
-#ifndef UI_H
-#define UI_H
+#ifndef Ui_H
+#define Ui_H
 
 #include <memory>
 
@@ -8,21 +8,21 @@
 #include "connection_initiator_base.h"
 #include "connection.h"
 
-class UI;
-typedef unique_ptr<UI> UI_ptr;
-typedef Connection_base<UI> UI_network;
+class Ui;
+typedef unique_ptr<Ui> Ui_ptr;
+typedef Connection_base<Ui> Ui_network;
 class Connection;
 typedef shared_ptr<Connection> Connection_ptr;
 
-extern UI_ptr ui; //might need to rename due to overload
+extern Ui_ptr ui; //might need to rename due to overload
 
-class UI: Connection_initiator_base {
+class Ui: Connection_initiator_base {
 public:
-  UI(){}
+  Ui(){}
   void run(uint16_t ui_port);
   void echo(const string& msg);
 private:
-  void handle_new_connection(tcp::socket socket);
+  void handle_new_connection(socket_ptr socket);
 
 #ifdef NCURSES
   string find_match(const string& input); //autofill funktion
@@ -40,4 +40,4 @@ CMD_LIST
 };
 #undef HANDLE_CMD
 
-#endif // UI_H
+#endif // Ui_H

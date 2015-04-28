@@ -23,7 +23,7 @@ typedef Connection_base<Connection> Connection_network;
 class Connection: public enable_shared_from_this<Connection>, public Connection_network{
   Connection();
 public:
-  Connection(tcp::socket& socket):Connection_network(socket){}
+  Connection(socket_ptr& socket):Connection_network(socket){}
 
   void init();
 
