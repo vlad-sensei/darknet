@@ -9,6 +9,7 @@ using namespace std;
 #include <iostream>
 #include "cryptopp/sha.h"
 #include "cryptopp/hex.h"
+#include <openssl/sha.h>
 #include <iomanip>
 
 /* Example usage:
@@ -17,10 +18,36 @@ using namespace std;
   debug("id2==id3 : %s; id1==id4 : %s", id2==id3 ? "true" : "false", id1==id4 ? "true" : "false");
   */
 
+//openssl 512 hash example
+/*
+#include <stdio.h>
+#include <string.h>
+#include <openssl/sha.h>
+
+int main()
+{
+    unsigned char digest[SHA512_DIGEST_LENGTH];
+    char string[] = "hello world";
+
+    SHA512((unsigned char*)&string, strlen(string), (unsigned char*)&digest);
+
+    char mdString[SHA512_DIGEST_LENGTH*2+1];
+
+    for(int i = 0; i < SHA512_DIGEST_LENGTH; i++)
+         sprintf(&mdString[i*2], "%02x", (unsigned int)digest[i]);
+
+    printf("SHA512 digest: %s\n", mdString);
+
+    return 0;
+}
+*/
+
+
 //TODO: actually make glob.cpp to not include cryptopp?
 struct hash512_t{
   inline hash512_t() : data {0,0,0,0,0,0,0,0} {}
-  explicit inline hash512_t(const string& value){CryptoPP::SHA512().CalculateDigest((byte*)data, (byte*)value.data(), value.size());}
+  explicit inline hash512_t(const string& value){SHA512((unsigned char*)value.c_str(), value.size(), (unsigned char*)&data);};
+  //explicit inline hash512_t(const string& value){Openssl::sha512().CalculateDigest((byte*)data, (byte*)value.data(), value.size());}
   inline bool operator== (const hash512_t& other)const {return  !memcmp(data, other.data, sizeof(data));}
   inline size_t std_hash() const {return data[0]^data[1]^data[2]^data[3]^data[4]^data[5]^data[6]^data[7];}
   friend ostream& operator << (ostream& os, const hash512_t& h);
@@ -32,18 +59,27 @@ private:
   uint64_t data[8];
 };
 
+
+
+
+
 inline ostream& operator << (ostream& os, const hash512_t& h){
   os << h.to_string();
   return os;
 }
 
 inline string hash512_t::to_string() const{
-  CryptoPP::HexEncoder encoder;
-  string output;
+
+    string output;
+
+  CryptoPP::HexEncoder encoder;  
   encoder.Attach( new CryptoPP::StringSink( output ) );
   encoder.Put( (unsigned char*) data, sizeof(data) );
-  encoder.MessageEnd();
-  return output;
+  encoder.MessageEnd();  
+
+
+
+     return output;
 }
 
 inline bool hash512_t::from_string(const string &id_str){
