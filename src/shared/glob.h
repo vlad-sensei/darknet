@@ -101,7 +101,14 @@ typedef uint32_t ip_t;
 #define SYNC_PERIOD 30
 #define N_SHARED_METAHEADS 100
 #define DEFAULT_DATABASE_PATH "database.db"
+
+#ifdef __linux__
 #define DEFAULT_ARENA_PATH "/tmp/arena"
+
+#else
+#define DEFAULT_ARENA_PATH "arena"
+#endif //__linux__
+
 #define DEFAULT_ARENA_SLOT_NUM 200
 #define DEAFULT_PEER_REQ_COUNT 10
 
