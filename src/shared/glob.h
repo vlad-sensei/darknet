@@ -7,57 +7,48 @@ using namespace std;
 #include <cstring>
 #include <cinttypes>
 #include <iostream>
-#include "cryptopp/sha.h"
-#include "cryptopp/hex.h"
+#include <openssl/sha.h>
 #include <iomanip>
-
-/* Example usage:
-  Id id1(""), id2("The quick brown fox jumps over the lazy dog"), id3("The quick brown fox jumps over the lazy dog."), id4("");
-  debug("Ids: \n%s\n%s\n%s\n%s\n",id1,id2,id3,id4);
-  debug("id2==id3 : %s; id1==id4 : %s", id2==id3 ? "true" : "false", id1==id4 ? "true" : "false");
-  */
 
 //TODO: actually make glob.cpp to not include cryptopp?
 struct hash512_t{
   inline hash512_t() : data {0,0,0,0,0,0,0,0} {}
-  explicit inline hash512_t(const string& value){CryptoPP::SHA512().CalculateDigest((byte*)data, (byte*)value.data(), value.size());}
-  inline bool operator== (const hash512_t& other)const {return  !memcmp(data, other.data, sizeof(data));}
+  explicit inline hash512_t(const string& value){SHA512((unsigned char*)value.c_str(), value.size(), (unsigned char*)&data);};
+
   inline size_t std_hash() const {return data[0]^data[1]^data[2]^data[3]^data[4]^data[5]^data[6]^data[7];}
+  inline bool operator== (const hash512_t& other)const {return  !memcmp(data, other.data, sizeof(data));}
   friend ostream& operator << (ostream& os, const hash512_t& h);
 
   inline string to_string() const;
   bool from_string(const string& id_str);
-
 private:
   uint64_t data[8];
 };
 
 inline ostream& operator << (ostream& os, const hash512_t& h){
-  os << h.to_string();
+  unsigned char *bytes = (unsigned char*) h.data;
+  for (int i = 0; i< 64; i++){
+    os << setw(2) << setfill('0') << hex << uppercase << (unsigned int) bytes[i];
+  }
   return os;
 }
 
 inline string hash512_t::to_string() const{
-  CryptoPP::HexEncoder encoder;
-  string output;
-  encoder.Attach( new CryptoPP::StringSink( output ) );
-  encoder.Put( (unsigned char*) data, sizeof(data) );
-  encoder.MessageEnd();
-  return output;
+  stringstream ss;
+  ss << data;
+  return ss.str();
 }
 
 inline bool hash512_t::from_string(const string &id_str){
   if(id_str.size() != sizeof(hash512_t)*2) return false;
   try{
-    string decoded;
-
-    CryptoPP::HexDecoder decoder;
-
-    decoder.Attach( new CryptoPP::StringSink( decoded ) );
-    decoder.Put( (byte*)id_str.data(), id_str.size() );
-    decoder.MessageEnd();
-
-    memcpy(&data,decoded.data(),sizeof(hash512_t));
+    //Convert each pair of hex charaters to a byte and insert the result into data
+    unsigned char *bytes = (unsigned char*) data;
+    for (int i = 0; i <64; i++){
+      unsigned int val;
+      istringstream(id_str.substr(2*i, 2)) >> hex >> val;
+      bytes[i] = val & 255;
+    }
   } catch (const exception&) {
     return false;
   }

@@ -12,13 +12,8 @@ win32{
     INCLUDEPATH += $$PWD/../../libs/sqlite
     INCLUDEPATH += $$PWD/../../libs
 
-    DEFINES += CRYPTOPP_EXPORTS
-
-    CONFIG += staticlib static
-
     LIBS += -lwsock32
     LIBS += -lws2_32
-    LIBS += $$PWD/../../libs/cryptopp.dll
     LIBS += $$PWD/../../libs/sqlite3.dll
     LIBS += $$PWD/../../libs/libboost_system-mgw49-1_58.dll
     LIBS += $$PWD/../../libs/libboost_filesystem-mgw49-1_58.dll
@@ -32,7 +27,6 @@ linux{
     LIBS += -lboost_thread
     LIBS += -lpthread
     LIBS += -lsqlite3
-    LIBS += -lcryptopp
     LIBS += -lreadline
     LIBS += -lssl
     LIBS += -lcrypto

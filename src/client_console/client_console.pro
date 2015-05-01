@@ -10,13 +10,8 @@ INCLUDEPATH += $$PWD/../shared
 win32{
     QMAKE_LFLAGS += -static-libgcc
 
-    INCLUDEPATH += $$PWD/../../libs/cryptopp
     INCLUDEPATH += $$PWD/../../libs/sqlite
     INCLUDEPATH += $$PWD/../../libs
-
-    DEFINES += CRYPTOPP_EXPORTS
-
-    CONFIG += staticlib static
 
     LIBS += -lwsock32
     LIBS += -lws2_32
@@ -32,7 +27,6 @@ linux{
     LIBS += -lboost_filesystem
     LIBS += -lboost_thread
     LIBS += -lpthread
-    LIBS += -lcryptopp
     LIBS += -lncurses
     LIBS += -lssl
     LIBS += -lcrypto
