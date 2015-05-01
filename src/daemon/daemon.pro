@@ -12,7 +12,6 @@ LIBS += -lboost_filesystem
 LIBS += -lboost_thread
 LIBS += -lpthread
 LIBS += -lsqlite3
-LIBS += -lcryptopp
 LIBS += -lssl
 LIBS += -lcrypto
 
