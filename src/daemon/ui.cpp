@@ -218,18 +218,23 @@ void UI::init_commands(){
       return string("Invalid arguments.");
     }
 
-    if(status){
+    if(status != 0){
       core->start_synch(period);
 #ifdef TEST
     string ret_str = "(<>) Synch started";
     return ret_str;
 #else
-      return string("synching started with period: " + to_string(period));
+      return string("Synching started with period: " + to_string(period));
 #endif
     }
     else{
       core->stop_synch();
-      return string("syncing stopped");
+#ifdef TEST
+    string ret_str = "(<>) Synch stopped";
+    return ret_str;
+#else
+    return string("Synching stopped");
+#endif
     }
   },
   "synch 1|0 [sync_period]",
@@ -281,22 +286,25 @@ void UI::init_commands(){
       core->search(args[1],mids);
 
 #ifdef TEST
-      string search_results = "\n\n";
+      string search_results = "";
+      for(Id mid : mids){
+        Metahead head;
+        core->get_metahead(mid,head);
+        search_results += "[mid "+head.mid.to_string()+"][tags "+head.tags+"][bid "+head.bid.to_string()+"]\n";
+      }
+      // Remove trailing newline
+      search_results = search_results.substr(0,search_results.length()-1);
+    string ret_str = "(<>)\n"+search_results;
+    return ret_str;
+#else
+      string search_results = "\n";
       search_results += "------ SEARCH RESULTS ------\n";
       for(Id mid : mids){
         Metahead head;
         core->get_metahead(mid,head);
-        search_results += "[mid "+head.bid.to_string()+"]\n [tags "+head.tags+"]\n [bid "+head.bid.to_string()+"]\n\n";
+        search_results += "[mid "+head.mid.to_string()+"]\n [tags "+head.tags+"]\n [bid "+head.bid.to_string()+"]\n\n";
       }
-    string ret_str = "(<>) "+search_results;
-    return ret_str;
-#else
-      for(Id mid:mids){
-        Metahead head;
-        core->get_metahead(mid,head);
-        debug("[mid %s]\n [tags %s]\n [bid %s]\n",head.mid, head.tags,head.bid);
-      }
-          return string("SEARCHING ...");
+    return search_results;
 #endif
 
     } catch(exception& e){
