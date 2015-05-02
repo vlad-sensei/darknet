@@ -1,3 +1,14 @@
+####################################################
+#
+#  noxnet_systemtest_multi_1.py
+#
+#---------------------------------------------------
+#
+# Tests Synch and Search functions mainly. Uses two
+#   daemons and clients.
+#
+####################################################
+
 from noxnet_systemtest import *
 
 TEST_DATA = [

@@ -1,3 +1,14 @@
+####################################################
+#
+#  noxnet_systemtest_single.py
+#
+#---------------------------------------------------
+#
+# Tests Upload, Download, Assemble and Search
+#   functions with one daemon and client.
+#
+####################################################
+
 from noxnet_systemtest import *
 
 TEST_DATA = [

@@ -262,8 +262,22 @@ class Testprocess(object):
         # Read all content, until error => clears the buffer
         while True:
             try:
-                # read() reads all until EOF (which we don't have)
+                '''
+                 read() reads all content unil EOF (which we don't have)
+                
+                Are you here because of backtrace after Crtl+C an execution of a test?
+                -> Read below
+
+                 Sometimes the execution freezes at following statement. This is
+                 NOT because read() blocks. It's because a PIPE contains an 
+                 infinite amount of empty characters, '' . This becomes an 
+                 infinite loop and the program seemingly freezes at read(). I
+                 don't know the cause of this, but one solution could be to 
+                 restart computer or run another test in between. Trying again
+                 might work, but the problem is likely to occur again.
+                '''
                 content += self.process.stdout.read()
+
             except IOError:
                 # No more to read => finished
                 break
