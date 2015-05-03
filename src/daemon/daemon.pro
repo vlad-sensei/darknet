@@ -8,7 +8,6 @@ QMAKE_CXXFLAGS += -std=c++14
 win32{
     QMAKE_LFLAGS += -static-libgcc
 
-    INCLUDEPATH += $$PWD/../../libs/cryptopp
     INCLUDEPATH += $$PWD/../../libs/sqlite
     INCLUDEPATH += $$PWD/../../libs
 

@@ -15,7 +15,6 @@ win32{
 
     LIBS += -lwsock32
     LIBS += -lws2_32
-    LIBS += $$PWD/../../libs/cryptopp.dll
     LIBS += $$PWD/../../libs/libboost_system-mgw49-1_58.dll
     LIBS += $$PWD/../../libs/libboost_filesystem-mgw49-1_58.dll
     LIBS += $$PWD/../../libs/libboost_thread-mgw49-mt-1_58.dll
