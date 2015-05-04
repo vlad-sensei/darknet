@@ -28,12 +28,13 @@ public:
     T_ECHO,
     T_CHUNK_REQ,
     T_META_REQ, //sent by a client requesting meta heads
-    T_META_REPLY, //message contains a list of metaheads
+    T_META_LIST, //message contains a list of metaheads
     T_CHUNK,
     T_UI_TEXT_COMMAND,
     T_LISTEN_PORT,
     T_CONNECT,
-    T_PEER_REQ
+    T_PEER_REQ,
+    T_EXIT
   }; // message types
   enum msg_keys : Key_type_t {
     K_BODY,
@@ -52,10 +53,11 @@ public:
   static Msg_ptr ui_text_command(const string& msg = "");
   static Msg_ptr meta_req();
   static Msg_ptr port(uint16_t port);
-  static Msg_ptr meta_reply(const vector<Metahead> &meta_list);
+  static Msg_ptr meta_list(const vector<Metahead> &meta_list);
   static Msg_ptr chunk(const Id& bid,const Chunk& chunk);
   static Msg_ptr merge_peer_req(const ip_t &addr, const uint16_t &);
   static Msg_ptr peer_req(const uint16_t &);
+  static Msg_ptr exit();
 };
 
 #endif // MESSAGE_H
