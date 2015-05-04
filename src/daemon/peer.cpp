@@ -37,7 +37,7 @@ void Peer::process_msg(const Msg_ptr& msg){
   case Message::T_META_REQ:
     handle_meta_req(msg);
     break;
-  case Message::T_META_REPLY:
+  case Message::T_META_LIST:
     handle_meta_reply(msg);
     break;
   case Message::T_CHUNK:

@@ -47,8 +47,8 @@ Msg_ptr Message::merge_peer_req(const ip_t& addr,const uint16_t& port){
   return make(T_CONNECT,K_IP,addr,K_PORT,port);
 }
 
-Msg_ptr Message::meta_reply(const vector<Metahead> &metaheads){
-  return make(T_META_REPLY, K_META_LIST, metaheads);
+Msg_ptr Message::meta_list(const vector<Metahead> &metaheads){
+  return make(T_META_LIST, K_META_LIST, metaheads);
 }
 
 Msg_ptr Message::peer_req(const uint16_t& count){

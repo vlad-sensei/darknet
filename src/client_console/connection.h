@@ -32,6 +32,8 @@ private:
   inline Connection_ptr shared_from_this(){return enable_shared_from_this<Connection>::shared_from_this();}
   void process_msg(const Msg_ptr& msg);
   void handle_echo(const Msg_ptr& msg);
+  void handle_meta_list(const Msg_ptr& msg);
+  void handle_exit(const Msg_ptr& msg);
 public:
   mutex m;
   condition_variable cv;
