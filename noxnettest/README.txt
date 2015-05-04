@@ -1,5 +1,8 @@
 To run any systemtest, make sure you are running on a UNIX system and have python installed.
 
+IMPORTANT! You must also change the path in file 'build_src_path.txt'
+to match your src folder in build path. 
+
 To run a test, navigate to the test folder in a terminal and type
 	'python <filename>'
 where <filename> is replaced with the testfile you want to run.

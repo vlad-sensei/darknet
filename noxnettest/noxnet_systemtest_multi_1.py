@@ -42,7 +42,7 @@ TEST_DATA = [
 ]
 
 def main():
-    systemtest = Systemtest("/home/cn/Documents/Qt/build-noxnet-GCC-Debug/src/",TEST_DATA,2,2,6,3)
+    systemtest = Systemtest(TEST_DATA,2,2,6,3)
     return systemtest.main()
 
 

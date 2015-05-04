@@ -71,13 +71,11 @@ class Systemtest(object):
     'Systemtest class used to test Noxnet'
 
     def __init__(self,
-                 path,
                  test_data,
                  daemon_count = 1,
                  client_count = 1,
                  daemon_init_wait = 5,
                  client_init_wait = 2):
-        self.path = path
         self.test_data = test_data
         self.daemon_count = daemon_count
         self.client_count = client_count
@@ -85,6 +83,8 @@ class Systemtest(object):
         self.client_init_wait = client_init_wait
 
         self.test_count = 0
+
+        self.read_path()
 
     def main(self):
         daemon_processes, client_processes = self.init()
@@ -193,6 +193,14 @@ class Systemtest(object):
 
     def get_test_count(self):
         return self.test_count
+
+    def read_path(self):
+        f = open("build_src_path.txt","r")
+        build_src_path = f.read()        
+        f.close()
+
+        # Remove newlines, which might be hard to see manually
+        self.path = build_src_path.strip('\n')        
 
     def init(self):
 
