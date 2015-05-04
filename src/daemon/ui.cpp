@@ -30,32 +30,32 @@ void Ui::spawn_client(socket_ptr &socket){
   data.clients[uid]->init();
 }
 
-string Ui::process_text_input(const string& text_input){
+Msg_ptr Ui::process_text_input(const string& text_input){
   istringstream ss(text_input);
   istream_iterator<string> begin(ss), end;
   vector<string> cmd_args(begin, end);
   if(cmd_args.empty()){
-    return "";
+    return Message::echo("No arguments");
   }
   Commands cmd_enum = command_map[cmd_args[0]];
 
   r_lock(commands_mtx);
   if(!data.command_exists(cmd_enum)){
-    return "No such command: "+ cmd_args[0];
+    return Message::echo("No such command: " + cmd_args[0]);
   }
   return data.commands[cmd_enum]->exec(cmd_args);
 }
 
-string Ui::Command::exec(const vector<string> &args){
+Msg_ptr Ui::Command::exec(const vector<string> &args){
   if(args.size()<minargc_||args.size()>maxargc_){
-    return "Wrong argument count\n"+help();
+    return Message::echo("Wrong argument count\n"+help());
   }
   try{
     return execute_(args);
   } catch(exception&e){
     safe_printf(" *** error processing command : %s\n",e.what());
   }
-  return "";
+  return Message::echo("Error processing command");
 }
 
 //TODO: make sure there are no copies
@@ -119,7 +119,7 @@ void Ui::init_commands(){
 
   init_command(Commands::CMD_EXIT,
                [this](const vector<string>& args){
-    return Message::exit();
+    return Message::echo("Exit");
     (void)args;
   },
   "'exit' or 'quit'",
@@ -179,7 +179,7 @@ void Ui::init_commands(){
 #ifdef TEST
       return Message::echo(string("(<>) "+bid.to_string()));
 #else
-      return Message::echo(string("Download succeded. File bid:["+bid.to_string()+"]";));
+      return Message::echo(string("Download succeded. File bid:["+bid.to_string()+"]"));
 #endif
 
     } catch(exception& e){
@@ -217,7 +217,7 @@ void Ui::init_commands(){
     else{
       core->stop_synch();
 #ifdef TEST
-      return Message::echo(string("(<>) Synch stopped");
+      return Message::echo(string("(<>) Synch stopped"));
     #else
       return Message::echo(string("Synching stopped"));
 #endif
@@ -270,14 +270,6 @@ void Ui::init_commands(){
     try{
       core->search(args[1],mids);
 
-#ifdef TEST
-      vector<Metahead> meta_list;
-      for(Id mid : mids){
-        Metahead head;
-        core->get_metahead(mid,head);
-        meta_list.push_back(head);
-      }
-#else
       vector<Metahead> meta_list;
       for(Id mid : mids){
         Metahead head;
@@ -285,7 +277,6 @@ void Ui::init_commands(){
         meta_list.push_back(head);
       }
       return Message::meta_list(meta_list);
-#endif
 
     } catch(exception& e){
       debug("*** error: %s",e.what());

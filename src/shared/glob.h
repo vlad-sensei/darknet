@@ -83,7 +83,7 @@ typedef uint64_t file_size_t;
 typedef uint32_t ip_t;
 
 
-//#define TEST
+#define TEST
 
 #ifdef __linux__
 #define NCURSES

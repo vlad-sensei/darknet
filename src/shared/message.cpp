@@ -53,7 +53,3 @@ Msg_ptr Message::meta_list(const vector<Metahead> &metaheads){
 Msg_ptr Message::peer_req(const uint16_t& count){
   return make(T_PEER_REQ, K_PEER_COUNT, count);
 }
-
-Msg_ptr Message::exit(){
-  return make(T_EXIT);
-}
