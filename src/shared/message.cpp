@@ -30,7 +30,6 @@ Msg_ptr Message::chunk(const Id& bid,const Chunk& chunk){
   return make(T_CHUNK, K_BID, bid,K_BODY,chunk.data);
 }
 
-
 Msg_ptr Message::ui_text_command(const string& msg){
   return make(T_UI_TEXT_COMMAND, K_BODY, msg);
 }
@@ -55,9 +54,6 @@ Msg_ptr Message::peer_req(const uint16_t& count){
   return make(T_PEER_REQ, K_PEER_COUNT, count);
 }
 
-/*
-void f(){
-  vector<Metahead> m;
-  to_binary_container(m);
+Msg_ptr Message::exit(){
+  return make(T_EXIT);
 }
-*/

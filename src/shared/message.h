@@ -33,7 +33,8 @@ public:
     T_UI_TEXT_COMMAND,
     T_LISTEN_PORT,
     T_CONNECT,
-    T_PEER_REQ
+    T_PEER_REQ,
+    T_EXIT
   }; // message types
   enum msg_keys : Key_type_t {
     K_BODY,
@@ -56,6 +57,7 @@ public:
   static Msg_ptr chunk(const Id& bid,const Chunk& chunk);
   static Msg_ptr merge_peer_req(const ip_t &addr, const uint16_t &);
   static Msg_ptr peer_req(const uint16_t &);
+  static Msg_ptr exit();
 };
 
 #endif // MESSAGE_H
