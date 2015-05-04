@@ -22,19 +22,19 @@
 #define DEFAULT_COMMAND_HELP_TEXT "No text available for this command"
 typedef function<string (const vector<string>&args)> cmd_lambda_t;
 
-class UI;
-typedef unique_ptr<UI> UI_ptr;
+class Ui;
+typedef unique_ptr<Ui> Ui_ptr;
 
-class UI : Connection_initiator_base {
+class Ui : Connection_initiator_base {
 public:
-  UI();
+  Ui();
   inline void set_port(const uint16_t& port){Connection_initiator_base::set_port(port);}
   void run();
   string process_text_input(const string& text_input);
 private:
 
-  void handle_new_connection(tcp::socket socket);
-  void spawn_client(tcp::socket& socket);
+  void handle_new_connection(socket_ptr socket);
+  void spawn_client(socket_ptr& socket);
 
   void init_commands();
 
@@ -74,7 +74,7 @@ private:
 
   struct {
     peer_id_t current_ui_peer=0;
-    unordered_map<peer_id_t,UI_client_ptr> clients;
+    unordered_map<peer_id_t,Ui_client_ptr> clients;
 
     unordered_map<Commands, Command_ptr,hash<int>> commands;
     inline bool command_exists(const Commands cmd_enum) {return commands.find(cmd_enum)!=commands.end();}

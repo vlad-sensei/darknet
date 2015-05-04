@@ -1,0 +1,51 @@
+#!/bin/bash
+
+#for ((i=0; i<$1; i++))
+#do#
+#./start_daemon $i
+#done
+#
+#read -p "wait for daemon"
+#
+#
+#for ((i=0; i<$1; i++))
+#do
+#./start_client $i "up tjena client_$1"
+#done
+#
+
+
+gnome-terminal -e "./start_daemon2 1"
+gnome-terminal -e "./start_daemon2 2"
+
+
+read -p "waite for daemons"
+
+mid=$(./start_client 1 "up tmp client_1" | grep "mid" | cut -f2 -d'[' | cut -f1 -d']')
+
+./start_client 1 "co localhost 8002"
+./start_client 2 "sy 1 3"
+read -p "waite for sy"
+
+./start_client 2 "sy 0"
+./start_client 2 "se client_1"
+read -p "waite for se"
+bid=$(./start_client 2 "do $mid" | grep "bid" | cut -f2 -d'[' | cut -f1 -d']')
+read -p "waite for do $bid"
+./start_client 2 "as $bid out"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

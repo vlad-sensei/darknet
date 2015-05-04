@@ -7,6 +7,7 @@
 #include <thread>
 
 #include <boost/asio.hpp>
+#include <boost/asio/ssl.hpp>
 
 #include "glob.h"
 #include "message.h"
@@ -14,11 +15,14 @@
 using tcp=boost::asio::ip::tcp;
 namespace bs = boost::system;
 
+typedef ba::ssl::stream<tcp::socket> ssl_socket_t;
+typedef shared_ptr<ssl_socket_t> socket_ptr;
+
 template<typename Tderived>
 class Connection_base {
   Connection_base();
 protected:
-  Connection_base(tcp::socket& socket);
+  Connection_base(socket_ptr& socket);
   virtual ~Connection_base(){}
 
   void run();
@@ -37,7 +41,7 @@ private:
 
   void handle_connection_error(const string& location, const string& error);
 
-  tcp::socket socket_;
+  socket_ptr socket_;
   Msg_ptr read_msg,write_msg;
 
   deque<Msg_ptr> msg_queue;
@@ -47,8 +51,8 @@ private:
 };
 
 template<typename Tderived> inline
-Connection_base<Tderived>::Connection_base(tcp::socket &socket):
-  remote_ip(socket.remote_endpoint().address().to_v4().to_ulong()),
+Connection_base<Tderived>::Connection_base(socket_ptr& socket):
+  remote_ip(socket->lowest_layer().remote_endpoint().address().to_v4().to_ulong()),
   socket_(move(socket))
 {}
 
@@ -61,7 +65,7 @@ template<typename Tderived> inline
 void Connection_base<Tderived>::do_read_header(){
   read_msg = Message::empty();
   auto self = shared_from_this();
-  ba::async_read(socket_, read_msg->get_raw(),[this, self](const bs::error_code& ec, const size_t&bytes)->size_t{
+  ba::async_read(*socket_, read_msg->get_raw(),[this, self](const bs::error_code& ec, const size_t&bytes)->size_t{
     if(ec) return 0;
     return Message::HEADER_SIZE-bytes;
   },
@@ -79,7 +83,7 @@ void Connection_base<Tderived>::do_read_header(){
 template<typename Tderived> inline
 void Connection_base<Tderived>::do_read_body(){
   auto self = shared_from_this();
-  ba::async_read(socket_, read_msg->get_raw(),[this,self](const bs::error_code& ec, const size_t&bytes)->size_t{
+  ba::async_read(*socket_, read_msg->get_raw(),[this,self](const bs::error_code& ec, const size_t&bytes)->size_t{
     if(ec) return 0;
     return read_msg->get_body_size()-bytes;
   },
@@ -112,7 +116,7 @@ void Connection_base<Tderived>::do_write(){
   msg_queue.pop_front();
   lck.unlock();
   auto self = shared_from_this();
-  ba::async_write(socket_, write_msg->get_raw(), [this,self](const bs::error_code &ec, const size_t&){
+  ba::async_write(*socket_, write_msg->get_raw(), [this,self](const bs::error_code &ec, const size_t&){
     if(ec){
       handle_connection_error("do_write", ec.message());
       return;
@@ -134,8 +138,8 @@ void Connection_base<Tderived>::handle_connection_error(const string &location, 
 template<typename Tderived> inline
 void Connection_base<Tderived>::close(){
   unique_lock<mutex> lck(socket_close_mtx);
-  if(!socket_.is_open()) return;
-  socket_.close();
+  if(!socket_->lowest_layer().is_open()) return;
+  socket_->lowest_layer().close();
   lck.unlock();
   terminate();
 }

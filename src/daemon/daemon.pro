@@ -13,6 +13,8 @@ LIBS += -lboost_thread
 LIBS += -lpthread
 LIBS += -lsqlite3
 LIBS += -lcryptopp
+LIBS += -lssl
+LIBS += -lcrypto
 
 SOURCES += main.cpp \
     core.cpp \

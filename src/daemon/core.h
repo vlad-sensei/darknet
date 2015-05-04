@@ -31,8 +31,9 @@
 
 class Core;
 typedef unique_ptr<Core> Core_ptr;
-class UI;
-typedef unique_ptr<UI> UI_ptr;
+
+class Ui;
+typedef unique_ptr<Ui> Ui_ptr;
 
 extern Core_ptr core;
 
@@ -53,13 +54,15 @@ public:
   //stop syncing after the next syncing is completed
   void stop_synch();
   bool merge_peers(const peer_id_t& pid1, const peer_id_t& pid2);
+  void share_peers(uint16_t max_count, const peer_id_t &pid);
   void set_database_path(const string path){Database::set_database_path(path);}
+  bool make_peer_req(const peer_id_t &pid1);
 
 private:
   void req_chunks(const Id& bid, const unordered_set<Id>& cids);
   void synch_all();
-  bool spawn_peer(tcp::socket& socket);
-  void handle_new_connection(tcp::socket socket);
+  bool spawn_peer(socket_ptr& socket);
+  void handle_new_connection(socket_ptr socket);
 
 
 
@@ -78,7 +81,7 @@ private:
   } data;
   rw_mutex peers_mtx, pid_mtx, sync_mtx;
 
-  UI_ptr ui;
+  Ui_ptr ui;
 };
 
 #endif // CORE_H

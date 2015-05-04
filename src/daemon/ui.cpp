@@ -7,30 +7,30 @@
 
 #include "core.h"
 
-UI::UI() {
+Ui::Ui() {
   init_commands();
 }
 
 
-void UI::run(){
+void Ui::run(){
   Connection_initiator_base::start_listen();
   Connection_initiator_base::run();
 }
 
-void UI::handle_new_connection(tcp::socket socket){
+void Ui::handle_new_connection(socket_ptr socket){
   // do some verification if needed
   spawn_client(socket);
 }
 
-void UI::spawn_client(tcp::socket &socket){
+void Ui::spawn_client(socket_ptr &socket){
   w_lock l(clients_mtx);
   const peer_id_t& uid = ++data.current_ui_peer;
-  data.clients[uid] = UI_client_ptr(new UI_client(socket));
+  data.clients[uid] = Ui_client_ptr(new Ui_client(socket));
 
   data.clients[uid]->init();
 }
 
-string UI::process_text_input(const string& text_input){
+string Ui::process_text_input(const string& text_input){
   istringstream ss(text_input);
   //istream_iterator<string> begin(ss), end;
   //vector<string> args(begin, end;
@@ -43,13 +43,12 @@ string UI::process_text_input(const string& text_input){
 
   r_lock(commands_mtx);
   if(!data.command_exists(cmd_enum)){
-    safe_printf("No such command: %s\n", cmd_args[0]);
     return "No such command: "+ cmd_args[0];
   }
   return data.commands[cmd_enum]->exec(cmd_args);
 }
 
-string UI::Command::exec(const vector<string> &args){
+string Ui::Command::exec(const vector<string> &args){
   if(args.size()<minargc_||args.size()>maxargc_){
     return "Wrong argument count\n"+help();
   }
@@ -62,15 +61,15 @@ string UI::Command::exec(const vector<string> &args){
 }
 
 //TODO: make sure there are no copies
-void UI::init_command(const Commands cmd_enum, const cmd_lambda_t &execute, const string &help_text, const unsigned &minargc, const unsigned &maxargc){
+void Ui::init_command(const Commands cmd_enum, const cmd_lambda_t &execute, const string &help_text, const unsigned &minargc, const unsigned &maxargc){
   Command_ptr cmd = Command_ptr(new Command(execute, help_text, minargc, maxargc));
   w_lock w(commands_mtx);
   data.commands[cmd_enum] = cmd;
   // for(const string& key_word : key_words) data.commands[key_word]=cmd;
 }
 
-//TODO: check if that this does not lead to any race condition when "this" (UI/Core) is destroyed
-void UI::init_commands(){
+//TODO: check if that this does not lead to any race condition when "this" (Ui/Core) is destroyed
+void Ui::init_commands(){
   init_command(Commands::CMD_CONNECT,
                [this](const vector<string>& args){
     //TODO: find a better way to parse args, perhaps a template of some kind
@@ -346,5 +345,28 @@ void UI::init_commands(){
   },
   "assemble bid [filename=\"unnamed_file\"]",
   3,3);
+
+  init_command(Commands::CMD_REQ_PEERS,
+               // Should have arg (tag1%tag2)
+               [this](const vector<string>& args){
+
+    try{
+      peer_id_t pid1=stoull(args[1]);
+      if(!core->make_peer_req(pid1)) return "reqest faild";
+      return "reqesting...";
+    } catch(exception& e){
+      debug("*** error: %s",e.what());
+      handle_invalid_args(e);
+      return "Invalid arguments.";
+    }
+
+
+
+  },
+  "assemble bid [filename=\"unnamed_file\"]",
+  2,2);
+
+
+
 
 }
