@@ -33,16 +33,21 @@ public:
     T_UI_TEXT_COMMAND,
     T_LISTEN_PORT,
     T_CONNECT,
-    T_PEER_REQ
+    T_PEER_REQ,
+    T_MID,
+    T_BID,
+    T_ASSEMBLE_FILENAME
   }; // message types
   enum msg_keys : Key_type_t {
     K_BODY,
+    K_MID,
     K_BID,
     K_CIDS,
     K_META_LIST,
     K_PORT,
     K_IP,
-    K_PEER_COUNT
+    K_PEER_COUNT,
+    K_FILENAME
   }; // header keys
 
   static Msg_ptr empty();
@@ -56,6 +61,9 @@ public:
   static Msg_ptr chunk(const Id& bid,const Chunk& chunk);
   static Msg_ptr merge_peer_req(const ip_t &addr, const uint16_t &);
   static Msg_ptr peer_req(const uint16_t &);
+  static Msg_ptr mid(const Id& mid);
+  static Msg_ptr bid(const Id& bid);
+  static Msg_ptr assemble_filename(const string& filename);
 };
 
 #endif // MESSAGE_H

@@ -152,11 +152,8 @@ void Ui::init_commands(){
       return Message::echo(string("Upload failed."));
     }
 
-#ifdef TEST
-    return Message::echo(string("(<>) "+mid.to_string()));
-#else
-    return Message::echo(string("Upload successful: mid[" + mid.to_string() +"]"));
-#endif
+    return Message::mid(mid); // mid.to_string() ??
+
   },
   "upload filename [tags]",
   2,3);
@@ -176,11 +173,8 @@ void Ui::init_commands(){
         debug("Metahead for mid [%s] doesn't exist",mid);
         return Message::echo(string("Invalid mid: Not found"));
       }
-#ifdef TEST
-      return Message::echo(string("(<>) "+bid.to_string()));
-#else
-      return Message::echo(string("Download succeded. File bid:["+bid.to_string()+"]"));
-#endif
+
+      return Message::bid(bid); // bid.to_string() ??
 
     } catch(exception& e){
       debug("*** error: %s",e.what());
@@ -245,11 +239,8 @@ void Ui::init_commands(){
         return Message::echo(string("Assembly failed: couldn't find file"));
       }
 
-#ifdef TEST
-      return Message::echo(string("(<>) "+filename));
-#else
-      return Message::echo(string("Assembly complete!"));
-#endif
+      return Message::assemble_filename(filename);
+
     } catch(exception& e){
       debug("*** error: %s",e.what());
       handle_invalid_args(e);

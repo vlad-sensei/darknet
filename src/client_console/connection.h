@@ -33,7 +33,9 @@ private:
   void process_msg(const Msg_ptr& msg);
   void handle_echo(const Msg_ptr& msg);
   void handle_meta_list(const Msg_ptr& msg);
-  void handle_exit(const Msg_ptr& msg);
+  void handle_mid(const Msg_ptr& msg);
+  void handle_bid(const Msg_ptr& msg);
+  void handle_assemble_filename(const Msg_ptr& msg);
 public:
   mutex m;
   condition_variable cv;

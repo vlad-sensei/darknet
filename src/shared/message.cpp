@@ -53,3 +53,15 @@ Msg_ptr Message::meta_list(const vector<Metahead> &metaheads){
 Msg_ptr Message::peer_req(const uint16_t& count){
   return make(T_PEER_REQ, K_PEER_COUNT, count);
 }
+
+Msg_ptr Message::mid(const Id& mid){
+  return make(T_MID, K_MID, mid);
+}
+
+Msg_ptr Message::bid(const Id& bid){
+  return make(T_BID, K_BID, bid);
+}
+
+Msg_ptr Message::assemble_filename(const string& filename){
+  return make(T_ASSEMBLE_FILENAME, K_FILENAME, filename);
+}
