@@ -71,6 +71,7 @@ class Connection_initiator_base {
 public:
   void set_port(const uint16_t& port);
   void run();
+  void stop();
   void start_listen();
 protected:
   Connection_initiator_base();
