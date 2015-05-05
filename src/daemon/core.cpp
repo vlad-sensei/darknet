@@ -148,6 +148,70 @@ bool Core::make_peer_req(const peer_id_t &pid){
   return true;
 }
 
+// --------------- chunk requests ----------
+
+bool Core::req_file(const Id& mid,Id& bid){
+  Metahead metahead;
+  if(!get_metahead(mid,metahead)){
+    debug("*** no mid found");
+    return false;
+  }
+  //debug("req_file with:\n[mid %s]\n[bid %s]",mid,metahead.bid);
+  w_lock l(chunk_req_mtx);
+  //data.chunk_reqs[metahead.bid]=make_pair(metahead.bid,unordered_set<peer_id_t>());
+  bid=metahead.bid;
+  data.chunk_reqs[bid]=File_req(bid);
+  l.unlock();
+  debug("*** TODO: check if file is on local pc");
+  return true;
+}
+
+void Core::handle_chunk(const Id& bid, const Chunk& chunk){
+  w_lock l(chunk_req_mtx);
+  if (!data.chunk_req_exists(bid,chunk.cid)){
+    debug("there is no request for this:\n[bid %s]\n[chunk.cid %s]\n",bid,chunk.cid);
+    return;
+  }
+  const File_req& req = data.chunk_reqs[bid];
+  ++req.writer_count;
+  req.erase(chunk.cid);
+  l.unlock();
+  const bool& add_chunk_success = add_chunk(bid,chunk);
+  l.lock();
+  --req.writer_count;
+  if(!add_chunk_success) return;
+
+  if(data.file_req_exists_and_not_empty(bid)||req.writer_count){
+    //debug("*** have more to get from the network");
+    return;
+  }
+
+  //build metabody OR we are done
+  if(data.chunk_reqs[bid].has_metabody ){
+    data.chunk_reqs.erase(bid);
+    l.unlock();
+    get_file(bid,"TODO_get_name_of_file");
+    return;
+  }
+  l.unlock();
+
+  Metabody metabody;
+  if(!get_metabody(bid,metabody)){
+    debug("*** need more chunks for a metabody");
+    l.lock();
+    data.chunk_reqs[bid].insert(metabody.bid_next());
+    //req_chunks(bid,data.chunk_reqs[bid]);
+    return;
+  }else{
+    data.chunk_reqs[bid];
+  }
+  l.lock();
+
+  for(Id& cid:metabody.cids){
+    data.chunk_reqs[bid].emplace(cid);
+  }
+  req_chunks(bid,data.chunk_reqs[bid]);
+}
 // ----------- Data -----------
 //TODO: consider diabling/tweaking for testing
 bool Core::spawn_peer(socket_ptr &socket){

@@ -37,6 +37,22 @@ typedef unique_ptr<Ui> Ui_ptr;
 
 extern Core_ptr core;
 
+struct File_req{
+  File_req(const Id& bid_):bid(bid_){chunk[bid_]={};}
+  File_req(){}
+  Id bid;
+  unordered_map<Id,unordered_set<peer_id_t> > chunk;
+  unsigned writer_count = 0;
+  bool has_metabody = false;
+  inline bool chunk_exists(const Id& cid) {return chunk.find(cid)!=chunk.end();}
+  inline void insert(const Id& cid) {chunk[cid]={};}
+  inline bool erase(const Id& cid){
+    if(!chunk_exists(cid)) return false;
+    chunk.erase(cid);
+    return true;
+  }
+};
+
 class Core : Connection_initiator_base, public Library {
 public:
   Core();
@@ -58,6 +74,9 @@ public:
   void set_database_path(const string path){Database::set_database_path(path);}
   bool make_peer_req(const peer_id_t &pid1);
 
+  bool req_file(const Id &mid, Id &bid);
+  void handle_chunk(const Id& bid, const Chunk& chunk);
+
 private:
   void req_chunks(const Id& bid, const unordered_set<Id>& cids);
   void synch_all();
@@ -68,18 +87,28 @@ private:
 
   //all data&methods in data must be synchronized
   struct {
+    //peers
     peer_id_t current_peer_id = 0;
     unordered_map<peer_id_t,Peer_ptr> peers;
     unordered_map<ip_t, peer_id_t> peer_ips;
     inline bool peer_exists(const peer_id_t& pid) {return peers.find(pid)!=peers.end();}
     inline bool peer_ip_exists(const ip_t& ip_v4){return peer_ips.find(ip_v4)!=peer_ips.end();}
 
+    //synch
     bool should_sync = SYNC;
     bool sync_thread_exists = false;
     thread sync_thread;
 
+    //chunk requests
+    unordered_map<Id, File_req > chunk_reqs;
+    inline bool file_req_exists(const Id& bid){ return chunk_reqs.find(bid) != chunk_reqs.end();}
+   /* inline bool file_req_exists_and_not_empty(const Id& bid){
+      return file_req_exists(bid) && !chunk_reqs[bid].chunk.empty();
+    }*/
+    inline bool chunk_req_exists(const Id& bid,const Id& cid){ return file_req_exists(bid) && chunk_reqs[bid].chunk_exists(cid);}
+
   } data;
-  rw_mutex peers_mtx, pid_mtx, sync_mtx;
+  rw_mutex peers_mtx, pid_mtx, sync_mtx, chunk_req_mtx;
 
   Ui_ptr ui;
 };
