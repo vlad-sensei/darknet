@@ -109,11 +109,13 @@ That is why I have explicitly specified a short and full name.
 
 enum Result_code {
   OK,
+  SYNCH_STARTED,
+  SYNCH_STOPPED,
   ERROR,
   INVALID_ARGUMENTS,
   FAILED,
   UNKNOWN_MID,
-  UNKNOWN_BID,
+  UNKNOWN_BID
 
 };
 

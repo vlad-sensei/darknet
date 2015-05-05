@@ -31,9 +31,11 @@ void Ui::spawn_client(socket_ptr &socket){
 }
 
 Msg_ptr Ui::process_text_input(const string& text_input){
+  //Splits input by whitespace and puts result in vector
   istringstream ss(text_input);
   istream_iterator<string> begin(ss), end;
   vector<string> cmd_args(begin, end);
+
   if(cmd_args.empty()){
     return Message::echo("No arguments");
   }
@@ -190,13 +192,13 @@ void Ui::init_commands(){
     if(status != 0){
       core->start_synch(period);
 
-      return Message::synch(Result_code::OK);
+      return Message::synch(Result_code::SYNCH_STARTED);
     }
 
     // status must be 0 to reach here
     core->stop_synch();
 
-    return Message::synch(Result_code::OK);
+    return Message::synch(Result_code::SYNCH_STOPPED);
   },
   "synch 1|0 [sync_period]",
   2,3);

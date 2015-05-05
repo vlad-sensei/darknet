@@ -43,13 +43,21 @@ void Connection::process_msg(const Msg_ptr &msg){
 }
 
 void Connection::handle_echo(const Msg_ptr &msg){
-  const string& echo_str = msg->get_string(Message::K_STRING);
+  const string& echo_str = msg->get_string(Message::K_BODY);
   ui->echo(echo_str);
 }
 
 void Connection::handle_search(const Msg_ptr &msg){
   Result_code res = msg->get_result(Message::K_RESULT);
-  debug("Result code [%s] of search",res);
+
+  if(res != Result_code::OK){
+    if(res == Result_code::INVALID_ARGUMENTS){
+      ui->echo("Invalid arguments.");
+    }else{
+      ui->echo("Search failed.");
+    }
+    return;
+  }
 
   vector<Metahead> v = msg->get_vector_metahead(Message::K_META_LIST);
 
@@ -76,7 +84,17 @@ void Connection::handle_search(const Msg_ptr &msg){
 
 void Connection::handle_upload(const Msg_ptr &msg){
   Result_code res = msg->get_result(Message::K_RESULT);
-  debug("Result code [%s] of upload",res);
+
+  if(res != Result_code::OK){
+    if(res == Result_code::INVALID_ARGUMENTS){
+      ui->echo("Invalid arguments.");
+    }else if(res == Result_code::UNKNOWN_MID){
+      ui->echo("Upload failed: invalid mid");
+    }else{
+      ui->echo("Upload failed.");
+    }
+    return;
+  }
 
   const Id& mid = msg->get_id(Message::K_ID);
 #ifdef TEST
@@ -87,7 +105,22 @@ void Connection::handle_upload(const Msg_ptr &msg){
 }
 
 void Connection::handle_download(const Msg_ptr &msg){
+
+  Result_code res = msg->get_result(Message::K_RESULT);
+
+  if(res != Result_code::OK){
+    if(res == Result_code::INVALID_ARGUMENTS){
+      ui->echo("Invalid arguments.");
+    }else if(res == Result_code::UNKNOWN_BID){
+      ui->echo("Download failed: invalid bid");
+    }else{
+      ui->echo("Download failed.");
+    }
+    return;
+  }
+
   const Id& bid = msg->get_id(Message::K_ID);
+
 #ifdef TEST
   ui->echo("(<>) "+bid.to_string());
 #else
@@ -96,6 +129,17 @@ void Connection::handle_download(const Msg_ptr &msg){
 }
 
 void Connection::handle_assemble(const Msg_ptr &msg){
+  Result_code res = msg->get_result(Message::K_RESULT);
+
+  if(res != Result_code::OK){
+    if(res == Result_code::INVALID_ARGUMENTS){
+      ui->echo("Invalid arguments.");
+    }else{
+      ui->echo("Assemble failed.");
+    }
+    return;
+  }
+
   const string& filename = msg->get_string(Message::K_STRING);
 #ifdef TEST
   ui->echo("(<>) "+filename);
@@ -105,6 +149,17 @@ void Connection::handle_assemble(const Msg_ptr &msg){
 }
 
 void Connection::handle_broadcast(const Msg_ptr &msg){
+  Result_code res = msg->get_result(Message::K_RESULT);
+
+  if(res != Result_code::OK){
+    if(res == Result_code::INVALID_ARGUMENTS){
+      ui->echo("Invalid arguments.");
+    }else{
+      ui->echo("Broadcast failed.");
+    }
+    return;
+  }
+
   // Broadcast message contains the broadcasted message.
   // Should already be known by the client, but fetch and print anyway
   const string& str = msg->get_string(Message::K_STRING);
@@ -128,18 +183,45 @@ void Connection::handle_connect(const Msg_ptr &msg){
 
 void Connection::handle_synch(const Msg_ptr &msg){
   Result_code res = msg->get_result(Message::K_RESULT);
-  debug("Result code [%s] of synch",res);
 
+  if(res != Result_code::OK && res != Result_code::SYNCH_STARTED && res != Result_code::SYNCH_STOPPED){
+    if(res == Result_code::INVALID_ARGUMENTS){
+      ui->echo("Invalid arguments.");
+    }else{
+      ui->echo("Synch failed.");
+    }
+    return;
+  }
 #ifdef TEST
-  ui->echo("(<>) Synch started");
+  if(res == Result_code::SYNCH_STARTED){
+    ui->echo("(<>) Synch started");
+  }else if(res == Result_code::SYNCH_STOPPED){
+    ui->echo("(<>) Synch stopped");
+  }else{
+    ui->echo("(<>) Synch ok");
+  }
 #else
-  ui->echo("Synch started.");
+  if(res == Result_code::SYNCH_STARTED){
+    ui->echo("Synch started");
+  }else if(res == Result_code::SYNCH_STOPPED){
+    ui->echo("Synch stopped");
+  }else{
+    ui->echo("Synch ok");
+  }
 #endif
 }
 
 void Connection::handle_merge(const Msg_ptr &msg){
   Result_code res = msg->get_result(Message::K_RESULT);
-  debug("Result code [%s] of merge",res);
+
+  if(res != Result_code::OK){
+    if(res == Result_code::INVALID_ARGUMENTS){
+      ui->echo("Invalid arguments.");
+    }else{
+      ui->echo("Merge failed.");
+    }
+    return;
+  }
 
 #ifdef TEST
   ui->echo("(<>) Merging");
@@ -150,7 +232,16 @@ void Connection::handle_merge(const Msg_ptr &msg){
 
 void Connection::handle_req_peers(const Msg_ptr &msg){
   Result_code res = msg->get_result(Message::K_RESULT);
-  debug("Result code [%s] of req_peers",res);
+
+  if(res != Result_code::OK){
+    if(res == Result_code::INVALID_ARGUMENTS){
+      ui->echo("Invalid arguments.");
+    }else{
+      ui->echo("Request peers failed.");
+    }
+    return;
+  }
+
 
 #ifdef TEST
   ui->echo("(<>) Requesting");

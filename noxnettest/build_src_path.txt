@@ -1,1 +1,1 @@
-/home/herman/uni/build-noxnet-Desktop_Qt_5_4_0_GCC_64bit-Debug/src/
+/home/cn/Documents/Qt/build-noxnet-GCC-Debug/src/
