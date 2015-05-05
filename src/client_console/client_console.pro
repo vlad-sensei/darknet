@@ -6,6 +6,7 @@ CONFIG -= qt
 QMAKE_CXXFLAGS += -std=c++14
 
 INCLUDEPATH += $$PWD/../shared
+INCLUDEPATH += $$PWD/../../libs
 
 LIBS += -lboost_system
 LIBS += -lboost_filesystem
@@ -28,10 +29,10 @@ SOURCES += main.cpp \
 HEADERS += \
     ui.h \
     connection.h \
-    ../shared/common.h \
-    ../shared/glob.h \
-    ../shared/message.h \
-    ../shared/message_base.h \
-    ../shared/connection_initiator_base.h \
-    ../shared/connection_base.h
-
+    common.h \
+    glob.h \
+    message.h \
+    ..\shared\message_base.h \
+    connection_initiator_base.h \
+    connection_base.h \
+    endian/conversion.hpp

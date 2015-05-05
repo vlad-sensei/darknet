@@ -1,4 +1,5 @@
 #include "message_base.h"
+#include <boost/endian/endian.hpp>
 
 Message_base::Message_base(Msg_base_ptr msg){
   type = msg->type;
