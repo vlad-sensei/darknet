@@ -23,11 +23,11 @@ Msg_ptr Message::echo(const string& msg){
 }
 
 Msg_ptr Message::chunk_req(const Id &bid, const unordered_set<Id> &cids){
-  return make(T_CHUNK_REQ, K_BID, bid, K_CIDS, cids);
+  return make(T_CHUNK_REQ, K_ID, bid, K_CIDS, cids);
 }
 
 Msg_ptr Message::chunk(const Id& bid,const Chunk& chunk){
-  return make(T_CHUNK, K_BID, bid,K_BODY,chunk.data);
+  return make(T_CHUNK, K_ID, bid,K_BODY,chunk.data);
 }
 
 Msg_ptr Message::ui_text_command(const string& msg){
@@ -42,7 +42,7 @@ Msg_ptr Message::port(uint16_t port){
   return make(T_LISTEN_PORT,K_PORT,port);
 }
 
-Msg_ptr Message::merge_peer_req(const ip_t& addr,const uint16_t& port){
+Msg_ptr Message::adress(const ip_t& addr,const uint16_t& port){
   return make(T_CONNECT,K_IP,addr,K_PORT,port);
 }
 
@@ -54,14 +54,38 @@ Msg_ptr Message::peer_req(const uint16_t& count){
   return make(T_PEER_REQ, K_PEER_COUNT, count);
 }
 
-Msg_ptr Message::mid(const Id& mid){
-  return make(T_MID, K_MID, mid);
+Msg_ptr Message::assemble(const string& filename,const Result_code& res){
+  return make(T_ASSEMBLE, K_STRING, filename,K_RESULT,res);
 }
 
-Msg_ptr Message::bid(const Id& bid){
-  return make(T_BID, K_BID, bid);
+Msg_ptr Message::upload(const Id& mid, const Result_code &res){
+  return make(T_UPLOAD, K_ID, mid,K_RESULT, res);
 }
 
-Msg_ptr Message::assemble_filename(const string& filename){
-  return make(T_ASSEMBLE_FILENAME, K_FILENAME, filename);
+Msg_ptr Message::download(const Id& bid, const Result_code &res){
+  return make(T_DOWNLOAD, K_ID, bid,K_RESULT, res);
+}
+
+Msg_ptr Message::broadcast(const string& msg,const Result_code& res){
+  return make(T_BROADCAST, K_STRING, msg, K_RESULT, res);
+}
+
+Msg_ptr Message::synch(const Result_code& res){
+  return make(T_SYNCH, K_RESULT, res);
+}
+
+Msg_ptr Message::search(const vector<Metahead> &metaheads, const Result_code& res){
+  return make(T_SEARCH, K_META_LIST, metaheads, K_RESULT, res);
+}
+
+Msg_ptr Message::connect(const string& addr, const uint16_t& port, const Result_code& res){
+  return make(T_CONNECT, K_STRING, addr, K_PORT, port, K_RESULT, res);
+}
+
+Msg_ptr Message::merge(const Result_code& res){
+  return make(T_MERGE, K_RESULT, res);
+}
+
+Msg_ptr Message::req_peers(const Result_code& res){
+  return make(T_REQ_PEERS, K_RESULT, res);
 }

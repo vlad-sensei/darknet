@@ -63,7 +63,7 @@ void Peer::handle_echo(const Msg_ptr &msg){
 }
 
 void Peer::handle_chunk(const Msg_ptr &msg){
-  const Id& bid = msg->get_id(Message::K_BID);
+  const Id& bid = msg->get_id(Message::K_ID);
   string data = msg->get_string(Message::K_BODY);
   Chunk chunk(data);
   core->handle_chunk(bid,chunk);
@@ -92,7 +92,7 @@ void Peer::handle_peer_req(const Msg_ptr &msg){
 
 
 void Peer::handle_chunk_req(const Msg_ptr &msg){
-  const Id& bid = msg->get_id(Message::K_BID);
+  const Id& bid = msg->get_id(Message::K_ID);
   const unordered_set<Id> cids = msg->get_unordered_set_id(Message::K_CIDS);
   //TODO: do something with them..
   debug("handle_chunk_req");

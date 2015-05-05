@@ -46,7 +46,7 @@ public:
     send(Message::peer_req(DEAFULT_PEER_REQ_COUNT));
   }
   inline void send_listen_port(const uint16_t& port){send(Message::port(port));}
-  inline void merge_peer(const ip_t& ip, const uint16_t& port){send(Message::merge_peer_req(ip,port));}
+  inline void merge_peer(const ip_t& ip, const uint16_t& port){send(Message::adress(ip,port));}
 
   inline ip_t get_ip() const {return remote_ip;}
   bool get_listen_port(uint16_t& listen_port);

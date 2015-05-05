@@ -75,10 +75,12 @@ void Ui::init_commands(){
     uint16_t port = DEFAULT_LISTEN_PORT;
     try{
       peer = args[1];
-      if(args.size()>2) port = stoul(args[2]);
+      if(args.size() > 2){
+        port = stoul(args[2]);
+      }
     } catch(exception& e){
       handle_invalid_args(e);
-      return Message::echo(string("Invalid arguments."));
+        return Message::connect(0,0,Result_code::INVALID_ARGUMENTS);
     }
     /* TODO: give connect command a return message. Now you think you have
      * connected even if you failed.
@@ -86,14 +88,7 @@ void Ui::init_commands(){
 
     core->connect(peer,port);
 
-    // Must return 'const char*', since previous return is that type.
-
-#ifdef TEST
-    return Message::echo(string("(<>) Connected to '"+peer+":"+to_string(port)+"'."));
-#else
-    return Message::echo(string("Connected to '"+peer+":"+to_string(port)+"'."));
-#endif
-
+    return Message::connect(peer,port,Result_code::OK);
   },
   "connect PEER_IP [PORT]",
   2,3);
@@ -105,25 +100,15 @@ void Ui::init_commands(){
       msg = args[1];
     } catch(exception& e){
       handle_invalid_args(e);
-      return Message::echo(string("Invalid arguments."));
+      return Message::broadcast("",Result_code::INVALID_ARGUMENTS);
     }
     core->broadcast_echo(msg);
-#ifdef TEST
-    return Message::echo(string("done"));
-#else
-    return Message::echo(string("Broadcast complete."));
-#endif
+
+    return Message::broadcast(msg,Result_code::OK);
+
   },
   "broadcast MESSAGE",
   2,2);
-
-  init_command(Commands::CMD_EXIT,
-               [this](const vector<string>& args){
-    return Message::echo("Exit");
-    (void)args;
-  },
-  "'exit' or 'quit'",
-  1,1);
 
   init_command(Commands::CMD_UPLOAD,
                // Should have args (filename (or file_path later),[tags])
@@ -133,7 +118,7 @@ void Ui::init_commands(){
       filename = args[1];
     } catch(exception& e){
       handle_invalid_args(e);
-      return Message::echo(string("Invalid arguments."));
+      return Message::upload(Id(),Result_code::INVALID_ARGUMENTS);
     }
     string tags;
     if(args.size() > 2){
@@ -141,7 +126,7 @@ void Ui::init_commands(){
         tags = args[2];
       } catch(exception& e){
         handle_invalid_args(e);
-        return Message::echo(string("Invalid arguments."));
+        return Message::upload(Id(),Result_code::INVALID_ARGUMENTS);
       }
     }else{
       tags = filename+":"+filename;
@@ -149,10 +134,10 @@ void Ui::init_commands(){
 
     Id mid;
     if(!core->upload_file(filename, tags, mid)){
-      return Message::echo(string("Upload failed."));
+      return Message::upload(Id(),Result_code::FAILED);
     }
 
-    return Message::mid(mid); // mid.to_string() ??
+    return Message::upload(mid,Result_code::OK);
 
   },
   "upload filename [tags]",
@@ -165,24 +150,24 @@ void Ui::init_commands(){
     Id mid;
     try{
       if(!mid.from_string(args[1])){
-        return Message::echo(string("Download failed: Invalid mid"));
+        return Message::download(Id(),Result_code::INVALID_ARGUMENTS);
       }
 
       Id bid;
       if(!core->req_file(mid,bid)){
         debug("Metahead for mid [%s] doesn't exist",mid);
-        return Message::echo(string("Invalid mid: Not found"));
+        return Message::download(Id(),Result_code::UNKNOWN_MID);
       }
 
-      return Message::bid(bid); // bid.to_string() ??
+      return Message::download(bid,Result_code::OK);
 
     } catch(exception& e){
       debug("*** error: %s",e.what());
       handle_invalid_args(e);
-      return Message::echo(string("Invalid arguments."));
+      return Message::download(Id(),Result_code::INVALID_ARGUMENTS);
     }
 
-    return Message::echo(string("Download failed."));
+    return Message::download(Id(),Result_code::FAILED);
 
   },
   "download mid",
@@ -194,28 +179,24 @@ void Ui::init_commands(){
     int period = SYNC_PERIOD;
     try{
       status = stoi(args[1]);
-      if(args.size()>2) period = stoi(args[2]);
+      if(args.size() > 2){
+        period = stoi(args[2]);
+      }
     } catch(exception& e){
       handle_invalid_args(e);
-      return Message::echo(string("Invalid arguments."));
+      return Message::synch(Result_code::INVALID_ARGUMENTS);
     }
 
     if(status != 0){
       core->start_synch(period);
-#ifdef TEST
-      return Message::echo(string("(<>) Synch started"));
-#else
-      return Message::echo(string("Synching started with period: " + to_string(period)));
-#endif
+
+      return Message::synch(Result_code::OK);
     }
-    else{
-      core->stop_synch();
-#ifdef TEST
-      return Message::echo(string("(<>) Synch stopped"));
-    #else
-      return Message::echo(string("Synching stopped"));
-#endif
-    }
+
+    // status must be 0 to reach here
+    core->stop_synch();
+
+    return Message::synch(Result_code::OK);
   },
   "synch 1|0 [sync_period]",
   2,3);
@@ -227,7 +208,7 @@ void Ui::init_commands(){
     Id bid;
     try{
       if(!bid.from_string(args[1])){
-        return Message::echo(string("Assemble failed: Invalid bid"));
+        return Message::assemble("",Result_code::INVALID_ARGUMENTS);
       }
 
       string filename("unnamed_file");
@@ -236,18 +217,18 @@ void Ui::init_commands(){
       }
       //TODO: filename checking
       if(!core->get_file(bid,filename)){
-        return Message::echo(string("Assembly failed: couldn't find file"));
+        return Message::assemble("",Result_code::UNKNOWN_BID);
       }
 
-      return Message::assemble_filename(filename);
+      return Message::assemble(filename,Result_code::OK);
 
     } catch(exception& e){
       debug("*** error: %s",e.what());
       handle_invalid_args(e);
-      return Message::echo(string("Invalid arguments."));
+      return Message::assemble("",Result_code::INVALID_ARGUMENTS);
     }
 
-    return Message::echo(string("Assembly failed."));
+    return Message::assemble("",Result_code::FAILED);
 
   },
   "assemble bid [filename=\"unnamed_file\"]",
@@ -267,15 +248,15 @@ void Ui::init_commands(){
         core->get_metahead(mid,head);
         meta_list.push_back(head);
       }
-      return Message::meta_list(meta_list);
+      return Message::search(meta_list,Result_code::OK);
 
     } catch(exception& e){
       debug("*** error: %s",e.what());
       handle_invalid_args(e);
-      return Message::echo(string("Invalid arguments."));
+      return Message::search(vector<Metahead>(),Result_code::INVALID_ARGUMENTS);
     }
 
-    return Message::echo(string("SEARCH failed."));
+    return Message::search(vector<Metahead>(),Result_code::FAILED);
 
   },
   "search tag_string",
@@ -289,19 +270,15 @@ void Ui::init_commands(){
       peer_id_t pid1 = stoull(args[1]), pid2 = stoull(args[2]);
 
       if(!core->merge_peers(pid1,pid2)){
-        return Message::echo(string("Merge failed"));
+        return Message::merge(Result_code::FAILED);
       }
 
-#ifdef TEST
-      return Message::echo(string("(<>) Merging..."));
-#else
-      return Message::echo(string("Merging..."));
-#endif
+      return Message::merge(Result_code::OK);
 
     } catch(exception& e){
       debug("*** error: %s",e.what());
       handle_invalid_args(e);
-      return Message::echo(string("Invalid arguments."));
+      return Message::merge(Result_code::INVALID_ARGUMENTS);
     }
 
   },
@@ -313,15 +290,17 @@ void Ui::init_commands(){
                [this](const vector<string>& args){
 
     try{
-      peer_id_t pid1=stoull(args[1]);
+      peer_id_t pid1 = stoull(args[1]);
+
       if(!core->make_peer_req(pid1)){
-        return Message::echo(string("Request failed."));
+        return Message::req_peers(Result_code::FAILED);
       }
-      return Message::echo(string("Requesting..."));
+      return Message::req_peers(Result_code::OK);
+
     } catch(exception& e){
       debug("*** error: %s",e.what());
       handle_invalid_args(e);
-      return Message::echo(string("Invalid arguments."));
+      return Message::req_peers(Result_code::INVALID_ARGUMENTS);
     }
 
   },

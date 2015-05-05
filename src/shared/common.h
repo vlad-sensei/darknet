@@ -101,14 +101,20 @@ That is why I have explicitly specified a short and full name.
   HANDLE_CMD(CMD_UPLOAD,2,"upload","up") \
   HANDLE_CMD(CMD_CONNECT,3,"connect","co") \
   HANDLE_CMD(CMD_BROADCAST,4,"broadcast","br") \
-  HANDLE_CMD(CMD_EXIT,5,"exit", "quit") \
-  HANDLE_CMD(CMD_ASSEMBLE,6,"assemble", "as") \
-  HANDLE_CMD(CMD_SYNCH,7,"synch", "sy") \
-  HANDLE_CMD(CMD_SEARCH,8,"search", "se")\
-  HANDLE_CMD(CMD_MERGE,9,"merge", "me")\
-  HANDLE_CMD(CMD_REQ_PEERS,10,"request", "re")\
+  HANDLE_CMD(CMD_ASSEMBLE,5,"assemble", "as") \
+  HANDLE_CMD(CMD_SYNCH,6,"synch", "sy") \
+  HANDLE_CMD(CMD_SEARCH,7,"search", "se")\
+  HANDLE_CMD(CMD_MERGE,8,"merge", "me")\
+  HANDLE_CMD(CMD_REQ_PEERS,9,"request", "re")\
 
+enum Result_code {
+  OK,
+  ERROR,
+  INVALID_ARGUMENTS,
+  FAILED,
+  UNKNOWN_MID,
+  UNKNOWN_BID,
 
-
+};
 
 #endif // COMMON_H
