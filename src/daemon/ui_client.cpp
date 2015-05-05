@@ -4,7 +4,7 @@
 Ui_ptr ui;
 
 void Ui_client::init(){
-  ui = make_unique<Ui>();
+  ui = unique_ptr<Ui>(new Ui);
   Connection_base::run();
 }
 
