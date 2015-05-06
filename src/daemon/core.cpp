@@ -158,9 +158,8 @@ bool Core::req_file(const Id& mid,Id& bid){
   }
   //debug("req_file with:\n[mid %s]\n[bid %s]",mid,metahead.bid);
   w_lock l(chunk_req_mtx);
-  //data.chunk_reqs[metahead.bid]=make_pair(metahead.bid,unordered_set<peer_id_t>());
   bid=metahead.bid;
-  data.chunk_reqs[bid]=File_req(bid);
+  data.file_reqs[bid]=File_req(bid);
   l.unlock();
   debug("*** TODO: check if file is on local pc");
   return true;
@@ -172,7 +171,7 @@ void Core::handle_chunk(const Id& bid, const Chunk& chunk){
     debug("there is no request for this:\n[bid %s]\n[chunk.cid %s]\n",bid,chunk.cid);
     return;
   }
-  const File_req& req = data.chunk_reqs[bid];
+  File_req& req = data.file_reqs[bid];
   ++req.writer_count;
   req.erase(chunk.cid);
   l.unlock();
@@ -181,36 +180,38 @@ void Core::handle_chunk(const Id& bid, const Chunk& chunk){
   --req.writer_count;
   if(!add_chunk_success) return;
 
-  if(data.file_req_exists_and_not_empty(bid)||req.writer_count){
+  if(!req.chunk.empty() || req.writer_count){
     //debug("*** have more to get from the network");
     return;
   }
 
   //build metabody OR we are done
-  if(data.chunk_reqs[bid].has_metabody ){
-    data.chunk_reqs.erase(bid);
+  if(req.has_metabody){
+    //we think we are done
+    data.file_reqs.erase(bid);
     l.unlock();
     get_file(bid,"TODO_get_name_of_file");
     return;
   }
   l.unlock();
 
+  //try to build a metabody
   Metabody metabody;
-  if(!get_metabody(bid,metabody)){
-    debug("*** need more chunks for a metabody");
-    l.lock();
-    data.chunk_reqs[bid].insert(metabody.bid_next());
-    //req_chunks(bid,data.chunk_reqs[bid]);
-    return;
-  }else{
-    data.chunk_reqs[bid];
-  }
+  bool get_metabody_success = get_metabody(bid, metabody);
   l.lock();
 
-  for(Id& cid:metabody.cids){
-    data.chunk_reqs[bid].emplace(cid);
+  if(!get_metabody_success){
+    debug("*** need more chunks for a metabody");
+    l.lock();
+    data.file_reqs[bid].insert(metabody.bid_next());
+    req_chunks(bid,req.chunk);
+    return;
   }
-  req_chunks(bid,data.chunk_reqs[bid]);
+  req.has_metabody = true;
+  for(const Id& cid:metabody.cids){
+   req.insert(cid);
+  }
+  req_chunks(bid,req);
 }
 // ----------- Data -----------
 //TODO: consider diabling/tweaking for testing

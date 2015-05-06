@@ -37,6 +37,7 @@ typedef unique_ptr<Ui> Ui_ptr;
 
 extern Core_ptr core;
 
+//not synchronized!
 struct File_req{
   File_req(const Id& bid_):bid(bid_){chunk[bid_]={};}
   File_req(){}
@@ -100,12 +101,9 @@ private:
     thread sync_thread;
 
     //chunk requests
-    unordered_map<Id, File_req > chunk_reqs;
-    inline bool file_req_exists(const Id& bid){ return chunk_reqs.find(bid) != chunk_reqs.end();}
-   /* inline bool file_req_exists_and_not_empty(const Id& bid){
-      return file_req_exists(bid) && !chunk_reqs[bid].chunk.empty();
-    }*/
-    inline bool chunk_req_exists(const Id& bid,const Id& cid){ return file_req_exists(bid) && chunk_reqs[bid].chunk_exists(cid);}
+    unordered_map<Id, File_req > file_reqs;
+    inline bool file_req_exists(const Id& bid){ return file_reqs.find(bid) != file_reqs.end();}
+    inline bool chunk_req_exists(const Id& bid,const Id& cid){ return file_req_exists(bid) && file_reqs[bid].chunk_exists(cid);}
 
   } data;
   rw_mutex peers_mtx, pid_mtx, sync_mtx, chunk_req_mtx;

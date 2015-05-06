@@ -64,8 +64,9 @@ struct Metabody {
   deque<Chunk> to_chunks();
   Metabody(const Id& bid_):bid(bid_){}
   Metabody() = default;
+  //TODO: fix and deprecate
   Id bid_next(){
-    debug("*** give the next bid to add for the metabody finishid");
+    debug("*** give the next bid to add for the metabody finished");
     return bid;
   }
   //void update_Id(){bid=Id(string((char*)this,sizeof(Metabody)));}
