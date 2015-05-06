@@ -1,0 +1,57 @@
+Build instructions for noxnet
+=============================
+To install the noxnet, you need to compile it from source.
+
+Supported platforms
+-------------------
+Noxnet has been tested on windows and linux for x86 processors, and linux for
+arm-processors.
+
+Getting the source
+-------------
+The source code is available on github, and can be retrieved using
+
+	git clone https://github.com/vlad-sensei/noxnet.git
+
+Prerequisites
+-------------
+The following libraries are needed to build noxnet.
+
+- OpenSSL
+- Boost System
+- Boost FileSystem
+- Boost Thread
+- Sqlite3
+
+You need a g++ compiler, or (when building on windows) the MinGW toolset
+with a version greater than or equal to 4.9. The latter is bundeled with
+the latest version of Qt Creator.
+
+You also need Qt Creator, which can be downloaded from
+https://www.qt.io/download-open-source/
+
+Buliding on Linux (Ubuntu)
+-------------------
+Install the libraries by entering the following into the commandline:
+	
+	sudo apt-get install libbost-all-dev libssl-dev openssl
+
+Open the file *noxnet.pro* in the top level directory using Qt Creator and
+configure it to use the correct gcc compiler (as noted in prerequisites),
+and select build.
+
+The executable is placed in the build folder.
+	
+Building on Windows
+-------------------
+The repository includes compiled libraries in the *libs* folder, that are
+need to build and run on Windows. These libraries are dynamically linked
+and need to be placed in the same directory as the exe file (for both
+the client and the daemon).
+
+Open the file *noxnet.pro* in the top level directory using Qt Creator and
+configure it to use the correct gcc compiler (as noted in prerequisites),
+and select build.
+
+Copy the dlls from the *libs* folder to same directory as the exe file, for
+both client and daemon.

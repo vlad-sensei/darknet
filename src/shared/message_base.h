@@ -41,14 +41,14 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <array>
-
+#include <arpa/inet.h>
 #include <boost/asio.hpp>
-//#include "conversion.hpp"
 
 namespace ba = boost::asio;
 
 #include "glob.h"
 #include "common.h"
+
 
 class Message_base;
 typedef shared_ptr<Message_base> Msg_base_ptr;
@@ -174,12 +174,20 @@ private:
   }
 
 public:
-  inline ip_t get_ip_t(const Key_type_t& key){return get<ip_t>(key);}
+  inline ip_t get_ip_t(const Key_type_t& key){
+    ip_t tmp = ntohs(get<uint16_t>(key));
+    return ntohl(get<ip_t>(key));
+  }
   inline string get_string(const Key_type_t& key){return move(h[key]);}
-  inline uint16_t get_uint16_t(const Key_type_t& key){return get<uint16_t>(key);}
+  inline uint16_t get_uint16_t(const Key_type_t& key){
+    uint16_t tmp = ntohs(get<uint16_t>(key));
+    return ntohs(get<uint16_t>(key));}
+  //time_t the structure of time_t is implementation defined, this might lead to problems
+  //transmitting it over network.
   inline time_t get_ts_t(const Key_type_t& key){return get<ts_t>(key);}
-  inline unsigned get_unsigned(const Key_num_t& key){return get<unsigned>(key);}
+  inline unsigned get_unsigned(const Key_num_t& key){return ntohl(get<unsigned>(key));}
   inline bool get_bool(const Key_num_t& key){return get<bool>(key);}
+  //peer_id_t is 64 bit, there is no standard way to byteswap these.
   inline peer_id_t get_peer_id(const Key_type_t &key){return get<peer_id_t>(key);}
   inline vector<Id> get_vector_id(const Key_type_t& key){return get_vector<Id>(key);}
   inline unordered_set<Id> get_unordered_set_id(const Key_type_t& key){return get_unordered_set<Id>(key);}
@@ -189,14 +197,26 @@ public:
 protected:
   template<typename T>
 
-  inline string to_binary(const T& value){return string((char*)&value,sizeof(T));}
-  inline string to_binary(const int&){return string();}
+  inline string to_binary_base(const T& value){
+    return string((char*)&value,sizeof(T));
+  }
+  inline string to_binary(const Id& id){return to_binary_base(id);}
+  inline string to_binary(const uint16_t& value){
+    uint16_t tmp = htons(value);
+    return string(to_binary_base(htons(value)));
+  }
+  inline string to_binary(const uint32_t& value){
+    uint32_t tmp = htonl(value);
+    return string(to_binary_base(htonl(value)));
+  }
   inline string to_binary(const string& value) {return value;}
   inline string to_binary(const Metahead& metahead);
   inline string to_binary(const vector<Id>& value){
-    return to_binary_container<vector<Id> >(value);}
+    return to_binary_container<vector<Id> >(value);
+  }
   inline string to_binary(const unordered_set<Id>& value){
-    return to_binary_container<unordered_set<Id> >(value);}
+    return to_binary_container<unordered_set<Id> >(value);
+  }
   inline string to_binary(const vector<Metahead>& metaheads){
     return to_binary_container<vector<Metahead> >(metaheads);}
 

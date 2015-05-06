@@ -34,6 +34,7 @@ Msg_ptr Ui::process_text_input(const string& text_input){
   istringstream ss(text_input);
   istream_iterator<string> begin(ss), end;
   vector<string> cmd_args(begin, end);
+
   if(cmd_args.empty()){
     return Message::echo("No arguments");
   }

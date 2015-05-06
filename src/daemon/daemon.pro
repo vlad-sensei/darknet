@@ -5,17 +5,33 @@ CONFIG -= qt
 
 QMAKE_CXXFLAGS += -std=c++14
 
-INCLUDEPATH += $$PWD/../shared
-INCLUDEPATH += $$PWD/../../libs
+win32{
+    QMAKE_LFLAGS += -static-libgcc
 
-LIBS += -lboost_system
-LIBS += -lboost_filesystem
-LIBS += -lboost_thread
-LIBS += -lpthread
-LIBS += -lsqlite3
-LIBS += -lcryptopp
-LIBS += -lssl
-LIBS += -lcrypto
+    INCLUDEPATH += $$PWD/../../libs/sqlite
+    INCLUDEPATH += $$PWD/../../libs
+
+    LIBS += -lwsock32
+    LIBS += -lws2_32
+    LIBS += $$PWD/../../libs/sqlite3.dll
+    LIBS += $$PWD/../../libs/libboost_system-mgw49-1_58.dll
+    LIBS += $$PWD/../../libs/libboost_filesystem-mgw49-1_58.dll
+    LIBS += $$PWD/../../libs/libboost_thread-mgw49-mt-1_58.dll
+    LIBS += $$PWD/../../libs/ssleay32.dll
+    LIBS += $$PWD/../../libs/libeay32.dll
+}
+linux{
+    LIBS += -lboost_system
+    LIBS += -lboost_filesystem
+    LIBS += -lboost_thread
+    LIBS += -lpthread
+    LIBS += -lsqlite3
+    LIBS += -lreadline
+    LIBS += -lssl
+    LIBS += -lcrypto
+}
+
+INCLUDEPATH += $$PWD/../shared
 
 SOURCES += main.cpp \
     core.cpp \
@@ -40,9 +56,9 @@ HEADERS += \
     database.h \
     ui_client.h \
     inventory.h \
-    common.h \
-    connection_base.h \
-    connection_initiator_base.h \
-    glob.h \
-    ..\shared\message_base.h \
-    message.h
+    ../shared/common.h \
+    ../shared/connection_base.h \
+    ../shared/connection_initiator_base.h \
+    ../shared/glob.h \
+    ../shared/message_base.h \
+    ../shared/message.h \

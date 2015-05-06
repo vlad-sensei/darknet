@@ -219,4 +219,3 @@ void Ui::get_text_input(){
 
 
 #endif // NCURSES
-

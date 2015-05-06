@@ -16,7 +16,8 @@ LIBS += -lboost_filesystem
 LIBS += -lpthread
 LIBS += -lsqlite3
 LIBS += -lunittest++
-LIBS += -lcryptopp
+LIBS += -lssl
+LIBS += -lcrypto
 
 HEADERS += database_test.h\
     ../src/daemon/core.h \

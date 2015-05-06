@@ -7,57 +7,49 @@ using namespace std;
 #include <cstring>
 #include <cinttypes>
 #include <iostream>
-#include "cryptopp/sha.h"
-#include "cryptopp/hex.h"
+#include <openssl/sha.h>
 #include <iomanip>
-
-/* Example usage:
-  Id id1(""), id2("The quick brown fox jumps over the lazy dog"), id3("The quick brown fox jumps over the lazy dog."), id4("");
-  debug("Ids: \n%s\n%s\n%s\n%s\n",id1,id2,id3,id4);
-  debug("id2==id3 : %s; id1==id4 : %s", id2==id3 ? "true" : "false", id1==id4 ? "true" : "false");
-  */
+#include <arpa/inet.h>
 
 //TODO: actually make glob.cpp to not include cryptopp?
 struct hash512_t{
   inline hash512_t() : data {0,0,0,0,0,0,0,0} {}
-  explicit inline hash512_t(const string& value){CryptoPP::SHA512().CalculateDigest((byte*)data, (byte*)value.data(), value.size());}
-  inline bool operator== (const hash512_t& other)const {return  !memcmp(data, other.data, sizeof(data));}
+  explicit inline hash512_t(const string& value){SHA512((unsigned char*)value.c_str(), value.size(), (unsigned char*)&data);};
+
   inline size_t std_hash() const {return data[0]^data[1]^data[2]^data[3]^data[4]^data[5]^data[6]^data[7];}
+  inline bool operator== (const hash512_t& other)const {return  !memcmp(data, other.data, sizeof(data));}
   friend ostream& operator << (ostream& os, const hash512_t& h);
 
   inline string to_string() const;
   bool from_string(const string& id_str);
-
 private:
   uint64_t data[8];
 };
 
 inline ostream& operator << (ostream& os, const hash512_t& h){
-  os << h.to_string();
+  unsigned char *bytes = (unsigned char*) h.data;
+  for (int i = 0; i< 64; i++){
+    os << setw(2) << setfill('0') << hex << uppercase << (unsigned int) bytes[i];
+  }
   return os;
 }
 
 inline string hash512_t::to_string() const{
-  CryptoPP::HexEncoder encoder;
-  string output;
-  encoder.Attach( new CryptoPP::StringSink( output ) );
-  encoder.Put( (unsigned char*) data, sizeof(data) );
-  encoder.MessageEnd();
-  return output;
+  stringstream ss;
+  ss << *(this);
+  return ss.str();
 }
 
 inline bool hash512_t::from_string(const string &id_str){
   if(id_str.size() != sizeof(hash512_t)*2) return false;
   try{
-    string decoded;
-
-    CryptoPP::HexDecoder decoder;
-
-    decoder.Attach( new CryptoPP::StringSink( decoded ) );
-    decoder.Put( (byte*)id_str.data(), id_str.size() );
-    decoder.MessageEnd();
-
-    memcpy(&data,decoded.data(),sizeof(hash512_t));
+    //Convert each pair of hex charaters to a byte and insert the result into data
+    unsigned char *bytes = (unsigned char*) data;
+    for (int i = 0; i <64; i++){
+      unsigned int val;
+      istringstream(id_str.substr(2*i, 2)) >> hex >> val;
+      bytes[i] = val & 255;
+    }
   } catch (const exception&) {
     return false;
   }
@@ -103,7 +95,14 @@ typedef uint32_t ip_t;
 #define SYNC_PERIOD 30
 #define N_SHARED_METAHEADS 100
 #define DEFAULT_DATABASE_PATH "database.db"
+
+#ifdef __linux__
 #define DEFAULT_ARENA_PATH "/tmp/arena"
+
+#else
+#define DEFAULT_ARENA_PATH "arena"
+#endif //__linux__
+
 #define DEFAULT_ARENA_SLOT_NUM 200
 #define DEAFULT_PEER_REQ_COUNT 10
 
@@ -184,6 +183,20 @@ array<char, size> debug_str(const string& str){
   array<char, size> arr;
   memcpy(arr.data(), str.data(), size);
   return arr;
+}
+
+inline uint64_t htonll(uint64_t value)
+{
+  static const int num = 42;
+
+  // Check the endianness
+  if (*reinterpret_cast<const char*>(&num) == num){
+    const uint32_t high_part = htonl(static_cast<uint32_t>(value >> 32));
+    const uint32_t low_part = htonl(static_cast<uint32_t>(value & 0xFFFFFFFFLL));
+
+    return (static_cast<uint64_t>(low_part) << 32) | high_part;
+  }
+  return value;
 }
 
 #endif // GLOB_H
