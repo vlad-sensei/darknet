@@ -1,5 +1,0 @@
-#ifndef DATABASE_TEST_H
-#define DATABASE_TEST_H
-
-#endif // DATABASE_TEST_H
-
