@@ -23,6 +23,6 @@ void Ui_client::process_msg(const Msg_ptr &msg){
 void Ui_client::handle_ui_text_command(const Msg_ptr &msg){
   const string& command = msg->get_string(Message::K_BODY);
   debug("command : %s", command);
-  const string& ret_val = ui->process_text_input(command);
-  send(Message::echo(ret_val));
+  const Msg_ptr& ret_val = ui->process_text_input(command);
+  send(ret_val);
 }
