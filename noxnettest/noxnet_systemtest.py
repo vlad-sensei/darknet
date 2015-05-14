@@ -208,8 +208,6 @@ class Systemtest(object):
         else:
             build_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
             dirs = os.listdir(build_root)
-            print "d " + string.join(dirs)
-            
             build_dir = re.findall(r"build-noxnet.*?Debug", string.join(dirs))[0]
             
             if build_dir:
