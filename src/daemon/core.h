@@ -27,6 +27,7 @@
 #include "ui.h"
 #include "library.h"
 
+
 #define DEBUG
 
 class Core;
@@ -39,19 +40,30 @@ extern Core_ptr core;
 
 //not synchronized!
 struct File_req{
-  File_req(const Id& bid_):bid(bid_){chunk[bid_]={};}
+  File_req(const Id& bid_,time_t time):bid(bid_),time_stamp(time){
+      chunks[bid_]={};
+  }
   File_req(){}
   Id bid;
-  unordered_map<Id,unordered_set<peer_id_t> > chunk;
+  time_t time_stamp;
+  unordered_map<Id,unordered_set<peer_id_t> > chunks;
   unsigned writer_count = 0;
   bool has_metabody = false;
-  inline bool chunk_exists(const Id& cid) {return chunk.find(cid)!=chunk.end();}
-  inline void insert(const Id& cid) {chunk[cid]={};}
+  inline bool chunk_exists(const Id& cid) {return chunks.find(cid)!=chunks.end();}
+  inline void insert(const Id& cid) {chunks[cid]={};}
   inline bool erase(const Id& cid){
     if(!chunk_exists(cid)) return false;
-    chunk.erase(cid);
+    chunks.erase(cid);
     return true;
   }
+  inline bool add_peer(const Id& cid,peer_id_t peer_id,time_t time){
+      if(!chunk_exists(cid)) return false;
+      chunks[cid].emplace(peer_id);
+      time_stamp=time;
+      return true;
+  }
+
+
 };
 
 class Core : Connection_initiator_base, public Library {
@@ -76,7 +88,9 @@ public:
   bool make_peer_req(const peer_id_t &pid1);
 
   bool req_file(const Id &mid, Id &bid);
+  bool req_file_from_peers(Id &bid);
   void handle_chunk(const Id& bid, const Chunk& chunk);
+  void handle_chunk_ack(const Id& bid,const unordered_set<Id>& cids,peer_id_t pid);
 
 private:
   void req_chunks(const Id& bid, const unordered_set<Id>& cids);
@@ -101,6 +115,7 @@ private:
     thread sync_thread;
 
     //chunk requests
+    map<time_t,Id>file_reqs_time;
     unordered_map<Id, File_req > file_reqs;
     inline bool file_req_exists(const Id& bid){ return file_reqs.find(bid) != file_reqs.end();}
     inline bool chunk_req_exists(const Id& bid,const Id& cid){ return file_req_exists(bid) && file_reqs[bid].chunk_exists(cid);}

@@ -69,6 +69,15 @@ void Peer::handle_chunk(const Msg_ptr &msg){
   core->handle_chunk(bid,chunk);
 }
 
+void Peer::handle_chunk_ack(const Msg_ptr &msg){
+    const Id& bid = msg->get_id(Message::K_BID);
+    const unordered_set<Id> cids = msg->get_unordered_set_id(Message::K_CIDS);
+    core->handle_chunk_ack(bid,cids,data.pid);
+
+
+}
+
+
 void Peer::handle_listen_port(const Msg_ptr &msg){
 
   const uint16_t& port=msg->get_uint16_t(Message::K_PORT);
@@ -106,6 +115,27 @@ void Peer::handle_chunk_req(const Msg_ptr &msg){
     }
   }
 }
+
+void Peer::handle_chunk_query(const Msg_ptr &msg){
+  const Id& bid = msg->get_id(Message::K_BID);
+  const unordered_set<Id> cids = msg->get_unordered_set_id(Message::K_CIDS);
+  const bool resend=msg->get_bool(Message::K_RESEND);
+  //TODO: do something with them..
+  debug("handle_chunk_req");
+  //(void)bid; (void)cids;
+
+  unordered_set<Id> ack_cids;
+  for(Id cid:cids){
+    Chunk chunk;
+    if(core->get_chunk(bid,cid,chunk)){
+      debug("seding chunk:");
+      ack_cids.emplace(cid);
+    }
+  }
+  send(Message::chunk_ack(bid,ack_cids));
+}
+
+
 
 void Peer::handle_meta_req(const Msg_ptr &msg){
   debug("SYNCH_REQ: %s", msg->get_string(Message::K_BODY));

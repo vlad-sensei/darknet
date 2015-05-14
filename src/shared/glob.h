@@ -10,6 +10,7 @@ using namespace std;
 #include "cryptopp/sha.h"
 #include "cryptopp/hex.h"
 #include <iomanip>
+#include <time.h>
 
 /* Example usage:
   Id id1(""), id2("The quick brown fox jumps over the lazy dog"), id3("The quick brown fox jumps over the lazy dog."), id4("");

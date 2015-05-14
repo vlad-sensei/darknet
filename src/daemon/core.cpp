@@ -159,10 +159,42 @@ bool Core::req_file(const Id& mid,Id& bid){
   //debug("req_file with:\n[mid %s]\n[bid %s]",mid,metahead.bid);
   w_lock l(chunk_req_mtx);
   bid=metahead.bid;
-  data.file_reqs[bid]=File_req(bid);
+  data.file_reqs[bid]=File_req(bid,time(0));
+  data.file_reqs_time[data.file_reqs[bid].time_stamp]=bid;
   l.unlock();
   debug("*** TODO: check if file is on local pc");
-  return true;
+  return req_file_from_peers(bid);
+}
+
+bool Core::req_file_from_peers(Id& bid){
+    r_lock chunk_lck(chunk_req_mtx);
+    if(!data.file_req_exists(bid)) return false;
+    unordered_set<Id> cids;
+    for(const auto& c:data.file_reqs[bid].chunks) cids.emplace(c.first);
+    chunk_lck.unlock();
+    r_lock peer_lck(peers_mtx);
+    for(const auto& it:data.peers){
+        const Peer_ptr& peer= it.second;
+        peer->chunk_query(bid,cids);
+    }
+    peer_lck.unlock();
+    return true;
+}
+
+
+void Core::handle_chunk_ack(const Id& bid,const unordered_set<Id>& cids,peer_id_t pid){
+    r_lock chunk_lck(chunk_req_mtx);
+    if(!data.file_req_exists(bid)) {
+        debug("*** do not need this any more");
+        return;
+    }
+    chunk_lck.unlock();
+    r_lock peer_lck(peers_mtx);
+    for(const auto& it:data.peers){
+        const Peer_ptr& peer= it.second;
+        peer->req_chunks(bid,cids);
+    }
+    peer_lck.unlock();
 }
 
 void Core::handle_chunk(const Id& bid, const Chunk& chunk){
@@ -180,7 +212,7 @@ void Core::handle_chunk(const Id& bid, const Chunk& chunk){
   --req.writer_count;
   if(!add_chunk_success) return;
 
-  if(!req.chunk.empty() || req.writer_count){
+  if(!req.chunks.empty() || req.writer_count){
     //debug("*** have more to get from the network");
     return;
   }
@@ -204,14 +236,14 @@ void Core::handle_chunk(const Id& bid, const Chunk& chunk){
     debug("*** need more chunks for a metabody");
     l.lock();
     data.file_reqs[bid].insert(metabody.bid_next());
-    req_chunks(bid,req.chunk);
+    //req_chunks(bid,req.chunks);
     return;
   }
   req.has_metabody = true;
   for(const Id& cid:metabody.cids){
    req.insert(cid);
   }
-  req_chunks(bid,req);
+  //req_chunks(bid,req);
 }
 // ----------- Data -----------
 //TODO: consider diabling/tweaking for testing

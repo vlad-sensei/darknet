@@ -34,7 +34,8 @@ public:
     T_LISTEN_PORT,
     T_CONNECT,
     T_PEER_REQ,
-    T_CHUNK_QUERY
+    T_CHUNK_QUERY,
+    T_CHUNK_ACK
   }; // message types
   enum msg_keys : Key_type_t {
     K_BODY,
@@ -54,6 +55,7 @@ public:
   //static Msg_ptr copy_msg(Msg_ptr other);
   static Msg_ptr echo(const string& msg = "");
   static Msg_ptr chunk_query(const Id& bid, const unordered_set<Id>& cids, const bool& resend = false);
+  static Msg_ptr chunk_ack(const Id& bid, const unordered_set<Id>& cids);
   static Msg_ptr chunk_req(const Id& bid, const unordered_set<Id>& cids);
   static Msg_ptr ui_text_command(const string& msg = "");
   static Msg_ptr meta_req();

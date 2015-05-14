@@ -26,6 +26,10 @@ Msg_ptr Message::chunk_query(const Id &bid, const unordered_set<Id> &cids, const
   return make(T_CHUNK_QUERY, K_BID,  bid, K_CIDS, cids, K_RESEND, (bool_t)resend);
 }
 
+Msg_ptr Message::chunk_ack(const Id &bid, const unordered_set<Id> &cids){
+  return make(T_CHUNK_ACK, K_BID,  bid, K_CIDS, cids);
+}
+
 Msg_ptr Message::chunk_req(const Id &bid, const unordered_set<Id> &cids){
   return make(T_CHUNK_REQ, K_BID, bid, K_CIDS, cids);
 }
