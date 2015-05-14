@@ -70,7 +70,7 @@ void Peer::handle_chunk(const Msg_ptr &msg){
 }
 
 void Peer::handle_chunk_ack(const Msg_ptr &msg){
-    const Id& bid = msg->get_id(Message::K_BID);
+    const Id& bid = msg->get_id(Message::K_ID);
     const unordered_set<Id> cids = msg->get_unordered_set_id(Message::K_CIDS);
     core->handle_chunk_ack(bid,cids,data.pid);
 
@@ -117,7 +117,7 @@ void Peer::handle_chunk_req(const Msg_ptr &msg){
 }
 
 void Peer::handle_chunk_query(const Msg_ptr &msg){
-  const Id& bid = msg->get_id(Message::K_BID);
+  const Id& bid = msg->get_id(Message::K_ID);
   const unordered_set<Id> cids = msg->get_unordered_set_id(Message::K_CIDS);
   const bool resend=msg->get_bool(Message::K_RESEND);
   //TODO: do something with them..
