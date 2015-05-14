@@ -45,6 +45,9 @@ void Core::ai_run(){
                     const Peer_ptr& peer =data.peers[peer_id];
                     const unordered_set<Id> cids={it2.first};
                     peer->req_chunks(it.first,cids);
+                }else{
+
+                    debug("faile");
                 }
 
             }
