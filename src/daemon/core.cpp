@@ -24,8 +24,36 @@ void Core::run(){
     ui->run();
   });
 
+  thread daemon_ai([this](){
+     core->ai_run();
+  });
+
   network_thread.join();
   ui_thread.join();
+}
+
+void Core::ai_run(){
+    while(true){
+        //TODO chech for time_stamp_over_do
+        debug("*** TODO ME !!! loop");
+        r_lock chunk_lck(chunk_req_mtx);
+        r_lock peer_lck(peers_mtx);
+        for(const auto& it:data.file_reqs){
+            for(const auto& it2:it.second.chunks){
+                if(!it2.second.empty()){
+                    const Peer_ptr& peer =data.peers[*it2.second.begin()];
+                    const unordered_set<Id> cids={it2.first};
+                    peer->req_chunks(it.first,cids);
+                }
+
+            }
+        }
+        chunk_lck.unlock();
+        peer_lck.unlock();
+
+
+        this_thread::sleep_for(chrono::seconds(DEFAULT_AI_SLEEP));
+    }
 }
 
 void Core::connect(const string &addr, const uint16_t &port){
@@ -191,13 +219,15 @@ void Core::handle_chunk_ack(const Id& bid,const unordered_set<Id>& cids,peer_id_
         debug("*** do not need this any more");
         return;
     }
-    chunk_lck.unlock();
-    r_lock peer_lck(peers_mtx);
-    for(const auto& it:data.peers){
-        const Peer_ptr& peer= it.second;
-        peer->req_chunks(bid,cids);
+    time_t t=time(0); // get new time to update to
+    for(const auto& cid:cids){
+        if(data.file_reqs[bid].chunk_exists(cid)){
+            if(!data.file_reqs[bid].add_peer(cid,pid,t)){
+                debug("*** cude not add peer to file_req");
+            }
+        }
     }
-    peer_lck.unlock();
+    chunk_lck.unlock();
 }
 
 void Core::handle_chunk(const Id& bid, const Chunk& chunk){
@@ -253,7 +283,7 @@ void Core::handle_chunk(const Id& bid, const Chunk& chunk){
   unordered_set<Id> cids;
   for(const auto& c:req.chunks) cids.emplace(c.first);
   req_chunks(bid,cids);
-  //req_chunks(bid,req);
+
 }
 // ----------- Data -----------
 //TODO: consider diabling/tweaking for testing

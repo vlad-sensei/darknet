@@ -107,7 +107,7 @@ typedef uint32_t ip_t;
 #define DEFAULT_ARENA_PATH "/tmp/arena"
 #define DEFAULT_ARENA_SLOT_NUM 200
 #define DEAFULT_PEER_REQ_COUNT 10
-
+#define DEFAULT_AI_SLEEP 5
 
 
 #if __cplusplus <= 201103L

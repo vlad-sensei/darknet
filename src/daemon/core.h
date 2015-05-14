@@ -74,6 +74,7 @@ public:
   inline void set_client_port(const uint16_t& port){ui->set_port(port);}
   void run();
   bool remove_peer(const peer_id_t& pid);
+  void ai_run();
 
   // user interaction (UI)
   void connect(const string& addr, const uint16_t& port);
