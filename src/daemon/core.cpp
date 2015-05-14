@@ -168,7 +168,10 @@ bool Core::req_file(const Id& mid,Id& bid){
 
 bool Core::req_file_from_peers(Id& bid){
     r_lock chunk_lck(chunk_req_mtx);
-    if(!data.file_req_exists(bid)) return false;
+    if(!data.file_req_exists(bid)) {
+        debug("*** no request for this bid");
+        return false;
+    }
     unordered_set<Id> cids;
     for(const auto& c:data.file_reqs[bid].chunks) cids.emplace(c.first);
     chunk_lck.unlock();

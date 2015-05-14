@@ -52,6 +52,12 @@ void Peer::process_msg(const Msg_ptr& msg){
   case Message::T_PEER_REQ:
     handle_peer_req(msg);
     break;
+  case Message::T_CHUNK_QUERY:
+    handle_chunk_query(msg);
+    break;
+  case Message::T_CHUNK_ACK:
+    handle_chunk_ack(msg);
+    break;
   default:
     debug("unknown messape type");
   }
