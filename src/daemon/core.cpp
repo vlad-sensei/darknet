@@ -38,10 +38,11 @@ void Core::ai_run(){
         debug("*** TODO ME !!! loop");
         r_lock chunk_lck(chunk_req_mtx);
         r_lock peer_lck(peers_mtx);
-        for(const auto& it:data.file_reqs){
+        peer_id_t peer_id;
+        for(auto& it:data.file_reqs){
             for(const auto& it2:it.second.chunks){
-                if(!it2.second.empty()){
-                    const Peer_ptr& peer =data.peers[*it2.second.begin()];
+                if(it.second.get_peer_id(it2.first,peer_id)){
+                    const Peer_ptr& peer =data.peers[peer_id];
                     const unordered_set<Id> cids={it2.first};
                     peer->req_chunks(it.first,cids);
                 }

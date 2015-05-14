@@ -46,7 +46,7 @@ struct File_req{
   File_req(){}
   Id bid;
   time_t time_stamp;
-  unordered_map<Id,unordered_set<peer_id_t> > chunks;
+  unordered_map<Id,deque<peer_id_t> > chunks;
   unsigned writer_count = 0;
   bool has_metabody = false;
   inline bool chunk_exists(const Id& cid) {return chunks.find(cid)!=chunks.end();}
@@ -58,8 +58,15 @@ struct File_req{
   }
   inline bool add_peer(const Id& cid,peer_id_t peer_id,time_t time){
       if(!chunk_exists(cid)) return false;
-      chunks[cid].emplace(peer_id);
+      chunks[cid].emplace_back(peer_id);
       time_stamp=time;
+      return true;
+  }
+  bool get_peer_id(const Id& cid,peer_id_t& peer_id){
+      if(!chunk_exists(cid)|| !chunks[cid].empty()) return false;
+      peer_id=chunks[cid].front();
+      chunks[cid].pop_front();
+      chunks[cid].emplace_back(peer_id);
       return true;
   }
 
