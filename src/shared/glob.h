@@ -10,7 +10,6 @@ using namespace std;
 #include <openssl/sha.h>
 #include <iomanip>
 
-//TODO: actually make glob.cpp to not include cryptopp?
 struct hash512_t{
   inline hash512_t() : data {0,0,0,0,0,0,0,0} {}
   explicit inline hash512_t(const string& value){SHA512((unsigned char*)value.c_str(), value.size(), (unsigned char*)&data);};
@@ -26,16 +25,16 @@ private:
 };
 
 inline ostream& operator << (ostream& os, const hash512_t& h){
-  unsigned char *bytes = (unsigned char*) h.data;
-  for (int i = 0; i< 64; i++){
-    os << setw(2) << setfill('0') << hex << uppercase << (unsigned int) bytes[i];
-  }
+  os << h.to_string();
   return os;
 }
 
 inline string hash512_t::to_string() const{
   stringstream ss;
-  ss << data;
+  unsigned char *bytes = (unsigned char*) data;
+  for (int i = 0; i< 64; i++){
+    ss << setw(2) << setfill('0') << hex << uppercase << (unsigned int) bytes[i];
+  }
   return ss.str();
 }
 
