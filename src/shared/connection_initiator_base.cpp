@@ -27,6 +27,10 @@ void Connection_initiator_base::run(){
   io_service_.run();
 }
 
+void Connection_initiator_base::stop(){
+  io_service_.stop();
+}
+
 
 void Connection_initiator_base::start_listen(){
   debug("listening to port %s..", get_port());

@@ -184,6 +184,8 @@ public:
   inline unordered_set<Id> get_unordered_set_id(const Key_type_t& key){return get_unordered_set<Id>(key);}
   inline Id get_id(const Key_type_t& key){return get<Id>(key);}
   inline vector<Metahead> get_vector_metahead(const Key_type_t& key){return get_vector<Metahead>(key);}
+  inline Result_code get_result(const Key_type_t& key){return get<Result_code>(key);}
+
 
 protected:
   template<typename T>

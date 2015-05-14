@@ -32,6 +32,7 @@ private:
 
   void get_text_input();
   Connection_ptr connection;
+  bool do_get_input=true;
 };
 
 #define HANDLE_CMD(cmd_enum, enum_val, cmd_full_name, cmd_short_name) cmd_full_name, cmd_short_name,

@@ -13,19 +13,19 @@ uint32_t content_index = 0;
 
 
 void Ui::run(uint16_t ui_port){
-    Connection_initiator_base::connect("localhost",ui_port);
+  Connection_initiator_base::connect("localhost",ui_port);
 
-    thread network_thread([this](){
-        Connection_initiator_base::run();
-    });
+  thread network_thread([this](){
+    Connection_initiator_base::run();
+  });
 
-    thread input_thread([this](){
-        get_text_input();
-    });
+  thread input_thread([this](){
+    get_text_input();
+  });
 
-    input_thread.join();
+  input_thread.join();
 
-    network_thread.join();
+  network_thread.join();
 }
 
 void Ui::handle_new_connection(socket_ptr socket){
@@ -57,7 +57,7 @@ void Ui::get_text_input(){
     string line("");
     uint32_t c,x,y,max_x,max_y,history_index = 0;
 
-    while(1){
+    while(do_get_input){
         c = 0;
         c = wgetch(stdscr); // Wait for user input
         getyx(stdscr,y,x);
@@ -121,9 +121,8 @@ void Ui::get_text_input(){
         //clear print area and print new text
         print_terminal_content(terminal_content, content_index);
         refresh();
-
     }
-    endwin();
+  endwin();
 }
 
 
@@ -163,48 +162,59 @@ void Ui::print_terminal_content(const vector<string>& terminal_content, int cont
             if(line.size() < 1)terminal_index++;
             row++;
             move(row,0);
-        }
-    }
-    // move cursor to correct position
-    int temp1 = 1+terminal_content[1].size()/max_x;
-    int temp2 = terminal_content[1].size() % max_x;
-    move(temp1,temp2);
-    refresh();
+        }    
+  }
+  // move cursor to correct position
+  int temp1 = 1+terminal_content[1].size()/max_x;
+  int temp2 = terminal_content[1].size() % max_x;
+  move(temp1,temp2);
+  refresh();
 
-    (void)y;
+  (void)y;
 }
 
 void Ui::echo(const string &msg){
-  vector <string> strings;
 
-  boost::split(strings,msg,boost::is_any_of("\n"));
+  if(msg == "exit"){
+    Connection_initiator_base::stop();
+    do_get_input = false;
+  }else{
+    vector <string> strings;
 
-  for(string str: strings){
-    terminal_content.insert(terminal_content.begin()+2,str);
+    boost::split(strings,msg,boost::is_any_of("\n"));
+
+    for(string str: strings){
+      terminal_content.insert(terminal_content.begin()+2,str);
+    }
+    print_terminal_content(terminal_content, content_index);
+    refresh();
   }
-  print_terminal_content(terminal_content, content_index);
-  refresh();
 }
 
 #else //not NCURSES
 
 void Ui::echo(const string &msg){
-  safe_printf("%s\n",msg);
+  if(msg == "exit"){
+    Connection_initiator_base::stop();
+    do_get_input = false;
+  }else{
+    safe_printf("%s\n",msg);
+  }
 }
 
 void Ui::get_text_input(){
-    string cmd="";
+  string cmd="";
 
-    while(true){
-        getline(cin,cmd);
+  while(do_get_input){
+    getline(cin,cmd);
 
-        if(!cmd.empty()){
-            connection->text_command(cmd);
-            //wait for return message of sent command
-            unique_lock<mutex> lk(connection->m);
-            connection->cv.wait(lk);
-        }
+    if(!cmd.empty()){
+      connection->text_command(cmd);
+      //wait for return message of sent command
+      unique_lock<mutex> lk(connection->m);
+      connection->cv.wait(lk);
     }
+  }
 }
 
 
