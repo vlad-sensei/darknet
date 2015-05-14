@@ -236,13 +236,20 @@ void Core::handle_chunk(const Id& bid, const Chunk& chunk){
     debug("*** need more chunks for a metabody");
     l.lock();
     data.file_reqs[bid].insert(metabody.bid_next());
-    //req_chunks(bid,req.chunks);
+
+    unordered_set<Id> cids;
+    for(const auto& c:req.chunks) cids.emplace(c.first);
+    req_chunks(bid,cids);
     return;
   }
   req.has_metabody = true;
   for(const Id& cid:metabody.cids){
    req.insert(cid);
   }
+
+  unordered_set<Id> cids;
+  for(const auto& c:req.chunks) cids.emplace(c.first);
+  req_chunks(bid,cids);
   //req_chunks(bid,req);
 }
 // ----------- Data -----------
