@@ -17,12 +17,20 @@ TEST(sha512){
   };
 
   stringstream ss;
+ //to string
  for (int i = 0; i < 4; i++){
     ss << hashes[i];
     CHECK_EQUAL(ss.str().c_str(), corrects[i]);
     ss.str(string());
     ss.clear();
   }
+
+ //from string
+ for (int i = 0; i < 4; i++){
+   Id test_id;
+   test_id.from_string(corrects[i]);
+   CHECK_EQUAL(hashes[i], test_id);
+ }
 }
 
 int main()

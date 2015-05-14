@@ -5,16 +5,33 @@ CONFIG -= qt
 
 QMAKE_CXXFLAGS += -std=c++14
 
-INCLUDEPATH += $$PWD/../shared
+win32{
+    QMAKE_LFLAGS += -static-libgcc
 
-LIBS += -lboost_system
-LIBS += -lboost_filesystem
-LIBS += -lboost_thread
-LIBS += -lpthread
-LIBS += -lsqlite3
-LIBS += -lcryptopp
-LIBS += -lssl
-LIBS += -lcrypto
+    INCLUDEPATH += $$PWD/../../libs/sqlite
+    INCLUDEPATH += $$PWD/../../libs
+
+    LIBS += -lwsock32
+    LIBS += -lws2_32
+    LIBS += $$PWD/../../libs/sqlite3.dll
+    LIBS += $$PWD/../../libs/libboost_system-mgw49-1_58.dll
+    LIBS += $$PWD/../../libs/libboost_filesystem-mgw49-1_58.dll
+    LIBS += $$PWD/../../libs/libboost_thread-mgw49-mt-1_58.dll
+    LIBS += $$PWD/../../libs/ssleay32.dll
+    LIBS += $$PWD/../../libs/libeay32.dll
+}
+linux{
+    LIBS += -lboost_system
+    LIBS += -lboost_filesystem
+    LIBS += -lboost_thread
+    LIBS += -lpthread
+    LIBS += -lsqlite3
+    LIBS += -lreadline
+    LIBS += -lssl
+    LIBS += -lcrypto
+}
+
+INCLUDEPATH += $$PWD/../shared
 
 SOURCES += main.cpp \
     core.cpp \

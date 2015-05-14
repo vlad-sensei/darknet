@@ -17,6 +17,7 @@ static const string lorem = string(
     "sanctus est Lorem ipsum dolor sit amet. Duis autem vel eum iriure dolor in hendrerit in vulputate velit"
     "esse molestie consequat, vel illum dolore eu feugiat nulla facilisis aaaaaaaaaaa"
     );
+/*
 class Database_test: public Database{
 public:
   Database_test():Database("database.db"){}
@@ -91,3 +92,4 @@ TEST(db_patter_metaheads){
   CHECK_EQUAL(v.size(), test1.size());
   CHECK_ARRAY_EQUAL(v, test1, v.size());
 }
+*/
