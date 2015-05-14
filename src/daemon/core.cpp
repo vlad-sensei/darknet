@@ -3,7 +3,7 @@
 Core_ptr core;
 
 // -------- Constructors ----
-Core::Core() : ui(make_unique<Ui>()){}
+Core::Core() : ui(unique_ptr<Ui>(new Ui)){}
 
 void Core::run(){
   thread Inventory_thread([this](){
@@ -74,7 +74,7 @@ void Core::start_synch(int period){
 
   if (data.sync_thread_exists) return;
   data.sync_thread = thread([this, period](void){
-    r_lock l(sync_mtx, std::defer_lock_t());
+    r_lock l(sync_mtx, defer_lock_type());
     while(true){
       this_thread::sleep_for(chrono::seconds(period));
       l.lock();

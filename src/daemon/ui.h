@@ -20,7 +20,7 @@
 #include "ui_client.h"
 
 #define DEFAULT_COMMAND_HELP_TEXT "No text available for this command"
-typedef function<string (const vector<string>&args)> cmd_lambda_t;
+typedef function<Msg_ptr (const vector<string>&args)> cmd_lambda_t;
 
 class Ui;
 typedef unique_ptr<Ui> Ui_ptr;
@@ -30,7 +30,7 @@ public:
   Ui();
   inline void set_port(const uint16_t& port){Connection_initiator_base::set_port(port);}
   void run();
-  string process_text_input(const string& text_input);
+  Msg_ptr process_text_input(const string& text_input);
 private:
 
   void handle_new_connection(socket_ptr socket);
@@ -55,7 +55,7 @@ private:
   public:
     Command(const cmd_lambda_t & execute,const string& help_text = DEFAULT_COMMAND_HELP_TEXT, const unsigned& minargc=1, const unsigned& maxargc=-1):
       execute_(execute), help_text_(help_text), minargc_(minargc), maxargc_(maxargc){}
-    string exec(const vector<string>& args);
+    Msg_ptr exec(const vector<string>& args);
     inline string help() {return help_text_;}
   private:
     Command();

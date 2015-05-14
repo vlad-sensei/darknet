@@ -108,11 +108,23 @@ typedef uint32_t ip_t;
 #define DEFAULT_ARENA_SLOT_NUM 200
 #define DEAFULT_PEER_REQ_COUNT 10
 
+
+
+#if __cplusplus <= 201103L
+#include <boost/thread.hpp>
+typedef boost::defer_lock_t defer_lock_type;
+typedef boost::shared_mutex rw_mutex;
+typedef boost::shared_lock<boost::shared_mutex> r_lock;
+typedef boost::unique_lock<boost::shared_mutex> w_lock;
+#else
 // c++14
 #include <shared_mutex>
+typedef std::defer_lock_t defer_lock_type;
 typedef std::shared_timed_mutex rw_mutex;
 typedef std::shared_lock<std::shared_timed_mutex> r_lock;
 typedef std::unique_lock<std::shared_timed_mutex> w_lock;
+
+#endif
 
 // ~~~~~~~~~~~~~~~~~ functions ~~~~~~~~~~~~~~~~~
 
