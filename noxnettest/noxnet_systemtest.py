@@ -27,6 +27,7 @@ from time import sleep
 import fcntl  # UNIX only!!
 import os
 import sys
+import re
 import string
 
 SUCCESS_COMMAND_PREFIX = "(<>)"
@@ -84,7 +85,7 @@ class Systemtest(object):
 
         self.test_count = 0
 
-        self.read_path()
+        self.find_build_path()
 
     def main(self):
         daemon_processes, client_processes = self.init()
@@ -194,13 +195,29 @@ class Systemtest(object):
     def get_test_count(self):
         return self.test_count
 
-    def read_path(self):
-        f = open("build_src_path.txt","r")
-        build_src_path = f.read()        
-        f.close()
-
-        # Remove newlines, which might be hard to see manually
-        self.path = build_src_path.strip('\n')        
+    """ If 'build_src_path.txt' exists, interprets its contents as the build dir.
+    Otherwise, tries to find the build dir """
+    def find_build_path(self):
+        if os.path.exists("build_src_path.txt"):
+            print "found build_src_path.txt"
+            f = open("build_src_path.txt","r")
+            build_src_path = f.read()        
+            f.close()
+            # Remove newlines, which might be hard to see manually
+            self.path = build_src_path.strip('\n')        
+        else:
+            build_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+            dirs = os.listdir(build_root)
+            print "d " + string.join(dirs)
+            
+            build_dir = re.findall(r"build-noxnet.*?Debug", string.join(dirs))[0]
+            
+            if build_dir:
+                self.path = os.path.join(build_root, build_dir, 'src/')
+                print "found build dir: " + self.path
+            else:
+                print "Couldn't find build dir, exiting ..."
+                sys.exit(1)
 
     def init(self):
 
