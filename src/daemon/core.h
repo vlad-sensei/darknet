@@ -63,7 +63,10 @@ struct File_req{
       return true;
   }
   bool get_peer_id(const Id& cid,peer_id_t& peer_id){
-      if(!chunk_exists(cid)|| !chunks[cid].empty()) return false;
+      if(!chunk_exists(cid)|| !chunks[cid].empty()) {
+          debug("*** no peer have left a ack");
+          return false;
+      }
       peer_id=chunks[cid].front();
       chunks[cid].pop_front();
       chunks[cid].emplace_back(peer_id);
