@@ -1,11 +1,11 @@
-.TH daemon 1 noxnet daemon "15 may 2015" "version 1.0"
+.TH daemon 1 "noxnet daemon" "2015-05-15" "version 1.0"
 
 .SH NAME
 daemon - daemon for noxnet
 
 .SH SYNOPSIS
-.BI "[-p " daemon_port "] [-c " client_port "] [-d " database "] " arena
-
+.BI "daemon [-p " daemon_port "] [-c " client_port "] [-d " database "] [-a "
+.IB arena ]
 .SH DESCRIPTION
 This is the daemon part of
 .IR noxnet .
@@ -19,9 +19,11 @@ The order of the options are not important.
 .IP -p
 Set the value of the port to listen to other daemons to 
 .IR daemon_port .
+.RI "The default value of " daemon_port " is 8453
 .IP -c
 Set the value of the port to listen to the client to 
-.IR client_port .
+.RI "The default value of " client_port " is 8888
+
 .IP -d
 Set the path to the database where Metaheads and chunk ids are stored.
 .IP -a
