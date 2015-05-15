@@ -1,0 +1,32 @@
+.TH daemon 1 noxnet daemon "15 may 2015" "version 1.0"
+
+.SH NAME
+daemon - daemon for noxnet
+
+.SH SYNOPSIS
+.BI "[-p " daemon_port "] [-c " client_port "] [-d " database "] " arena
+
+.SH DESCRIPTION
+This is the daemon part of
+.IR noxnet .
+It is intended to run as a background process, and handles communication
+with other noxnet users. It is controlled by a noxnet client, for example
+.IR client_console .
+
+.SH OPTIONS
+The order of the options are not important.
+
+.IP -p
+Set the value of the port to listen to other daemons to 
+.IR daemon_port .
+.IP -c
+Set the value of the port to listen to the client to 
+.IR client_port .
+.IP -d
+Set the path to the database where Metaheads and chunk ids are stored.
+.IP -a
+Set the path to the file where chunks are stored.
+
+.SH SEE ALSO
+.BR client_console (1)
+.daemon
