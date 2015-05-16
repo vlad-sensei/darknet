@@ -215,7 +215,7 @@ bool Core::req_file(const Id& mid,Id& bid){
 bool Core::req_file_from_peers(const Id& bid,const bool& aggresiv){
     r_lock chunk_lck(chunk_req_mtx);
     if(!data.file_req_exists(bid)) {
-        debug("*** no request for this bid");
+        debug("*** no request for this bid %s",bid);
         return false;
     }
     unordered_set<Id> cids;
@@ -224,7 +224,7 @@ bool Core::req_file_from_peers(const Id& bid,const bool& aggresiv){
     r_lock peer_lck(peers_mtx);
     for(const auto& it:data.peers){
         const Peer_ptr& peer= it.second;
-        peer->chunk_query(bid,cids,true);
+        peer->chunk_query(bid,cids,aggresiv);
     }
     peer_lck.unlock();
     return true;
