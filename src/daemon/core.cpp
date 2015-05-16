@@ -198,7 +198,7 @@ bool Core::req_file(const Id& mid,Id& bid){
   return req_file_from_peers(bid);
 }
 
-bool Core::req_file_from_peers(Id& bid){
+bool Core::req_file_from_peers(const Id& bid){
     r_lock chunk_lck(chunk_req_mtx);
     if(!data.file_req_exists(bid)) {
         debug("*** no request for this bid");
@@ -294,20 +294,16 @@ void Core::handle_chunk(const Id& bid, const Chunk& chunk){
     debug("*** need more chunks for a metabody");
     l.lock();
     data.file_reqs[bid].insert(metabody.bid_next());
-
-//    unordered_set<Id> cids;
-//    for(const auto& c:req.chunks) cids.emplace(c.first);
-//    req_chunks(bid,cids);
+    l.unlock();
+    req_file_from_peers(bid);
     return;
   }
   req.has_metabody = true;
   for(const Id& cid:metabody.cids){
    req.insert(cid);
   }
-
-//  unordered_set<Id> cids;
-//  for(const auto& c:req.chunks) cids.emplace(c.first);
-//  req_chunks(bid,cids);
+    l.unlock();
+    req_file_from_peers(bid);
 
 }
 // ----------- Data -----------

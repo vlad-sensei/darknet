@@ -99,7 +99,7 @@ public:
   bool make_peer_req(const peer_id_t &pid1);
 
   bool req_file(const Id &mid, Id &bid);
-  bool req_file_from_peers(Id &bid);
+  bool req_file_from_peers(const Id &bid);
 
   void handle_aggresiv_query(const Id& bid,const unordered_set<Id>& cids,peer_id_t pid);
   void handle_chunk(const Id& bid, const Chunk& chunk);
