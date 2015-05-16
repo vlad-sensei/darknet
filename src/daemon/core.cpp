@@ -46,7 +46,7 @@ void Core::ai_run(){
                 debug("*** no more old querys %s", difftime(time_now,iter->first));
                 break;
             }
-            debug("sending a aggresiv query now=%s,past=%s \n id=%s",time_now,iter->first,iter->second);
+            //debug("sending a aggresiv query now=%s,past=%s \n id=%s",time_now,iter->first,iter->second);
             req_file_from_peers(iter->second,true);
             data.file_reqs_time.erase(iter->first);
             data.file_reqs_time[time_now]=iter->second;
@@ -260,6 +260,7 @@ void Core::handle_aggresiv_query(const Id& bid,const unordered_set<Id>& cids,pee
 }
 
 void Core::handle_chunk_forword_ack(const Id &bid, const unordered_set<Id> &cids, const ip_t &addr){
+    debug("***handle_chunk_forword_ack");
     r_lock chunk_lck(chunk_req_mtx);
     r_lock peer_lck(peers_mtx);
     if(!data.file_req_exists(bid) && !data.peer_ip_exists(addr)) {
@@ -269,7 +270,7 @@ void Core::handle_chunk_forword_ack(const Id &bid, const unordered_set<Id> &cids
 
     for(const auto& cid:cids){
         if(data.file_reqs[bid].chunk_exists(cid)){
-            if(!data.file_reqs[bid].add_peer(cid,data.peer_ips[addr])){
+            if(!data.peer_ip_exists(addr) && !data.file_reqs[bid].add_peer(cid,data.peer_ips[addr])){
                 debug("*** cude not add peer to file_req");
             }
         }
