@@ -40,14 +40,17 @@ void Core::ai_run(){
         //debug("*** TODO ME !!! loop");
 
         time_now=time(0);
-        for(auto i = data.file_reqs_time.end(); i !=data.file_reqs_time.begin(); i--){
-            if(difftime(time_now,i->first) < DEFAULT_WAIT_TO_AGGRESIV) {
-                debug("*** no old querys %s", difftime(time_now,i->first));
+
+        for(map<time_t, Id>::reverse_iterator iter = data.file_reqs_time.rbegin(); iter != data.file_reqs_time.rend(); ++iter){
+            if(difftime(time_now,iter->first) < DEFAULT_WAIT_TO_AGGRESIV) {
+                debug("*** no more old querys %s", difftime(time_now,iter->first));
                 break;
             }
-            debug("sending a aggresiv query %s",difftime(time_now,i->first));
-            req_file_from_peers(i->second,true);
+            debug("sending a aggresiv query now=%s,past=%s \n id=%s",time_now,iter->first,iter->second);
+            req_file_from_peers(iter->second,true);
         }
+
+
         r_lock chunk_lck(chunk_req_mtx);
         r_lock peer_lck(peers_mtx);
 
@@ -202,10 +205,11 @@ bool Core::req_file(const Id& mid,Id& bid){
         debug("*** no mid found");
         return false;
     }
-    //debug("req_file with:\n[mid %s]\n[bid %s]",mid,metahead.bid);
+    time_t time_now=time(0);
+    debug("req_file with:\n[mid %s]\n[bid %s]\n[time_stamp %s]",mid,metahead.bid,time_now);
     w_lock l(chunk_req_mtx);
     bid=metahead.bid;
-    data.file_reqs[bid]=File_req(bid,time(0));
+    data.file_reqs[bid]=File_req(bid,time_now);
     data.file_reqs_time[data.file_reqs[bid].time_stamp]=bid;
     l.unlock();
     debug("*** TODO: check if file is on local pc");
