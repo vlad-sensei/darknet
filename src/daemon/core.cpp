@@ -288,7 +288,7 @@ void Core::handle_chunk_ack(const Id& bid,const unordered_set<Id>& cids,peer_id_
     if(data.file_req_exists(bid)){
         for(const auto& cid:cids){
             if(data.file_reqs[bid].chunk_exists(cid)){
-                if(!data.file_reqs[bid].add_peer(cid,pid)){
+                if(!data.file_reqs[bid].add_peer(cid,data.peers[pid]->get_ip())){
                     debug("*** cude not add peer to file_req");
                 }
             }
