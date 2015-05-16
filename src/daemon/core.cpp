@@ -40,7 +40,7 @@ void Core::ai_run(){
         //debug("*** TODO ME !!! loop");
 
         time_now=time(0);
-
+        w_lock time_lck(time_mtx);
         for(map<time_t, Id>::reverse_iterator iter = data.file_reqs_time.rbegin(); iter != data.file_reqs_time.rend(); ++iter){
             if(difftime(time_now,iter->first) < DEFAULT_WAIT_TO_AGGRESIV) {
                 debug("*** no more old querys %s", difftime(time_now,iter->first));
@@ -48,9 +48,11 @@ void Core::ai_run(){
             }
             debug("sending a aggresiv query now=%s,past=%s \n id=%s",time_now,iter->first,iter->second);
             req_file_from_peers(iter->second,true);
+            data.file_reqs_time.erase(iter->first);
+            data.file_reqs_time[time_now]=iter->second;
         }
 
-
+        time_lck.unlock();
         r_lock chunk_lck(chunk_req_mtx);
         r_lock peer_lck(peers_mtx);
 

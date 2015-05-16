@@ -165,7 +165,7 @@ private:
     inline bool indirect_chunk_req_exists(const Id& bid,const Id& cid){ return indirect_file_req_exists(bid) && indirect_reqs[bid].chunk_exists(cid);}
 
   } data;
-  rw_mutex peers_mtx, pid_mtx, sync_mtx, chunk_req_mtx;
+  rw_mutex peers_mtx, pid_mtx, sync_mtx, chunk_req_mtx,time_mtx;
 
   Ui_ptr ui;
 };
