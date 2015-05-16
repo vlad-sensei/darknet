@@ -216,6 +216,27 @@ bool Core::req_file_from_peers(Id& bid){
     return true;
 }
 
+void Core::handle_aggresiv_query(const Id& bid,const unordered_set<Id>& cids,peer_id_t pid){
+    w_lock l(chunk_req_mtx);
+    data.indirect_reqs[bid]=File_req(bid,time(0));
+
+    //unordered_set<Id> cids;
+    //for(const auto& c:data.indirect_reqs.chunks) cids.emplace(c.first);
+
+    l.unlock();
+    r_lock peer_lck(peers_mtx);
+    for(const auto& it:data.peers){
+
+        const Peer_ptr& peer= it.second;
+        if(peer!= data.peers[pid]){
+            // Do no ask the one that asks you
+            peer->chunk_query(bid,cids);
+        }
+    }
+    peer_lck.unlock();
+
+}
+
 
 void Core::handle_chunk_ack(const Id& bid,const unordered_set<Id>& cids,peer_id_t pid){
     r_lock chunk_lck(chunk_req_mtx);
@@ -274,9 +295,9 @@ void Core::handle_chunk(const Id& bid, const Chunk& chunk){
     l.lock();
     data.file_reqs[bid].insert(metabody.bid_next());
 
-    unordered_set<Id> cids;
-    for(const auto& c:req.chunks) cids.emplace(c.first);
-    req_chunks(bid,cids);
+//    unordered_set<Id> cids;
+//    for(const auto& c:req.chunks) cids.emplace(c.first);
+//    req_chunks(bid,cids);
     return;
   }
   req.has_metabody = true;
@@ -284,9 +305,9 @@ void Core::handle_chunk(const Id& bid, const Chunk& chunk){
    req.insert(cid);
   }
 
-  unordered_set<Id> cids;
-  for(const auto& c:req.chunks) cids.emplace(c.first);
-  req_chunks(bid,cids);
+//  unordered_set<Id> cids;
+//  for(const auto& c:req.chunks) cids.emplace(c.first);
+//  req_chunks(bid,cids);
 
 }
 // ----------- Data -----------

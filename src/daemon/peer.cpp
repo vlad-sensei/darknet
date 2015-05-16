@@ -129,16 +129,21 @@ void Peer::handle_chunk_query(const Msg_ptr &msg){
   //TODO: do something with them..
   debug("handle_chunk_req");
   //(void)bid; (void)cids;
-
-  unordered_set<Id> ack_cids;
-  for(Id cid:cids){
-    Chunk chunk;
-    if(core->get_chunk(bid,cid,chunk)){
-      debug("seding chunk:");
-      ack_cids.emplace(cid);
-    }
+  if(!resend){
+      unordered_set<Id> ack_cids;
+      for(Id cid:cids){
+        Chunk chunk;
+        if(core->get_chunk(bid,cid,chunk)){
+          debug("sedning ack for chunk: %s",cid);
+          ack_cids.emplace(cid);
+        }
+      }
+      send(Message::chunk_ack(bid,ack_cids));
+  }else{
+        debug("handle_aggresive_query");
+        core->handle_aggresiv_query(bid,cids,data.pid);
   }
-  send(Message::chunk_ack(bid,ack_cids));
+
 }
 
 

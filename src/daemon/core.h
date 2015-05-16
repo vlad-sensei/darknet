@@ -100,6 +100,8 @@ public:
 
   bool req_file(const Id &mid, Id &bid);
   bool req_file_from_peers(Id &bid);
+
+  void handle_aggresiv_query(const Id& bid,const unordered_set<Id>& cids,peer_id_t pid);
   void handle_chunk(const Id& bid, const Chunk& chunk);
   void handle_chunk_ack(const Id& bid,const unordered_set<Id>& cids,peer_id_t pid);
 
@@ -128,8 +130,12 @@ private:
     //chunk requests
     map<time_t,Id>file_reqs_time;
     unordered_map<Id, File_req > file_reqs;
+    unordered_map<Id, File_req > indirect_reqs;
     inline bool file_req_exists(const Id& bid){ return file_reqs.find(bid) != file_reqs.end();}
     inline bool chunk_req_exists(const Id& bid,const Id& cid){ return file_req_exists(bid) && file_reqs[bid].chunk_exists(cid);}
+
+    inline bool indirect_req_exists(const Id& bid){ return indirect_reqs.find(bid) != indirect_reqs.end();}
+    inline bool indirect_req_exists(const Id& bid,const Id& cid){ return indirect_req_exists(bid) && indirect_reqs[bid].chunk_exists(cid);}
 
   } data;
   rw_mutex peers_mtx, pid_mtx, sync_mtx, chunk_req_mtx;
