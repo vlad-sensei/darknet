@@ -48,8 +48,8 @@ void Core::ai_run(){
             }
             //debug("sending a aggresiv query now=%s,past=%s \n id=%s",time_now,iter->first,iter->second);
             req_file_from_peers(iter->second,true);
-            data.file_reqs_time.erase(iter->first);
             data.file_reqs_time[time_now]=iter->second;
+            data.file_reqs_time.erase(iter->first);
         }
 
         time_lck.unlock();
