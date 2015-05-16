@@ -45,8 +45,8 @@ void Core::ai_run(){
                 debug("*** no old querys %s", difftime(time_now,i->first));
                 break;
             }
-            //debug("sending a aggresiv query %s",difftime(time_now,i->first));
-            //req_file_from_peers(i->second,true);
+            debug("sending a aggresiv query %s",difftime(time_now,i->first));
+            req_file_from_peers(i->second,true);
         }
         r_lock chunk_lck(chunk_req_mtx);
         r_lock peer_lck(peers_mtx);
