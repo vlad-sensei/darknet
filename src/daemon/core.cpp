@@ -41,7 +41,10 @@ void Core::ai_run(){
 
         time_now=time(0);
         for(auto i = data.file_reqs_time.end(); i !=data.file_reqs_time.begin(); i--){
-            if(difftime(time_now,i->first) < DEFAULT_WAIT_TO_AGGRESIV) break;
+            if(difftime(time_now,i->first) < DEFAULT_WAIT_TO_AGGRESIV) {
+                debug("*** no old querys %s", difftime(time_now,i->first));
+                break;
+            }
             req_file_from_peers(i->second,true);
         }
         r_lock chunk_lck(chunk_req_mtx);
