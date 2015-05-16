@@ -43,6 +43,7 @@ struct File_req{
   File_req(const Id& bid_,time_t time):bid(bid_),time_stamp(time){
       chunks[bid_]={};
   }
+  File_req(time_t time):time_stamp(time){}
   File_req(){}
   Id bid;
   time_t time_stamp;
@@ -72,9 +73,35 @@ struct File_req{
       chunks[cid].emplace_back(peer_id);
       return true;
   }
+};
+//not synchronized!
 
+struct Inidirect_File_req{
+  Inidirect_File_req(const Id& bid_,time_t time):bid(bid_),time_stamp(time){
+      chunks[bid_]={};
+  }
+  Inidirect_File_req(time_t time):time_stamp(time){}
+  Inidirect_File_req(){}
+  Id bid;
+  time_t time_stamp;
+  unordered_map<Id,unordered_set<peer_id_t>> chunks;
+  unsigned writer_count = 0;
+  bool has_metabody = false;
+  inline bool chunk_exists(const Id& cid) {return chunks.find(cid)!=chunks.end();}
+  inline void insert(const Id& cid) {chunks[cid]={};}
+  inline bool erase(const Id& cid){
+    if(!chunk_exists(cid)) return false;
+    chunks.erase(cid);
+    return true;
+  }
+  void remove_peer(peer_id_t peer_id){
+      for(auto& it:chunks){
+          it.second.erase(peer_id);
+      }
+  }
 
 };
+
 
 class Core : Connection_initiator_base, public Library {
 public:
@@ -130,12 +157,12 @@ private:
     //chunk requests
     map<time_t,Id>file_reqs_time;
     unordered_map<Id, File_req > file_reqs;
-    unordered_map<Id, File_req > indirect_reqs;
+    unordered_map<Id, Inidirect_File_req > indirect_reqs;
     inline bool file_req_exists(const Id& bid){ return file_reqs.find(bid) != file_reqs.end();}
     inline bool chunk_req_exists(const Id& bid,const Id& cid){ return file_req_exists(bid) && file_reqs[bid].chunk_exists(cid);}
 
-    inline bool indirect_req_exists(const Id& bid){ return indirect_reqs.find(bid) != indirect_reqs.end();}
-    inline bool indirect_req_exists(const Id& bid,const Id& cid){ return indirect_req_exists(bid) && indirect_reqs[bid].chunk_exists(cid);}
+    inline bool indirect_file_req_exists(const Id& bid){ return indirect_reqs.find(bid) != indirect_reqs.end();}
+    inline bool indirect_chunk_req_exists(const Id& bid,const Id& cid){ return indirect_file_req_exists(bid) && indirect_reqs[bid].chunk_exists(cid);}
 
   } data;
   rw_mutex peers_mtx, pid_mtx, sync_mtx, chunk_req_mtx;
