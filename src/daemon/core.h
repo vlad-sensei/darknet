@@ -57,10 +57,9 @@ struct File_req{
     chunks.erase(cid);
     return true;
   }
-  inline bool add_peer(const Id& cid,peer_id_t peer_id,time_t time){
+  inline bool add_peer(const Id& cid,peer_id_t peer_id){
       if(!chunk_exists(cid)) return false;
       chunks[cid].emplace_back(peer_id);
-      time_stamp=time;
       return true;
   }
   bool get_peer_id(const Id& cid,peer_id_t& peer_id){
@@ -126,7 +125,7 @@ public:
   bool make_peer_req(const peer_id_t &pid1);
 
   bool req_file(const Id &mid, Id &bid);
-  bool req_file_from_peers(const Id &bid);
+  bool req_file_from_peers(const Id &bid,const bool& aggresiv=false);
 
   void handle_aggresiv_query(const Id& bid,const unordered_set<Id>& cids,peer_id_t pid);
   void handle_chunk(const Id& bid, const Chunk& chunk);

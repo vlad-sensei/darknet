@@ -33,12 +33,22 @@ void Core::run(){
 }
 
 void Core::ai_run(){
+    time_t time_now;
+    peer_id_t peer_id;
     while(true){
         //TODO chech for time_stamp_over_do
         //debug("*** TODO ME !!! loop");
+
+        time_now=time(0);
+        for(auto i = data.file_reqs_time.end(); i !=data.file_reqs_time.begin(); i--){
+            if(difftime(time_now,i->first) < DEFAULT_WAIT_TO_AGGRESIV) break;
+            req_file_from_peers(i->second,true);
+        }
         r_lock chunk_lck(chunk_req_mtx);
         r_lock peer_lck(peers_mtx);
-        peer_id_t peer_id;
+
+
+
         for(auto& it:data.file_reqs){
             for(const auto& it2:it.second.chunks){
                 if(it.second.get_peer_id(it2.first,peer_id)){
@@ -198,7 +208,7 @@ bool Core::req_file(const Id& mid,Id& bid){
     return req_file_from_peers(bid);
 }
 
-bool Core::req_file_from_peers(const Id& bid){
+bool Core::req_file_from_peers(const Id& bid,const bool& aggresiv){
     r_lock chunk_lck(chunk_req_mtx);
     if(!data.file_req_exists(bid)) {
         debug("*** no request for this bid");
@@ -210,7 +220,7 @@ bool Core::req_file_from_peers(const Id& bid){
     r_lock peer_lck(peers_mtx);
     for(const auto& it:data.peers){
         const Peer_ptr& peer= it.second;
-        peer->chunk_query(bid,cids,true);
+        peer->chunk_query(bid,cids,aggresiv);
     }
     peer_lck.unlock();
     return true;
@@ -247,10 +257,9 @@ void Core::handle_chunk_forword_ack(const Id &bid, const unordered_set<Id> &cids
         return;
     }
 
-    time_t t=time(0); // get new time to update to
     for(const auto& cid:cids){
         if(data.file_reqs[bid].chunk_exists(cid)){
-            if(!data.file_reqs[bid].add_peer(cid,data.peer_ips[addr],t)){
+            if(!data.file_reqs[bid].add_peer(cid,data.peer_ips[addr])){
                 debug("*** cude not add peer to file_req");
             }
         }
@@ -266,10 +275,9 @@ void Core::handle_chunk_ack(const Id& bid,const unordered_set<Id>& cids,peer_id_
         return;
     }
     if(data.file_req_exists(bid)){
-        time_t t=time(0); // get new time to update to
         for(const auto& cid:cids){
             if(data.file_reqs[bid].chunk_exists(cid)){
-                if(!data.file_reqs[bid].add_peer(cid,pid,t)){
+                if(!data.file_reqs[bid].add_peer(cid,pid)){
                     debug("*** cude not add peer to file_req");
                 }
             }
