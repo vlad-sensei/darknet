@@ -47,7 +47,7 @@ struct File_req{
   File_req(){}
   Id bid;
   time_t time_stamp;
-  unordered_map<Id,deque<peer_id_t> > chunks;
+  unordered_map<Id,deque<ip_t> > chunks;
   unsigned writer_count = 0;
   bool has_metabody = false;
   inline bool chunk_exists(const Id& cid) {return chunks.find(cid)!=chunks.end();}
@@ -57,19 +57,19 @@ struct File_req{
     chunks.erase(cid);
     return true;
   }
-  inline bool add_peer(const Id& cid,peer_id_t peer_id){
+  inline bool add_peer(const Id& cid,ip_t peer_ip){
       if(!chunk_exists(cid)) return false;
-      chunks[cid].emplace_back(peer_id);
+      chunks[cid].emplace_back(peer_ip);
       return true;
   }
-  bool get_peer_id(const Id& cid,peer_id_t& peer_id){
+  bool get_peer_ip(const Id& cid,ip_t& peer_ip){
       if(!chunk_exists(cid) || chunks[cid].empty()) {
           debug("*** no peer have left a ack");
           return false;
       }
-      peer_id=chunks[cid].front();
+      peer_ip=chunks[cid].front();
       chunks[cid].pop_front();
-      chunks[cid].emplace_back(peer_id);
+      chunks[cid].emplace_back(peer_ip);
       return true;
   }
 };

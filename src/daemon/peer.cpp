@@ -136,9 +136,10 @@ void Peer::handle_chunk_query(const Msg_ptr &msg){
   const unordered_set<Id> cids = msg->get_unordered_set_id(Message::K_CIDS);
   const bool resend=msg->get_bool(Message::K_RESEND);
   //TODO: do something with them..
-  debug("handle_chunk_req");
+
   //(void)bid; (void)cids;
   if(!resend){
+      debug("handle_chunk_query");
       unordered_set<Id> ack_cids;
       for(Id cid:cids){
         Chunk chunk;

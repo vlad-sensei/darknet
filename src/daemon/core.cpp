@@ -34,7 +34,7 @@ void Core::run(){
 
 void Core::ai_run(){
     time_t time_now;
-    peer_id_t peer_id;
+    ip_t peer_ip;
     while(true){
         //TODO chech for time_stamp_over_do
         //debug("*** TODO ME !!! loop");
@@ -60,8 +60,8 @@ void Core::ai_run(){
 
         for(auto& it:data.file_reqs){
             for(const auto& it2:it.second.chunks){
-                if(it.second.get_peer_id(it2.first,peer_id)){
-                    const Peer_ptr& peer =data.peers[peer_id];
+                if(it.second.get_peer_ip(it2.first,peer_ip)&& data.peer_ip_exists(peer_ip)){
+                    const Peer_ptr& peer =data.peers[data.peer_ips[peer_ip]];
                     const unordered_set<Id> cids={it2.first};
                     peer->req_chunks(it.first,cids);
                 }else{
@@ -270,7 +270,7 @@ void Core::handle_chunk_forword_ack(const Id &bid, const unordered_set<Id> &cids
 
     for(const auto& cid:cids){
         if(data.file_reqs[bid].chunk_exists(cid)){
-            if(!data.peer_ip_exists(addr) && !data.file_reqs[bid].add_peer(cid,data.peer_ips[addr])){
+            if(!data.file_reqs[bid].add_peer(cid,addr)){
                 debug("*** cude not add peer to file_req");
             }
         }
