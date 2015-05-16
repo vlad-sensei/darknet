@@ -45,7 +45,8 @@ void Core::ai_run(){
                 debug("*** no old querys %s", difftime(time_now,i->first));
                 break;
             }
-            req_file_from_peers(i->second,true);
+            //debug("sending a aggresiv query %s",difftime(time_now,i->first));
+            //req_file_from_peers(i->second,true);
         }
         r_lock chunk_lck(chunk_req_mtx);
         r_lock peer_lck(peers_mtx);
@@ -223,7 +224,7 @@ bool Core::req_file_from_peers(const Id& bid,const bool& aggresiv){
     r_lock peer_lck(peers_mtx);
     for(const auto& it:data.peers){
         const Peer_ptr& peer= it.second;
-        peer->chunk_query(bid,cids,aggresiv);
+        peer->chunk_query(bid,cids,true);
     }
     peer_lck.unlock();
     return true;
