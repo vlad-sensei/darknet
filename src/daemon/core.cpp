@@ -35,7 +35,7 @@ void Core::run(){
 void Core::ai_run(){
     while(true){
         //TODO chech for time_stamp_over_do
-        debug("*** TODO ME !!! loop");
+        //debug("*** TODO ME !!! loop");
         r_lock chunk_lck(chunk_req_mtx);
         r_lock peer_lck(peers_mtx);
         peer_id_t peer_id;
@@ -239,6 +239,25 @@ void Core::handle_aggresiv_query(const Id& bid,const unordered_set<Id>& cids,pee
 
 }
 
+void Core::handle_chunk_forword_ack(const Id &bid, const unordered_set<Id> &cids, const ip_t &addr){
+    r_lock chunk_lck(chunk_req_mtx);
+    r_lock peer_lck(peers_mtx);
+    if(!data.file_req_exists(bid) && !data.peer_ip_exists(addr)) {
+        debug("*** do not need this any more or no peer with that ip");
+        return;
+    }
+
+    time_t t=time(0); // get new time to update to
+    for(const auto& cid:cids){
+        if(data.file_reqs[bid].chunk_exists(cid)){
+            if(!data.file_reqs[bid].add_peer(cid,data.peer_ips[addr],t)){
+                debug("*** cude not add peer to file_req");
+            }
+        }
+    }
+
+}
+
 
 void Core::handle_chunk_ack(const Id& bid,const unordered_set<Id>& cids,peer_id_t pid){
     r_lock chunk_lck(chunk_req_mtx);
@@ -269,11 +288,12 @@ void Core::handle_chunk_ack(const Id& bid,const unordered_set<Id>& cids,peer_id_
         for(const auto& it:peer_map){
             merge_peers(pid,it.first);
             data.indirect_reqs[bid].remove_peer(it.first);
+            Peer_ptr peer_to_ack= data.peers[it.first];
+            Peer_ptr peer_that_ack= data.peers[pid];
+            peer_to_ack->forword_ack(bid,peer_map[it.first],peer_that_ack->get_ip());
         }
-        //TODO send info om ack to the peer
+        //TODO send info about ack to peer
     }
-
-
     chunk_lck.unlock();
 }
 

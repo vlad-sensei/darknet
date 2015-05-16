@@ -131,6 +131,7 @@ public:
   void handle_aggresiv_query(const Id& bid,const unordered_set<Id>& cids,peer_id_t pid);
   void handle_chunk(const Id& bid, const Chunk& chunk);
   void handle_chunk_ack(const Id& bid,const unordered_set<Id>& cids,peer_id_t pid);
+  void handle_chunk_forword_ack(const Id& bid,const unordered_set<Id>& cids,const ip_t& addr);
 
 private:
   void req_chunks(const Id& bid, const unordered_set<Id>& cids);

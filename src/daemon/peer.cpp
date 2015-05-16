@@ -58,6 +58,9 @@ void Peer::process_msg(const Msg_ptr& msg){
   case Message::T_CHUNK_ACK:
     handle_chunk_ack(msg);
     break;
+  case Message::T_CHUNK_FORWORD_ACK:
+    handle_chunk_forword_ack(msg);
+    break;
   default:
     debug("unknown messape type");
   }
@@ -79,8 +82,14 @@ void Peer::handle_chunk_ack(const Msg_ptr &msg){
     const Id& bid = msg->get_id(Message::K_ID);
     const unordered_set<Id> cids = msg->get_unordered_set_id(Message::K_CIDS);
     core->handle_chunk_ack(bid,cids,data.pid);
+}
 
+void Peer::handle_chunk_forword_ack(const Msg_ptr &msg){
+    const Id& bid = msg->get_id(Message::K_ID);
+    const unordered_set<Id> cids = msg->get_unordered_set_id(Message::K_CIDS);
+    const ip_t& addr=msg->get_ip_t(Message::K_IP);
 
+    core->handle_chunk_forword_ack(bid,cids,addr);
 }
 
 

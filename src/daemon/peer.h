@@ -53,6 +53,9 @@ public:
 
   inline ip_t get_ip() const {return remote_ip;}
   bool get_listen_port(uint16_t& listen_port);
+  inline void forword_ack(const Id& bid, const unordered_set<Id>& cids,const ip_t &addr){
+      send(Message::chunk_forword_ack(bid,cids,addr));
+  }
 private:
   Peer();
   void terminate();
@@ -68,6 +71,7 @@ private:
   void handle_chunk_req(const Msg_ptr& msg);
   void handle_chunk_query(const Msg_ptr& msg);
   void handle_chunk_ack(const Msg_ptr& msg);
+  void handle_chunk_forword_ack(const Msg_ptr& msg);
 
   void handle_meta_req(const Msg_ptr& msg);
   void handle_meta_reply(const Msg_ptr& msg);

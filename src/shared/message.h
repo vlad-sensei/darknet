@@ -43,9 +43,8 @@ public:
     T_SYNCH,
     T_SEARCH,
     T_MERGE,
-    T_REQ_PEERS
-
-
+    T_REQ_PEERS,
+    T_CHUNK_FORWORD_ACK
   }; // message types
   enum msg_keys : Key_type_t {
     K_BODY,
@@ -67,6 +66,7 @@ public:
   static Msg_ptr echo(const string& msg = "");
   static Msg_ptr chunk_query(const Id& bid, const unordered_set<Id>& cids, const bool& resend = false);
   static Msg_ptr chunk_ack(const Id& bid, const unordered_set<Id>& cids);
+  static Msg_ptr chunk_forword_ack(const Id& bid, const unordered_set<Id>& cids, const ip_t& addr);
   static Msg_ptr chunk_req(const Id& bid, const unordered_set<Id>& cids);
   static Msg_ptr ui_text_command(const string& msg = "");
   static Msg_ptr meta_req();

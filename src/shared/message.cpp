@@ -30,6 +30,10 @@ Msg_ptr Message::chunk_ack(const Id &bid, const unordered_set<Id> &cids){
   return make(T_CHUNK_ACK, K_ID,  bid, K_CIDS, cids);
 }
 
+Msg_ptr Message::chunk_forword_ack(const Id &bid, const unordered_set<Id> &cids, const ip_t &addr){
+  return make(T_CHUNK_FORWORD_ACK, K_ID,  bid, K_CIDS, cids,K_IP,addr);
+}
+
 Msg_ptr Message::chunk_req(const Id &bid, const unordered_set<Id> &cids){
   return make(T_CHUNK_REQ, K_ID, bid, K_CIDS, cids);
 }
