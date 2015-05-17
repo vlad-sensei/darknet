@@ -70,19 +70,16 @@ void Core::ai_run(){
                     const Peer_ptr& peer =data.peers[data.peer_ips[peer_ip]];
                     const unordered_set<Id> cids={it2.first};
                     peer->req_chunks(it.first,cids);
-                }else{
-
-                    debug("faile");
                 }
-
             }
         }
 
 
         chunk_lck.unlock();
         peer_lck.unlock();
+
         vector<Metahead> metahead_list=publish_metaheads();
-        if(!metahead_list.empty()){
+        if(!metahead_list.empty() && rand()%10 > 5){
             Metahead random=metahead_list[rand()%metahead_list.size()];
             req_file(random.mid,random.bid);
         }

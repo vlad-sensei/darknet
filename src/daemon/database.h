@@ -82,7 +82,9 @@ public:
 protected:
 
   void add_chunk(const Id& bid, const Id& cid, const size_t& size, const size_t& slot){exec_s(I_CHUNK,bid,cid,size,slot);}
-  void add_metahead(const Metahead & metahead) {exec_s(I_METAHEAD,metahead.mid,metahead.tags,metahead.bid);}
+  void add_metahead(const Metahead & metahead) {
+      debug("saving [mid %s]\n [tags %s]\n [bid %s]\n",metahead.mid,metahead.tags,metahead.bid);
+      exec_s(I_METAHEAD,metahead.mid,metahead.tags,metahead.bid);}
 
   //read
   void get_all_metaheads(vector<Metahead>& metaheads);

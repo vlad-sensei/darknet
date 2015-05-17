@@ -247,8 +247,7 @@ void Ui::init_commands(){
       vector<Metahead> meta_list;
       for(Id mid : mids){
         Metahead head;
-        core->get_metahead(mid,head);
-        meta_list.push_back(head);
+        if(core->get_metahead(mid,head)) meta_list.push_back(head);
       }
       return Message::search(meta_list,Result_code::OK);
 
