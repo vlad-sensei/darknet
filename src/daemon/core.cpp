@@ -46,7 +46,7 @@ void Core::ai_run(){
                 debug("*** no more old querys %s", difftime(time_now,iter->first));
                 break;
             }
-            //debug("sending a aggresiv query now=%s,past=%s \n id=%s",time_now,iter->first,iter->second);
+            debug("sending a aggresiv query now=%s,past=%s \n id=%s",time_now,iter->first,iter->second);
             req_file_from_peers(iter->second,true);
             data.file_reqs_time[time_now]=iter->second;
             data.file_reqs_time.erase(iter->first);
@@ -155,6 +155,7 @@ void Core::synch_all(){
 // ----------- Routing ---------
 
 bool Core::merge_peers(const peer_id_t &pid1, const peer_id_t &pid2){
+    debug("merging peers [pid1 %s] [pid2 %s]",pid1,pid2);
     //verify they exist
     r_lock l(peers_mtx);
     if(!data.peer_exists(pid1)||!data.peer_exists(pid2)) {
