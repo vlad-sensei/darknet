@@ -7,15 +7,6 @@ Library::Library() {
 }
 
 bool Library::upload_file(const string& file_path, const string& tags,Id& mid){
-
-  boost::filesystem::path boost_file_path(file_path);
-  //path.stem() gives filename WITHOUT extension
-  //path.filename() gives filename WITH extension
-
-  debug("PATH: [%s]",boost_file_path.c_str());
-  debug("PATH FILENAME: [%s]",boost_file_path.filename().c_str());
-
-  //Metahead metahead(hash512_t(boost_file_path.filename().string()),tags);
   Metahead metahead;
   if(!Inventory::upload_file(file_path,metahead,tags))return false;
   mid=metahead.mid;

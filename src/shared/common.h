@@ -114,7 +114,7 @@ enum Result_code {
   OK,
   SYNCH_STARTED,
   SYNCH_STOPPED,
-  ERROR,
+  //ERROR, this constant conflicts with boost
   INVALID_ARGUMENTS,
   FAILED,
   UNKNOWN_MID,
