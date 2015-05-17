@@ -42,14 +42,17 @@ void Core::ai_run(){
         time_now=time(0);
         w_lock time_lck(time_mtx);
         for(map<time_t, Id>::reverse_iterator iter = data.file_reqs_time.rbegin(); iter != data.file_reqs_time.rend(); ++iter){
-            if(difftime(time_now,iter->first) < DEFAULT_WAIT_TO_AGGRESIV) {
-                debug("*** no more old querys %s", difftime(time_now,iter->first));
+            time_t time_stamp=iter->first;
+            Id bid=iter->second;
+
+            if(difftime(time_now,time_stamp) < DEFAULT_WAIT_TO_AGGRESIV) {
+                debug("*** no more old querys %s", difftime(time_now,time_stamp));
                 break;
             }
-            debug("sending a aggresiv query now=%s,past=%s \n id=%s",time_now,iter->first,iter->second);
+            debug("sending a aggresiv query now=%s,time_stamp=%s \n id=%s",time_now,time_stamp,bid);
             req_file_from_peers(iter->second,true);
-            data.file_reqs_time[time_now]=iter->second;
-            data.file_reqs_time.erase(iter->first);
+            data.file_reqs_time[time_now]=bid;
+            data.file_reqs_time.erase(time_stamp);
         }
 
         time_lck.unlock();
