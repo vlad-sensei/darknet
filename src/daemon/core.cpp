@@ -37,17 +37,18 @@ void Core::ai_run(){
     ip_t peer_ip;
     while(true){
         //TODO chech for time_stamp_over_do
-        //debug("*** TODO ME !!! loop");
+
 
         time_now=time(0);
         w_lock time_lck(time_mtx);
+        unordered_set<time_t> to_be_erased;
         //loop to find old querys
         for(map<time_t, Id>::reverse_iterator iter = data.file_reqs_time.rbegin(); iter != data.file_reqs_time.rend(); ++iter){
             time_t time_stamp=iter->first;
             Id bid=iter->second;
 
             if(difftime(time_now,time_stamp) < DEFAULT_WAIT_TO_AGGRESIV) {
-                debug("*** no more old querys %s", difftime(time_now,time_stamp));
+                debug("*** no more old querys [diff %s] [size %s]", difftime(time_now,time_stamp),data.file_reqs_time.size());
                 break;
             }
             // make an aggresiv query if old and stil wanted
@@ -55,13 +56,16 @@ void Core::ai_run(){
                 req_file_from_peers(iter->second,true);
                 data.file_reqs_time[time_now]=bid;
             }
-            data.file_reqs_time.erase(time_stamp);
+            to_be_erased.emplace(time_stamp);
+        }
+
+        for(auto e:to_be_erased){
+            data.file_reqs_time.erase(e);
         }
 
         time_lck.unlock();
         r_lock chunk_lck(chunk_req_mtx);
         r_lock peer_lck(peers_mtx);
-
 
         //req chunks from all peers that have left an ack
         for(auto& it:data.file_reqs){
