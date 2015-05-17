@@ -39,11 +39,13 @@ void Core::ai_run(){
         //TODO chech for time_stamp_over_do
 
 
-        time_now=time(0);
+
         w_lock time_lck(time_mtx);
         unordered_set<time_t> to_be_erased;
+        unordered_set<Id> to_be_inserted;
         //loop to find old querys
-        for(map<time_t, Id>::reverse_iterator iter = data.file_reqs_time.rbegin(); iter != data.file_reqs_time.rend(); ++iter){
+        for(map<time_t, Id>::iterator iter = data.file_reqs_time.begin(); iter != data.file_reqs_time.end(); ++iter){
+            time_now=time(0);
             time_t time_stamp=iter->first;
             Id bid=iter->second;
 
@@ -56,12 +58,9 @@ void Core::ai_run(){
                 req_file_from_peers(iter->second,true);
                 data.file_reqs_time[time_now]=bid;
             }
-            to_be_erased.emplace(time_stamp);
+            data.file_reqs_time.erase(time_stamp);
         }
 
-        for(auto e:to_be_erased){
-            data.file_reqs_time.erase(e);
-        }
 
         time_lck.unlock();
         r_lock chunk_lck(chunk_req_mtx);
