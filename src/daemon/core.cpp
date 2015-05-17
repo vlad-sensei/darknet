@@ -37,9 +37,6 @@ void Core::ai_run(){
     ip_t peer_ip;
     while(true){
         //TODO chech for time_stamp_over_do
-
-
-
         w_lock time_lck(time_mtx);
         unordered_set<time_t> to_be_erased;
         unordered_set<Id> to_be_inserted;
@@ -80,8 +77,16 @@ void Core::ai_run(){
 
             }
         }
+
+
         chunk_lck.unlock();
         peer_lck.unlock();
+        vector<Metahead> metahead_list=publish_metaheads();
+        if(!metahead_list.empty()){
+            Metahead random=metahead_list[rand()%metahead_list.size()];
+            req_file(random.mid,random.bid);
+        }
+
         this_thread::sleep_for(chrono::seconds(DEFAULT_AI_SLEEP));
     }
 }
@@ -211,13 +216,14 @@ bool Core::make_peer_req(const peer_id_t &pid){
 
 bool Core::req_file(const Id& mid,Id& bid){
     Metahead metahead;
-    if(!get_metahead(mid,metahead)){
-        debug("*** no mid found");
+    w_lock l(chunk_req_mtx);
+    if(!get_metahead(mid,metahead)&& !data.file_req_exists(metahead.bid)){
+        debug("*** no mid found [mid %s]\n or a req is on going",mid);
         return false;
     }
     time_t time_now=time(0);
-    //debug("req_file with:\n[mid %s]\n[bid %s]\n[time_stamp %s]",mid,metahead.bid,time_now);
-    w_lock l(chunk_req_mtx);
+    debug("req_file with:\n[mid %s]\n[bid %s]\n[time_stamp %s]",mid,metahead.bid,time_now);
+
     bid=metahead.bid;
     data.file_reqs[bid]=File_req(bid,time_now);
     data.file_reqs_time[data.file_reqs[bid].time_stamp]=bid;

@@ -18,8 +18,8 @@ bool Library::upload_file(const string& file_path, const string& tags,Id& mid){
   //Metahead metahead(hash512_t(boost_file_path.filename().string()),tags);
   Metahead metahead;
   if(!Inventory::upload_file(file_path,metahead,tags))return false;
-  add_metahead(metahead);
   mid=metahead.mid;
+  add_metahead(metahead);
   return true;
 }
 
