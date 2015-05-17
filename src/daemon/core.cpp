@@ -41,6 +41,7 @@ void Core::ai_run(){
 
         time_now=time(0);
         w_lock time_lck(time_mtx);
+        //loop to find old querys
         for(map<time_t, Id>::reverse_iterator iter = data.file_reqs_time.rbegin(); iter != data.file_reqs_time.rend(); ++iter){
             time_t time_stamp=iter->first;
             Id bid=iter->second;
@@ -49,9 +50,11 @@ void Core::ai_run(){
                 debug("*** no more old querys %s", difftime(time_now,time_stamp));
                 break;
             }
-            debug("sending a aggresiv query now=%s,time_stamp=%s \n id=%s",time_now,time_stamp,bid);
-            req_file_from_peers(iter->second,true);
-            data.file_reqs_time[time_now]=bid;
+            // make an aggresiv query if old and stil wanted
+            if(data.file_req_exists(bid)){
+                req_file_from_peers(iter->second,true);
+                data.file_reqs_time[time_now]=bid;
+            }
             data.file_reqs_time.erase(time_stamp);
         }
 
@@ -60,7 +63,7 @@ void Core::ai_run(){
         r_lock peer_lck(peers_mtx);
 
 
-
+        //req chunks from all peers that have left an ack
         for(auto& it:data.file_reqs){
             for(const auto& it2:it.second.chunks){
                 if(it.second.get_peer_ip(it2.first,peer_ip)&& data.peer_ip_exists(peer_ip)){
@@ -76,8 +79,6 @@ void Core::ai_run(){
         }
         chunk_lck.unlock();
         peer_lck.unlock();
-
-
         this_thread::sleep_for(chrono::seconds(DEFAULT_AI_SLEEP));
     }
 }
@@ -212,7 +213,7 @@ bool Core::req_file(const Id& mid,Id& bid){
         return false;
     }
     time_t time_now=time(0);
-    debug("req_file with:\n[mid %s]\n[bid %s]\n[time_stamp %s]",mid,metahead.bid,time_now);
+    //debug("req_file with:\n[mid %s]\n[bid %s]\n[time_stamp %s]",mid,metahead.bid,time_now);
     w_lock l(chunk_req_mtx);
     bid=metahead.bid;
     data.file_reqs[bid]=File_req(bid,time_now);
@@ -252,7 +253,6 @@ void Core::handle_aggresiv_query(const Id& bid,const unordered_set<Id>& cids,pee
     l.unlock();
     r_lock peer_lck(peers_mtx);
     for(const auto& it:data.peers){
-
         const Peer_ptr& peer= it.second;
         if(peer!= data.peers[pid]){
             // Do no ask the one that asks you
@@ -315,7 +315,6 @@ void Core::handle_chunk_ack(const Id& bid,const unordered_set<Id>& cids,peer_id_
             Peer_ptr peer_that_ack= data.peers[pid];
             peer_to_ack->forword_ack(bid,peer_map[it.first],peer_that_ack->get_ip());
         }
-        //TODO send info about ack to peer
     }
     chunk_lck.unlock();
 }
@@ -345,7 +344,8 @@ void Core::handle_chunk(const Id& bid, const Chunk& chunk){
         //we think we are done
         data.file_reqs.erase(bid);
         l.unlock();
-        get_file(bid,"TODO_get_name_of_file");
+        //get_file(bid,"TODO_get_name_of_file");
+        debug("!!!Download complet!!!");
         return;
     }
     l.unlock();
