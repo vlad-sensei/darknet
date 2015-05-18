@@ -283,8 +283,8 @@ void Core::handle_chunk_forward_ack(const Id &bid, const unordered_set<Id> &cids
     debug("chunk forward ack..");
     r_lock chunk_lck(chunk_req_mtx);
     r_lock peer_lck(peers_mtx);
-    if(!data.file_req_exists(bid) || !data.peer_ip_exists(addr)) {
-        debug("*** do not need this any more or no peer with that ip");
+    if(!data.file_req_exists(bid)) {
+        debug("*** do not need this any more");
         return;
     }
     peer_lck.unlock();
