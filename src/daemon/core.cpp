@@ -290,7 +290,7 @@ void Core::handle_chunk_forward_ack(const Id &bid, const unordered_set<Id> &cids
 }
 
 
-void Core::handle_chunk_ack(const Id& bid,const unordered_set<Id>& cids,const peer_id_t& pid){
+void Core::handle_chunk_ack(const Id& bid,const unordered_set<Id>& cids,const peer_id_t& source_pid){
   r_lock chunk_lck(chunk_req_mtx);
   if(!data.file_req_exists(bid) && !data.indirect_file_req_exists(bid)) {
     debug("*** do not need this any more");
@@ -301,7 +301,7 @@ void Core::handle_chunk_ack(const Id& bid,const unordered_set<Id>& cids,const pe
   if(data.file_req_exists(bid)){
     for(const Id& cid:cids){
       if(data.file_reqs[bid].chunk_exists(cid))
-        if(!data.file_reqs[bid].add_peer(cid,data.peers[pid]->get_ip()))
+        if(!data.file_reqs[bid].add_peer(cid,data.peers[source_pid]->get_ip()))
           debug("*** could not add peer to file_req");
     }
   }
@@ -317,12 +317,18 @@ void Core::handle_chunk_ack(const Id& bid,const unordered_set<Id>& cids,const pe
         }
       }
     }
+    r_lock peer_lck(peers_mtx);
+    if(!data.peer_exists(source_pid)) return;
+    const Peer_ptr& source_peer= data.peers[source_pid];
+
     for(const auto& it:peer_map){
-      merge_peers(pid,it.first);
-      data.indirect_reqs[bid].remove_peer(it.first);
-      Peer_ptr peer_to_ack= data.peers[it.first];
-      Peer_ptr peer_that_ack= data.peers[pid];
-      peer_to_ack->forward_ack(bid,peer_map[it.first],peer_that_ack->get_ip());
+      const peer_id_t& destination_pid = it.first;
+      if(!data.peer_exists(destination_pid)) continue;
+      const Peer_ptr& destination_peer= data.peers[destination_pid];
+
+      merge_peers(source_pid,destination_pid);
+      data.indirect_reqs[bid].remove_peer(destination_pid);
+      destination_peer->forward_ack(bid,peer_map[destination_pid],source_peer->get_ip());
     }
   }
   chunk_lck.unlock();
