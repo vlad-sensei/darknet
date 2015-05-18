@@ -248,23 +248,21 @@ bool Core::req_file_from_peers(const Id& bid, const bool& aggresive){
   return true;
 }
 
-void Core::handle_aggressive_query(const Id& bid,const unordered_set<Id>& cids,peer_id_t pid){
-  w_lock l(chunk_req_mtx);
+void Core::handle_aggressive_query(const Id& bid,const unordered_set<Id>& cids,const peer_id_t& buyer_pid){
+  w_lock chunk_req_lck(chunk_req_mtx);
   if(!data.indirect_file_req_exists(bid)){
     data.indirect_reqs[bid]=Inidirect_file_req(time(0));
   }
 
+  for(const Id& cid:cids) data.indirect_reqs[bid].chunks[cid].emplace(buyer_pid);
 
-  for(const auto& c:cids) data.indirect_reqs[bid].chunks[c].emplace(pid);
-
-  l.unlock();
+  chunk_req_lck.unlock();
   r_lock peer_lck(peers_mtx);
   for(const auto& it:data.peers){
     const Peer_ptr& peer= it.second;
-    if(peer!= data.peers[pid]){
-      // Do no ask the one that asks you
-      peer->chunk_query(bid,cids);
-    }
+    // do no ask the one that asks you
+    if(peer->get_pid()==buyer_pid) continue;
+    peer->chunk_query(bid,cids);
   }
   peer_lck.unlock();
 

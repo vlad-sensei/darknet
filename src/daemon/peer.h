@@ -56,6 +56,8 @@ public:
   inline void forward_ack(const Id& bid, const unordered_set<Id>& cids,const ip_t &addr){
       send(Message::chunk_forword_ack(bid,cids,addr));
   }
+
+  peer_id_t get_pid(){ return data.pid;}
 private:
   Peer();
   void terminate();
@@ -88,7 +90,6 @@ private:
     Data();
   } data;
   rw_mutex listen_port_mtx;
-  peer_id_t get_pid(){ return data.pid;}
 };
 
 #endif // PEER_H
