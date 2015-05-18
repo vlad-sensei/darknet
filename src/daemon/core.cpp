@@ -218,6 +218,7 @@ bool Core::req_file(const Id& mid,Id& bid){
         debug("*** no mid found [mid %s]\n or a req is on going",mid);
         return false;
     }
+    //TODO: use time + timeout delay
     time_t time_now=time(0);
     debug("req_file with:\n[mid %s]\n[bid %s]\n[time_stamp %s]",mid,metahead.bid,time_now);
 

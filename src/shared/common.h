@@ -3,17 +3,12 @@
 
 #include <vector>
 #include <deque>
+#include <unordered_set>
+#include <unordered_map>
 
 #include "glob.h"
 
-// ~~ Keccak
-/* Hash function that uses SHA-3, implemented using libcrypto++.
- * The function allocates a 64 byte on the heap using unique_ptr
- * the result is moved into the return value.
-*/
-
 const size_t CHUNK_SIZE = 1 << 19;
-
 
 #define MAX_CIDS_PER_METABODY 2000
 #define MAX_BIDS_PER_METABODY 30
@@ -95,6 +90,69 @@ inline bool operator==(const Metahead& m1, const Metahead& m2){
   return m1.mid==m2.mid && m1.bid==m2.bid && m1.tags==m2.tags;
 }
 
+struct File_req{
+  File_req(const Id& bid_,time_t time):bid(bid_),time_stamp(time){
+      chunks[bid_]={};
+  }
+  File_req(time_t time):time_stamp(time){}
+  File_req(){}
+  Id bid;
+  time_t time_stamp;
+  unordered_map<Id,deque<ip_t> > chunks;
+  unsigned writer_count = 0;
+  bool has_metabody = false;
+  inline bool chunk_exists(const Id& cid) {return chunks.find(cid)!=chunks.end();}
+  inline void insert(const Id& cid) {chunks[cid]={};}
+  inline bool erase(const Id& cid){
+    if(!chunk_exists(cid)) return false;
+    chunks.erase(cid);
+    return true;
+  }
+  inline bool add_peer(const Id& cid,ip_t peer_ip){
+      if(!chunk_exists(cid)) return false;
+      chunks[cid].emplace_back(peer_ip);
+      return true;
+  }
+  bool get_peer_ip(const Id& cid,ip_t& peer_ip){
+      if(!chunk_exists(cid) || chunks[cid].empty()) {
+          debug("*** no peer have left a ack");
+          return false;
+      }
+      peer_ip=chunks[cid].front();
+      chunks[cid].pop_front();
+      chunks[cid].emplace_back(peer_ip);
+      return true;
+  }
+};
+
+struct Inidirect_File_req{
+  Inidirect_File_req(const Id& bid_,time_t time):bid(bid_),time_stamp(time){
+      chunks[bid_]={};
+  }
+  Inidirect_File_req(time_t time):time_stamp(time){}
+  Inidirect_File_req(){}
+  Id bid;
+  time_t time_stamp;
+  unordered_map<Id,unordered_set<peer_id_t> > chunks;
+  unsigned writer_count = 0;
+  bool has_metabody = false;
+  inline bool chunk_exists(const Id& cid) {return chunks.find(cid)!=chunks.end();}
+  inline void insert(const Id& cid) {chunks[cid]={};}
+  inline bool erase(const Id& cid){
+    if(!chunk_exists(cid)) return false;
+    chunks.erase(cid);
+    return true;
+  }
+  void remove_peer(peer_id_t peer_id){
+      for(auto& it:chunks){
+          it.second.erase(peer_id);
+      }
+  }
+
+};
+
+
+
 /* List contains (enum name,full command name, short command name)
 I thought that it's not neccessary with more than two names per command
 That is why I have explicitly specified a short and full name.
@@ -119,7 +177,6 @@ enum Result_code {
   FAILED,
   UNKNOWN_MID,
   UNKNOWN_BID
-
 };
 
 #endif // COMMON_H
