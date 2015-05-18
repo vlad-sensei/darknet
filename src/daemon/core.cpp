@@ -39,7 +39,7 @@ void Core::ai_run(){
     w_lock timeout_lck(timeout_mtx);
 
     //handle all timed out file queries
-    while(data.file_reqs_timeout.begin()->first<=now && !data.file_reqs_timeout.empty()){
+    while(!data.file_reqs_timeout.empty() && data.file_reqs_timeout.begin()->first<=now) {
       Id bid = data.file_reqs_timeout.begin()->second;
       data.file_reqs_timeout.erase(data.file_reqs_timeout.begin());
       //handle the timeout request..
