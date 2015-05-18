@@ -144,13 +144,14 @@ void Peer::handle_chunk_query(const Msg_ptr &msg){
 
   debug("handle_chunk_query");
   unordered_set<Id> ack_cids;
-  for(Id cid:cids){
+  for(const Id& cid:cids){
     Chunk chunk;
     if(core->get_chunk(bid,cid,chunk)){
       debug("sedning ack for chunk: %s",cid);
       ack_cids.emplace(cid);
     }
   }
+  if(ack_cids.empty()) return;
   send(Message::chunk_ack(bid,ack_cids));
 }
 
