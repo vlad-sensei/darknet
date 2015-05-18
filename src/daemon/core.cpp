@@ -39,6 +39,7 @@ void Core::ai_run(){
         //w_lock timeout_lck(timeout_mtx);
 
         //handle all timed out file queries
+        debug("size before %s",data.file_reqs_timeout.size());
         while(!data.file_reqs_timeout.empty() && data.file_reqs_timeout.begin()->first<=now) {
 
             Id bid = data.file_reqs_timeout.begin()->second;
@@ -47,7 +48,8 @@ void Core::ai_run(){
             req_file_from_peers(bid,true);
 
         }
-        debug("!!!fan!!!");
+        debug("after %s",data.file_reqs_timeout.size());
+
         r_lock chunk_lck(chunk_req_mtx);
         r_lock peer_lck(peers_mtx);
 
