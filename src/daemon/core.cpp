@@ -36,17 +36,16 @@ void Core::ai_run(){
   while(true){
     time_t now = time(0);
 
-    w_lock timeout_lck(timeout_mtx);
+    //w_lock timeout_lck(timeout_mtx);
 
     //handle all timed out file queries
     while(!data.file_reqs_timeout.empty() && data.file_reqs_timeout.begin()->first<=now) {
 
       Id bid = data.file_reqs_timeout.begin()->second;
-      timeout_lck.unlock();
       remove_file_req_timeout(data.file_reqs_timeout.begin()->first);
       //handle the timeout request..
       req_file_from_peers(bid,true);
-      timeout_lck.lock();
+
     }
 
     r_lock chunk_lck(chunk_req_mtx);
