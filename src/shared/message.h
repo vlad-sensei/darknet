@@ -44,7 +44,7 @@ public:
     T_SEARCH,
     T_MERGE,
     T_REQ_PEERS,
-    T_CHUNK_FORWORD_ACK
+    T_CHUNK_FORWARD_ACK
   }; // message types
   enum msg_keys : Key_type_t {
     K_BODY,

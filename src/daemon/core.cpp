@@ -230,7 +230,7 @@ bool Core::req_file(const Id& mid,Id& bid){
   return req_file_from_peers(bid);
 }
 
-bool Core::req_file_from_peers(const Id& bid, const bool& aggresiv){
+bool Core::req_file_from_peers(const Id& bid, const bool& aggresive){
   r_lock chunk_lck(chunk_req_mtx);
   if(!data.file_req_exists(bid)) {
     debug("*** no request for this bid %s",bid);
@@ -241,8 +241,8 @@ bool Core::req_file_from_peers(const Id& bid, const bool& aggresiv){
   chunk_lck.unlock();
   r_lock peer_lck(peers_mtx);
   for(const auto& it:data.peers){
-    const Peer_ptr& peer= it.second;
-    peer->chunk_query(bid,cids,aggresiv);
+    const Peer_ptr& peer = it.second;
+    peer->chunk_query(bid,cids,aggresive);
   }
   peer_lck.unlock();
   return true;
@@ -270,7 +270,7 @@ void Core::handle_aggresiv_query(const Id& bid,const unordered_set<Id>& cids,pee
 
 }
 
-void Core::handle_chunk_forword_ack(const Id &bid, const unordered_set<Id> &cids, const ip_t &addr){
+void Core::handle_chunk_forward_ack(const Id &bid, const unordered_set<Id> &cids, const ip_t &addr){
   debug("***handle_chunk_forword_ack");
   r_lock chunk_lck(chunk_req_mtx);
   r_lock peer_lck(peers_mtx);
@@ -320,7 +320,7 @@ void Core::handle_chunk_ack(const Id& bid,const unordered_set<Id>& cids,peer_id_
       data.indirect_reqs[bid].remove_peer(it.first);
       Peer_ptr peer_to_ack= data.peers[it.first];
       Peer_ptr peer_that_ack= data.peers[pid];
-      peer_to_ack->forword_ack(bid,peer_map[it.first],peer_that_ack->get_ip());
+      peer_to_ack->forward_ack(bid,peer_map[it.first],peer_that_ack->get_ip());
     }
   }
   chunk_lck.unlock();

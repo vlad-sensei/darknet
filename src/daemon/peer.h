@@ -42,7 +42,7 @@ public:
   inline void req_chunks(const Id& bid, const unordered_set<Id>& cids) {send(Message::chunk_req(bid,cids));}
   inline void chunk_query(const Id& bid,const unordered_set<Id>& cids,const bool& resend=false){
       send(Message::chunk_query(bid,cids,resend));
-  };
+  }
   inline void req_metaheads(){send(Message::meta_req());}
   inline void send_metaheads(const vector<Metahead>& metaheads){send(Message::meta_list(metaheads));}
   inline void req_peers(){
@@ -53,7 +53,7 @@ public:
 
   inline ip_t get_ip() const {return remote_ip;}
   bool get_listen_port(uint16_t& listen_port);
-  inline void forword_ack(const Id& bid, const unordered_set<Id>& cids,const ip_t &addr){
+  inline void forward_ack(const Id& bid, const unordered_set<Id>& cids,const ip_t &addr){
       send(Message::chunk_forword_ack(bid,cids,addr));
   }
 private:
@@ -71,7 +71,7 @@ private:
   void handle_chunk_req(const Msg_ptr& msg);
   void handle_chunk_query(const Msg_ptr& msg);
   void handle_chunk_ack(const Msg_ptr& msg);
-  void handle_chunk_forword_ack(const Msg_ptr& msg);
+  void handle_chunk_forward_ack(const Msg_ptr& msg);
 
   void handle_meta_req(const Msg_ptr& msg);
   void handle_meta_reply(const Msg_ptr& msg);
