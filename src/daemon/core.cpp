@@ -52,16 +52,16 @@ void Core::ai_run(){
 
 
     for(auto& it:data.file_reqs){
-      Id bid=it.first;
+      const Id& bid=it.first;
       unordered_map<ip_t,unordered_set<Id> > peer_map;
       for(const auto& it2:it.second.chunks){
-        Id cid=it2.first;
+        const Id& cid=it2.first;
         for(const auto& peer_ip:it2.second){
             peer_map[peer_ip].emplace(cid);
         }
       }
       for(const auto& it2:peer_map){
-          ip_t peer_ip=it2.first;
+          const ip_t& peer_ip=it2.first;
           unordered_set<Id> cids=it2.second;
           if(data.peer_ip_exists(peer_ip)){
             const Peer_ptr& peer =data.peers[data.peer_ips[peer_ip]];

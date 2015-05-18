@@ -123,7 +123,7 @@ struct File_req{
     chunks[cid].erase(chunks[cid].begin());
     return true;
   }
-  void remove_peer(ip_t peer_ip){
+  void remove_peer(const ip_t& peer_ip){
     for(auto& it:chunks){
       it.second.erase(peer_ip);
     }
@@ -150,7 +150,7 @@ struct Inidirect_file_req{
     chunks.erase(cid);
     return true;
   }
-  void remove_peer(peer_id_t peer_id){
+  void remove_peer(const peer_id_t& peer_id){
     for(auto& it:chunks){
       it.second.erase(peer_id);
     }
