@@ -26,7 +26,6 @@ linux{
     LIBS += -lboost_thread
     LIBS += -lpthread
     LIBS += -lsqlite3
-    LIBS += -lreadline
     LIBS += -lssl
     LIBS += -lcrypto
 }
