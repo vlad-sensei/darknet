@@ -278,6 +278,7 @@ void Core::handle_chunk_forward_ack(const Id &bid, const unordered_set<Id> &cids
     debug("*** do not need this any more or no peer with that ip");
     return;
   }
+  peer_lck.unlock();
 
   for(const Id& cid:cids){
     if(data.file_reqs[bid].chunk_exists(cid))
