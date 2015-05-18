@@ -271,20 +271,18 @@ void Core::handle_aggresive_query(const Id& bid,const unordered_set<Id>& cids,pe
 }
 
 void Core::handle_chunk_forward_ack(const Id &bid, const unordered_set<Id> &cids, const ip_t &addr){
-  debug("***handle_chunk_forword_ack");
+  debug("chunk forward ack..");
   r_lock chunk_lck(chunk_req_mtx);
   r_lock peer_lck(peers_mtx);
-  if(!data.file_req_exists(bid) && !data.peer_ip_exists(addr)) {
+  if(!data.file_req_exists(bid) || !data.peer_ip_exists(addr)) {
     debug("*** do not need this any more or no peer with that ip");
     return;
   }
 
-  for(const auto& cid:cids){
-    if(data.file_reqs[bid].chunk_exists(cid)){
-      if(!data.file_reqs[bid].add_peer(cid,addr)){
-        debug("*** cude not add peer to file_req");
-      }
-    }
+  for(const Id& cid:cids){
+    if(data.file_reqs[bid].chunk_exists(cid))
+      if(!data.file_reqs[bid].add_peer(cid,addr))
+        debug(" *** could not add peer to file_req");
   }
 
 }
