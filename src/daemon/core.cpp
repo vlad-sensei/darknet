@@ -232,8 +232,9 @@ bool Core::req_file(const Id& mid,Id& bid){
     data.file_reqs[bid]=File_req(bid,time_now);
 
     chunk_req_lck.unlock();
-    debug("*** TODO: check if file is on local pc");
-    return req_file_from_peers(bid);
+    //debug("*** TODO: check if file is on local pc");
+
+    return get_file(bid,"TODO_get_name_of_file") || req_file_from_peers(bid);
 }
 
 bool Core::req_file_from_peers(const Id& bid, const bool& aggresive){
