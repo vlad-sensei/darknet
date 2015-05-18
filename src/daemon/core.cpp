@@ -287,7 +287,7 @@ void Core::handle_chunk_forward_ack(const Id &bid, const unordered_set<Id> &cids
 }
 
 
-void Core::handle_chunk_ack(const Id& bid,const unordered_set<Id>& cids,const peer_id_t& source_pid){
+void Core::handle_chunk_ack(const Id& bid,const unordered_set<Id>& cids,const peer_id_t& seller_pid){
   r_lock chunk_lck(chunk_req_mtx);
   if(!data.file_req_exists(bid) && !data.indirect_file_req_exists(bid)) {
     debug("*** do not need this any more");
@@ -298,7 +298,7 @@ void Core::handle_chunk_ack(const Id& bid,const unordered_set<Id>& cids,const pe
   if(data.file_req_exists(bid)){
     for(const Id& cid:cids){
       if(data.file_reqs[bid].chunk_exists(cid))
-        if(!data.file_reqs[bid].add_peer(cid,data.peers[source_pid]->get_ip()))
+        if(!data.file_reqs[bid].add_peer(cid,data.peers[seller_pid]->get_ip()))
           debug("*** could not add peer to file_req");
     }
   }
@@ -315,17 +315,17 @@ void Core::handle_chunk_ack(const Id& bid,const unordered_set<Id>& cids,const pe
       }
     }
     r_lock peer_lck(peers_mtx);
-    if(!data.peer_exists(source_pid)) return;
-    const Peer_ptr& source_peer= data.peers[source_pid];
+    if(!data.peer_exists(seller_pid)) return;
+    const Peer_ptr& seller_peer= data.peers[seller_pid];
 
     for(const auto& it:peer_map){
-      const peer_id_t& destination_pid = it.first;
-      if(!data.peer_exists(destination_pid)) continue;
-      const Peer_ptr& destination_peer= data.peers[destination_pid];
+      const peer_id_t& buyer_pid = it.first;
+      if(!data.peer_exists(buyer_pid)) continue;
+      const Peer_ptr& destination_peer= data.peers[buyer_pid];
 
-      merge_peers(source_pid,destination_pid);
-      data.indirect_reqs[bid].remove_peer(destination_pid);
-      destination_peer->forward_ack(bid,peer_map[destination_pid],source_peer->get_ip());
+      merge_peers(seller_pid,buyer_pid);
+      data.indirect_reqs[bid].remove_peer(buyer_pid);
+      destination_peer->forward_ack(bid,peer_map[buyer_pid],seller_peer->get_ip());
     }
   }
   chunk_lck.unlock();
