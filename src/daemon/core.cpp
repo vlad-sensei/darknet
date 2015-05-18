@@ -76,6 +76,11 @@ void Core::ai_run(){
   }
 }
 
+void Core::add_file_req_timeout(const Id &bid, const time_t &timeout){
+  w_lock l(timeout_mtx);
+  data.file_reqs_timeout[timeout]=bid;
+}
+
 void Core::connect(const string &addr, const uint16_t &port){
   debug("connecting [%s:%d]..",addr.c_str(),port);
   Connection_initiator_base::connect(addr,port);
@@ -213,9 +218,6 @@ bool Core::req_file(const Id& mid,Id& bid){
   bid=metahead.bid;
   data.file_reqs[bid]=File_req(bid,time_now);
 
-  w_lock file_req_timeout_lck(timeout_mtx);
-  data.file_reqs_timeout[data.file_reqs[bid].created_at+DEFAULT_FILE_REQ_TIMEOUT]=bid;
-  file_req_timeout_lck.unlock();
   chunk_req_lck.unlock();
   debug("*** TODO: check if file is on local pc");
   return req_file_from_peers(bid);
@@ -227,6 +229,7 @@ bool Core::req_file_from_peers(const Id& bid, const bool& aggresive){
     debug("*** no request for this bid %s",bid);
     return false;
   }
+  add_file_req_timeout(bid,time(0)+DEFAULT_FILE_REQ_TIMEOUT);
   unordered_set<Id> cids;
   for(const auto& c:data.file_reqs[bid].chunks) cids.emplace(c.first);
   chunk_lck.unlock();
