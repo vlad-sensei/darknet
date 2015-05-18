@@ -40,13 +40,15 @@ void Core::ai_run(){
 
     //handle all timed out file queries
     while(!data.file_reqs_timeout.empty() && data.file_reqs_timeout.begin()->first<=now) {
+
       Id bid = data.file_reqs_timeout.begin()->second;
-      data.file_reqs_timeout.erase(data.file_reqs_timeout.begin());
+      timeout_lck.unlock();
+      remove_file_req_timeout(data.file_reqs_timeout.begin()->first);
       //handle the timeout request..
       req_file_from_peers(bid,true);
+      timeout_lck.lock();
     }
 
-    timeout_lck.unlock();
     r_lock chunk_lck(chunk_req_mtx);
     r_lock peer_lck(peers_mtx);
 
@@ -69,7 +71,6 @@ void Core::ai_run(){
           it.second.remove_peer(peer_ip);
         }
       }
-
     }
     chunk_lck.unlock();
     peer_lck.unlock();
@@ -83,6 +84,11 @@ void Core::ai_run(){
     this_thread::sleep_for(chrono::seconds(DEFAULT_AI_SLEEP));
   }
 }
+void Core::remove_file_req_timeout(const time_t& time){
+  w_lock l(timeout_mtx);
+  data.file_reqs_timeout.erase(time);
+}
+
 
 void Core::add_file_req_timeout(const Id &bid, const time_t &timeout){
   w_lock l(timeout_mtx);

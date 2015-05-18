@@ -68,7 +68,7 @@ public:
   void handle_chunk_ack(const Id& bid, const unordered_set<Id>& cids, const peer_id_t& seller_pid);
   void handle_chunk_forward_ack(const Id& bid,const unordered_set<Id>& cids,const ip_t& addr);
   void add_file_req_timeout(const Id& bid, const time_t& timeout);
-
+  void remove_file_req_timeout(const time_t& time);
 private:
   void req_chunks(const Id& bid, const unordered_set<Id>& cids);
   void synch_all();
