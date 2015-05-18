@@ -51,16 +51,25 @@ void Core::ai_run(){
     r_lock chunk_lck(chunk_req_mtx);
     r_lock peer_lck(peers_mtx);
 
-    //req chunks from all peers that have left an ack
+    unordered_map<ip_t,unordered_set<Id> > peer_map;
     for(auto& it:data.file_reqs){
       for(const auto& it2:it.second.chunks){
-        if(it.second.get_peer_ip(it2.first,peer_ip)&& data.peer_ip_exists(peer_ip)){
-          const Peer_ptr& peer =data.peers[data.peer_ips[peer_ip]];
-          const unordered_set<Id> cids={it2.first};
-          peer->req_chunks(it.first,cids);
+        for(const auto& peer_ip:it2.second){
+            peer_map[peer_ip].emplace(it2.first);
         }
       }
+      for(const auto& it2:peer_map){
+          if(data.peer_ip_exists(it2.first)){
+            const Peer_ptr& peer =data.peers[data.peer_ips[it2.first]];
+            peer->req_chunks(it.first,it2.second);
+            data.file_reqs[it.first].remove_peer(it2.first);
+          }
+      }
+
     }
+
+
+
 
 
     chunk_lck.unlock();

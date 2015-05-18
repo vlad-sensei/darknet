@@ -98,7 +98,7 @@ struct File_req{
   File_req(){}
   Id bid;
   time_t created_at;
-  unordered_map<Id,deque<ip_t> > chunks;
+  unordered_map<Id,unordered_set<ip_t> > chunks;
   unsigned writer_count = 0;
   bool has_metabody = false;
 
@@ -111,7 +111,7 @@ struct File_req{
   }
   inline bool add_peer(const Id& cid,ip_t peer_ip){
     if(!chunk_exists(cid)) return false;
-    chunks[cid].emplace_back(peer_ip);
+    chunks[cid].emplace(peer_ip);
     return true;
   }
   bool get_peer_ip(const Id& cid,ip_t& peer_ip){
@@ -119,11 +119,17 @@ struct File_req{
       debug("*** no peer have left a ack");
       return false;
     }
-    peer_ip=chunks[cid].front();
-    chunks[cid].pop_front();
-    chunks[cid].emplace_back(peer_ip);
+    peer_ip=*chunks[cid].begin();
+    chunks[cid].erase(chunks[cid].begin());
     return true;
   }
+  void remove_peer(ip_t peer_ip){
+    for(auto& it:chunks){
+      it.second.erase(peer_ip);
+    }
+  }
+
+
 };
 
 struct Inidirect_file_req{
