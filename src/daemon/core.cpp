@@ -47,7 +47,7 @@ void Core::ai_run(){
             req_file_from_peers(bid,true);
 
         }
-
+        debug("!!!fan!!!");
         r_lock chunk_lck(chunk_req_mtx);
         r_lock peer_lck(peers_mtx);
 
