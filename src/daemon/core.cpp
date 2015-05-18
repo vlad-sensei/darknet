@@ -239,6 +239,7 @@ bool Core::req_file(const Id& mid,Id& bid){
 
 bool Core::req_file_from_peers(const Id& bid, const bool& aggresive){
     r_lock chunk_lck(chunk_req_mtx);
+    debug("req_file_from_peers");
     if(!data.file_req_exists(bid)) {
         debug("*** no request for this bid %s",bid);
         return false;
