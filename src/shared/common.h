@@ -101,6 +101,7 @@ struct File_req{
   unordered_map<Id,deque<ip_t> > chunks;
   unsigned writer_count = 0;
   bool has_metabody = false;
+
   inline bool chunk_exists(const Id& cid) {return chunks.find(cid)!=chunks.end();}
   inline void insert(const Id& cid) {chunks[cid]={};}
   inline bool erase(const Id& cid){
@@ -125,12 +126,12 @@ struct File_req{
   }
 };
 
-struct Inidirect_File_req{
-  Inidirect_File_req(const Id& bid_,time_t time):bid(bid_),time_stamp(time){
+struct Inidirect_file_req{
+  Inidirect_file_req(const Id& bid_,time_t time):bid(bid_),time_stamp(time){
     chunks[bid_]={};
   }
-  Inidirect_File_req(time_t time):time_stamp(time){}
-  Inidirect_File_req(){}
+  Inidirect_file_req(time_t time):time_stamp(time){}
+  Inidirect_file_req(){}
   Id bid;
   time_t time_stamp;
   unordered_map<Id,unordered_set<peer_id_t> > chunks;

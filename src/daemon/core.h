@@ -65,7 +65,7 @@ public:
 
   void handle_aggresive_query(const Id& bid,const unordered_set<Id>& cids,peer_id_t pid);
   void handle_chunk(const Id& bid, const Chunk& chunk);
-  void handle_chunk_ack(const Id& bid,const unordered_set<Id>& cids,peer_id_t pid);
+  void handle_chunk_ack(const Id& bid,const unordered_set<Id>& cids, const peer_id_t& pid);
   void handle_chunk_forward_ack(const Id& bid,const unordered_set<Id>& cids,const ip_t& addr);
 
 private:
@@ -93,7 +93,7 @@ private:
     //chunk requests
     map<time_t,Id>file_reqs_time;
     unordered_map<Id, File_req > file_reqs;
-    unordered_map<Id, Inidirect_File_req > indirect_reqs;
+    unordered_map<Id, Inidirect_file_req > indirect_reqs;
     inline bool file_req_exists(const Id& bid){ return file_reqs.find(bid) != file_reqs.end();}
     inline bool chunk_req_exists(const Id& bid,const Id& cid){ return file_req_exists(bid) && file_reqs[bid].chunk_exists(cid);}
 

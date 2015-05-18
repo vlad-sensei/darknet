@@ -251,7 +251,7 @@ bool Core::req_file_from_peers(const Id& bid, const bool& aggresive){
 void Core::handle_aggresive_query(const Id& bid,const unordered_set<Id>& cids,peer_id_t pid){
   w_lock l(chunk_req_mtx);
   if(!data.indirect_file_req_exists(bid)){
-    data.indirect_reqs[bid]=Inidirect_File_req(time(0));
+    data.indirect_reqs[bid]=Inidirect_file_req(time(0));
   }
 
 
@@ -290,27 +290,29 @@ void Core::handle_chunk_forward_ack(const Id &bid, const unordered_set<Id> &cids
 }
 
 
-void Core::handle_chunk_ack(const Id& bid,const unordered_set<Id>& cids,peer_id_t pid){
+void Core::handle_chunk_ack(const Id& bid,const unordered_set<Id>& cids,const peer_id_t& pid){
   r_lock chunk_lck(chunk_req_mtx);
   if(!data.file_req_exists(bid) && !data.indirect_file_req_exists(bid)) {
     debug("*** do not need this any more");
     return;
   }
+
+  //local request
   if(data.file_req_exists(bid)){
-    for(const auto& cid:cids){
-      if(data.file_reqs[bid].chunk_exists(cid)){
-        if(!data.file_reqs[bid].add_peer(cid,data.peers[pid]->get_ip())){
-          debug("*** cude not add peer to file_req");
-        }
-      }
+    for(const Id& cid:cids){
+      if(data.file_reqs[bid].chunk_exists(cid))
+        if(!data.file_reqs[bid].add_peer(cid,data.peers[pid]->get_ip()))
+          debug("*** could not add peer to file_req");
     }
   }
 
+  //remote request
   if(data.indirect_file_req_exists(bid)){
+    //get all peers who are awaiting for the cids
     unordered_map<peer_id_t,unordered_set<Id> > peer_map;
-    for(const auto& cid:cids){
+    for(const Id& cid:cids){
       if(data.indirect_reqs[bid].chunk_exists(cid)){
-        for(const auto& peer_id:data.indirect_reqs[bid].chunks[cid]){
+        for(const peer_id_t& peer_id:data.indirect_reqs[bid].chunks[cid]){
           peer_map[peer_id].emplace(cid);
         }
       }
