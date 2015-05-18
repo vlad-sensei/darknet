@@ -13,7 +13,7 @@ using namespace std;
 
 struct hash512_t{
   inline hash512_t() : data {0,0,0,0,0,0,0,0} {}
-  explicit inline hash512_t(const string& value){SHA512((unsigned char*)value.c_str(), value.size(), (unsigned char*)&data);};
+  explicit inline hash512_t(const string& value){SHA512((unsigned char*)value.c_str(), value.size(), (unsigned char*)&data);}
 
   inline size_t std_hash() const {return data[0]^data[1]^data[2]^data[3]^data[4]^data[5]^data[6]^data[7];}
   inline bool operator== (const hash512_t& other)const {return  !memcmp(data, other.data, sizeof(data));}
@@ -105,7 +105,7 @@ typedef uint32_t ip_t;
 #define DEFAULT_ARENA_SLOT_NUM 200
 #define DEAFULT_PEER_REQ_COUNT 10
 #define DEFAULT_AI_SLEEP 5
-#define DEFAULT_WAIT_TO_AGGRESIV 20 //in seconds
+#define DEFAULT_FILE_REQ_TIMEOUT 20 //in seconds
 #define DEFUALT_PERCENT_TO_DOWNLOAD 15
 
 

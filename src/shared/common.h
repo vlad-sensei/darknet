@@ -127,13 +127,13 @@ struct File_req{
 };
 
 struct Inidirect_file_req{
-  Inidirect_file_req(const Id& bid_,time_t time):bid(bid_),time_stamp(time){
+  Inidirect_file_req(const Id& bid_,const time_t& timestamp):bid(bid_),created_at(timestamp){
     chunks[bid_]={};
   }
-  Inidirect_file_req(time_t time):time_stamp(time){}
+  Inidirect_file_req(const time_t& timestamp):created_at(timestamp){}
   Inidirect_file_req(){}
   Id bid;
-  time_t time_stamp;
+  time_t created_at;
   unordered_map<Id,unordered_set<peer_id_t> > chunks;
   unsigned writer_count = 0;
   bool has_metabody = false;

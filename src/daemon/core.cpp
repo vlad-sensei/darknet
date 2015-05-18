@@ -33,17 +33,24 @@ void Core::run(){
 }
 
 void Core::ai_run(){
-  time_t time_now;
-  ip_t peer_ip;
   while(true){
-    //TODO chech for time_stamp_over_do
-    w_lock time_lck(time_mtx);
-    unordered_set<time_t> to_be_erased;
-    unordered_set<Id> to_be_inserted;
-    //loop to find old querys
-    for(map<time_t, Id>::iterator iter = data.file_reqs_time.begin(); iter != data.file_reqs_time.end(); ++iter){
-      time_now=time(0);
-      time_t time_stamp=iter->first;
+    time_t now = time(0);
+
+    w_lock timeout_lck(timeout_mtx);
+
+    //handle all timed out file queries
+    while(data.file_reqs_timeout.begin()->first<=now){
+      Id bid = data.file_reqs_timeout.begin()->second;
+      data.file_reqs_timeout.erase(data.file_reqs_timeout.begin());
+      //handle the timeout request..
+
+
+    }
+
+
+    for(auto iter = data.file_reqs_time.begin(); iter != data.file_reqs_time.end(); ++iter){
+
+      const time_t& time_stamp=iter->first;
       Id bid=iter->second;
 
       if(difftime(time_now,time_stamp) < DEFAULT_WAIT_TO_AGGRESIV) {
@@ -213,7 +220,7 @@ bool Core::make_peer_req(const peer_id_t &pid){
 
 bool Core::req_file(const Id& mid,Id& bid){
   Metahead metahead;
-  w_lock l(chunk_req_mtx);
+  w_lock chunk_req_lck(chunk_req_mtx);
   if(!get_metahead(mid,metahead)&& !data.file_req_exists(metahead.bid)){
     debug("*** no mid found [mid %s]\n or a req is on going",mid);
     return false;
@@ -224,8 +231,11 @@ bool Core::req_file(const Id& mid,Id& bid){
 
   bid=metahead.bid;
   data.file_reqs[bid]=File_req(bid,time_now);
-  data.file_reqs_time[data.file_reqs[bid].time_stamp]=bid;
-  l.unlock();
+
+  w_lock file_req_timeout_lck(timeout_mtx);
+  data.file_reqs_timeout[data.file_reqs[bid].created_at+DEFAULT_FILE_REQ_TIMEOUT]=bid;
+  file_req_timeout_lck.unlock();
+  chunk_req_lck.unlock();
   debug("*** TODO: check if file is on local pc");
   return req_file_from_peers(bid);
 }

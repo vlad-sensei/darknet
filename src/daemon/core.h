@@ -91,7 +91,7 @@ private:
     thread sync_thread;
 
     //chunk requests
-    map<time_t,Id>file_reqs_time;
+    map<time_t,Id>file_reqs_timeout;
     unordered_map<Id, File_req > file_reqs;
     unordered_map<Id, Inidirect_file_req > indirect_reqs;
     inline bool file_req_exists(const Id& bid){ return file_reqs.find(bid) != file_reqs.end();}
@@ -101,7 +101,7 @@ private:
     inline bool indirect_chunk_req_exists(const Id& bid,const Id& cid){ return indirect_file_req_exists(bid) && indirect_reqs[bid].chunk_exists(cid);}
 
   } data;
-  rw_mutex peers_mtx, pid_mtx, sync_mtx, chunk_req_mtx,time_mtx;
+  rw_mutex peers_mtx, pid_mtx, sync_mtx, chunk_req_mtx,timeout_mtx;
 
   Ui_ptr ui;
 };
