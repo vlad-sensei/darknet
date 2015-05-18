@@ -248,7 +248,7 @@ bool Core::req_file_from_peers(const Id& bid, const bool& aggresive){
   return true;
 }
 
-void Core::handle_aggresiv_query(const Id& bid,const unordered_set<Id>& cids,peer_id_t pid){
+void Core::handle_aggresive_query(const Id& bid,const unordered_set<Id>& cids,peer_id_t pid){
   w_lock l(chunk_req_mtx);
   if(!data.indirect_file_req_exists(bid)){
     data.indirect_reqs[bid]=Inidirect_File_req(time(0));

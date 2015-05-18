@@ -79,17 +79,17 @@ void Peer::handle_chunk(const Msg_ptr &msg){
 }
 
 void Peer::handle_chunk_ack(const Msg_ptr &msg){
-    const Id& bid = msg->get_id(Message::K_ID);
-    const unordered_set<Id> cids = msg->get_unordered_set_id(Message::K_CIDS);
-    core->handle_chunk_ack(bid,cids,data.pid);
+  const Id& bid = msg->get_id(Message::K_ID);
+  const unordered_set<Id> cids = msg->get_unordered_set_id(Message::K_CIDS);
+  core->handle_chunk_ack(bid,cids,data.pid);
 }
 
 void Peer::handle_chunk_forward_ack(const Msg_ptr &msg){
-    const Id& bid = msg->get_id(Message::K_ID);
-    const unordered_set<Id> cids = msg->get_unordered_set_id(Message::K_CIDS);
-    const ip_t& addr=msg->get_ip_t(Message::K_IP);
+  const Id& bid = msg->get_id(Message::K_ID);
+  const unordered_set<Id> cids = msg->get_unordered_set_id(Message::K_CIDS);
+  const ip_t& addr=msg->get_ip_t(Message::K_IP);
 
-    core->handle_chunk_forward_ack(bid,cids,addr);
+  core->handle_chunk_forward_ack(bid,cids,addr);
 }
 
 
@@ -133,27 +133,25 @@ void Peer::handle_chunk_req(const Msg_ptr &msg){
 
 void Peer::handle_chunk_query(const Msg_ptr &msg){
   const Id& bid = msg->get_id(Message::K_ID);
-  const unordered_set<Id> cids = msg->get_unordered_set_id(Message::K_CIDS);
-  const bool resend=msg->get_bool(Message::K_RESEND);
-  //TODO: do something with them..
+  const unordered_set<Id>& cids = msg->get_unordered_set_id(Message::K_CIDS);
+  const bool& resend = msg->get_bool(Message::K_RESEND);
 
-  //(void)bid; (void)cids;
-  if(!resend){
-      debug("handle_chunk_query");
-      unordered_set<Id> ack_cids;
-      for(Id cid:cids){
-        Chunk chunk;
-        if(core->get_chunk(bid,cid,chunk)){
-          debug("sedning ack for chunk: %s",cid);
-          ack_cids.emplace(cid);
-        }
-      }
-      send(Message::chunk_ack(bid,ack_cids));
-  }else{
-        debug("handle_aggresive_query");
-        core->handle_aggresiv_query(bid,cids,data.pid);
+  if(resend){
+    debug("handle_aggresive_query");
+    core->handle_aggresive_query(bid,cids,data.pid);
+    return;
   }
 
+  debug("handle_chunk_query");
+  unordered_set<Id> ack_cids;
+  for(Id cid:cids){
+    Chunk chunk;
+    if(core->get_chunk(bid,cid,chunk)){
+      debug("sedning ack for chunk: %s",cid);
+      ack_cids.emplace(cid);
+    }
+  }
+  send(Message::chunk_ack(bid,ack_cids));
 }
 
 
@@ -171,9 +169,9 @@ void Peer::handle_meta_req(const Msg_ptr &msg){
 void Peer::handle_meta_reply(const Msg_ptr &msg){
   debug("META_LIST_REPLY:");
   vector<Metahead> v = msg->get_vector_metahead(Message::K_META_LIST);
-   for (const auto& e: v){
-       core->add_metahead(e);
-     }
+  for (const auto& e: v){
+    core->add_metahead(e);
+  }
 }
 
 // ----------------- peer data -----------
