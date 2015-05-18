@@ -74,11 +74,11 @@ void Core::ai_run(){
         chunk_lck.unlock();
         peer_lck.unlock();
 
-        vector<Metahead> metahead_list=publish_metaheads();
-        if(!metahead_list.empty() && rand()%100 < DEFUALT_PERCENT_TO_DOWNLOAD ){
-            Metahead random=metahead_list[rand()%metahead_list.size()];
-            req_file(random.mid,random.bid);
-        }
+//        vector<Metahead> metahead_list=publish_metaheads();
+//        if(!metahead_list.empty() && rand()%100 < DEFUALT_PERCENT_TO_DOWNLOAD ){
+//            Metahead random=metahead_list[rand()%metahead_list.size()];
+//            req_file(random.mid,random.bid);
+//        }
 
         this_thread::sleep_for(chrono::seconds(DEFAULT_AI_SLEEP));
     }
