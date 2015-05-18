@@ -88,6 +88,7 @@ private:
     Data();
   } data;
   rw_mutex listen_port_mtx;
+  peer_id_t get_pid(){ return data.pid;}
 };
 
 #endif // PEER_H

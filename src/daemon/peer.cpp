@@ -81,7 +81,7 @@ void Peer::handle_chunk(const Msg_ptr &msg){
 void Peer::handle_chunk_ack(const Msg_ptr &msg){
   const Id& bid = msg->get_id(Message::K_ID);
   const unordered_set<Id> cids = msg->get_unordered_set_id(Message::K_CIDS);
-  core->handle_chunk_ack(bid,cids,data.pid);
+  core->handle_chunk_ack(bid,cids,get_pid());
 }
 
 void Peer::handle_chunk_forward_ack(const Msg_ptr &msg){
@@ -92,10 +92,9 @@ void Peer::handle_chunk_forward_ack(const Msg_ptr &msg){
   core->handle_chunk_forward_ack(bid,cids,addr);
 }
 
-
 void Peer::handle_listen_port(const Msg_ptr &msg){
-
   const uint16_t& port=msg->get_uint16_t(Message::K_PORT);
+
   debug("seting listen port [%s]",port);
   set_listen_port(port);
 }
@@ -111,9 +110,8 @@ void Peer::handle_connect(const Msg_ptr &msg){
 void Peer::handle_peer_req(const Msg_ptr &msg){
   //TODO troll check
   const uint16_t max_count = msg->get_uint16_t(Message::K_PEER_COUNT);
-  core->share_peers(max_count,data.pid);
+  core->share_peers(max_count,get_pid());
 }
-
 
 void Peer::handle_chunk_req(const Msg_ptr &msg){
   const Id& bid = msg->get_id(Message::K_ID);
@@ -154,8 +152,6 @@ void Peer::handle_chunk_query(const Msg_ptr &msg){
   if(ack_cids.empty()) return;
   send(Message::chunk_ack(bid,ack_cids));
 }
-
-
 
 void Peer::handle_meta_req(const Msg_ptr &msg){
   debug("SYNCH_REQ: %s", msg->get_string(Message::K_BODY));
