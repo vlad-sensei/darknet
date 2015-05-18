@@ -65,7 +65,7 @@ public:
 
   void handle_aggressive_query(const Id& bid,const unordered_set<Id>& cids,const peer_id_t& buyer_pid);
   void handle_chunk(const Id& bid, const Chunk& chunk);
-  void handle_chunk_ack(const Id& bid, const unordered_set<Id>& cids, const peer_id_t& source_pid);
+  void handle_chunk_ack(const Id& bid, const unordered_set<Id>& cids, const peer_id_t& seller_pid);
   void handle_chunk_forward_ack(const Id& bid,const unordered_set<Id>& cids,const ip_t& addr);
 
 private:
