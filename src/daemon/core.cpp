@@ -39,34 +39,15 @@ void Core::ai_run(){
     w_lock timeout_lck(timeout_mtx);
 
     //handle all timed out file queries
-    while(data.file_reqs_timeout.begin()->first<=now){
+    while(data.file_reqs_timeout.begin()->first<=now && !data.file_reqs_timeout.empty()){
       Id bid = data.file_reqs_timeout.begin()->second;
       data.file_reqs_timeout.erase(data.file_reqs_timeout.begin());
       //handle the timeout request..
-
-
+      req_file_from_peers(bid,true);
+      data.file_reqs_timeout[now+DEFAULT_FILE_REQ_TIMEOUT]=bid;
     }
 
-
-    for(auto iter = data.file_reqs_time.begin(); iter != data.file_reqs_time.end(); ++iter){
-
-      const time_t& time_stamp=iter->first;
-      Id bid=iter->second;
-
-      if(difftime(time_now,time_stamp) < DEFAULT_WAIT_TO_AGGRESIV) {
-        debug("*** no more old querys [diff %s] [size %s]", difftime(time_now,time_stamp),data.file_reqs_time.size());
-        break;
-      }
-      // make an aggresiv query if old and stil wanted
-      if(data.file_req_exists(bid)){
-        req_file_from_peers(iter->second,true);
-        data.file_reqs_time[time_now]=bid;
-      }
-      data.file_reqs_time.erase(time_stamp);
-    }
-
-
-    time_lck.unlock();
+    timeout_lck.unlock();
     r_lock chunk_lck(chunk_req_mtx);
     r_lock peer_lck(peers_mtx);
 

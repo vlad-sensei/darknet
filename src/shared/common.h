@@ -91,13 +91,13 @@ inline bool operator==(const Metahead& m1, const Metahead& m2){
 }
 
 struct File_req{
-  File_req(const Id& bid_,time_t time):bid(bid_),time_stamp(time){
+  File_req(const Id& bid_,time_t time):bid(bid_),created_at(time){
     chunks[bid_]={};
   }
-  File_req(time_t time):time_stamp(time){}
+  File_req(time_t time):created_at(time){}
   File_req(){}
   Id bid;
-  time_t time_stamp;
+  time_t created_at;
   unordered_map<Id,deque<ip_t> > chunks;
   unsigned writer_count = 0;
   bool has_metabody = false;
