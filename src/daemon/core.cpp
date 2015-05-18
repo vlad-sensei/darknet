@@ -44,15 +44,15 @@ void Core::ai_run(){
       data.file_reqs_timeout.erase(data.file_reqs_timeout.begin());
       //handle the timeout request..
       req_file_from_peers(bid,true);
-      data.file_reqs_timeout[now+DEFAULT_FILE_REQ_TIMEOUT]=bid;
     }
 
     timeout_lck.unlock();
     r_lock chunk_lck(chunk_req_mtx);
     r_lock peer_lck(peers_mtx);
 
-    unordered_map<ip_t,unordered_set<Id> > peer_map;
+
     for(auto& it:data.file_reqs){
+      unordered_map<ip_t,unordered_set<Id> > peer_map;
       for(const auto& it2:it.second.chunks){
         for(const auto& peer_ip:it2.second){
             peer_map[peer_ip].emplace(it2.first);
@@ -62,16 +62,11 @@ void Core::ai_run(){
           if(data.peer_ip_exists(it2.first)){
             const Peer_ptr& peer =data.peers[data.peer_ips[it2.first]];
             peer->req_chunks(it.first,it2.second);
-            data.file_reqs[it.first].remove_peer(it2.first);
+            it.second.remove_peer(it2.first);
           }
       }
 
     }
-
-
-
-
-
     chunk_lck.unlock();
     peer_lck.unlock();
 
