@@ -92,7 +92,7 @@ inline bool operator==(const Metahead& m1, const Metahead& m2){
 
 struct File_req{
   File_req(const Id& bid_,time_t time):bid(bid_),time_stamp(time){
-      chunks[bid_]={};
+    chunks[bid_]={};
   }
   File_req(time_t time):time_stamp(time){}
   File_req(){}
@@ -109,25 +109,25 @@ struct File_req{
     return true;
   }
   inline bool add_peer(const Id& cid,ip_t peer_ip){
-      if(!chunk_exists(cid)) return false;
-      chunks[cid].emplace_back(peer_ip);
-      return true;
+    if(!chunk_exists(cid)) return false;
+    chunks[cid].emplace_back(peer_ip);
+    return true;
   }
   bool get_peer_ip(const Id& cid,ip_t& peer_ip){
-      if(!chunk_exists(cid) || chunks[cid].empty()) {
-          debug("*** no peer have left a ack");
-          return false;
-      }
-      peer_ip=chunks[cid].front();
-      chunks[cid].pop_front();
-      chunks[cid].emplace_back(peer_ip);
-      return true;
+    if(!chunk_exists(cid) || chunks[cid].empty()) {
+      debug("*** no peer have left a ack");
+      return false;
+    }
+    peer_ip=chunks[cid].front();
+    chunks[cid].pop_front();
+    chunks[cid].emplace_back(peer_ip);
+    return true;
   }
 };
 
 struct Inidirect_File_req{
   Inidirect_File_req(const Id& bid_,time_t time):bid(bid_),time_stamp(time){
-      chunks[bid_]={};
+    chunks[bid_]={};
   }
   Inidirect_File_req(time_t time):time_stamp(time){}
   Inidirect_File_req(){}
@@ -144,9 +144,9 @@ struct Inidirect_File_req{
     return true;
   }
   void remove_peer(peer_id_t peer_id){
-      for(auto& it:chunks){
-          it.second.erase(peer_id);
-      }
+    for(auto& it:chunks){
+      it.second.erase(peer_id);
+    }
   }
 
 };
