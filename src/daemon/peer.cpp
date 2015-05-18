@@ -136,7 +136,7 @@ void Peer::handle_chunk_query(const Msg_ptr &msg){
 
   if(resend){
     debug("handle_aggresive_query");
-    core->handle_aggresive_query(bid,cids,data.pid);
+    core->handle_aggressive_query(bid,cids,data.pid);
     return;
   }
 
