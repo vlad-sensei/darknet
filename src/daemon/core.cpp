@@ -77,7 +77,7 @@ void Core::ai_run(){
         peer_lck.unlock();
 
         vector<Metahead> metahead_list=publish_metaheads();
-        if(!metahead_list.empty() && rand()%100 < DEFUALT_PERCENT_TO_DOWNLOAD ){
+        if(!metahead_list.empty() && rand()%1000 < DEFUALT_PER_THOUSAND_TO_DOWNLOAD ){
             Metahead random=metahead_list[rand()%metahead_list.size()];
             req_file(random.mid,random.bid);
         }

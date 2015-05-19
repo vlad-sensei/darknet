@@ -28,7 +28,7 @@ public:
   //TODO: right now you need to search the tags in the same order in which it was written.
   void search(const string& pattern, vector<Id>& mids);
   bool upload_file(const string& file_path, const string& tags, Id& mid);
-  inline void add_metahead(const Metahead & metahead) {if(!Database::metahead_exits(metahead)) Database::add_metahead(metahead);}
+  inline void add_metahead(const Metahead & metahead) {if(!Database::metahead_exits(metahead.mid)) Database::add_metahead(metahead);}
   bool get_metahead(const Id& mid, Metahead& metahead);
   vector<Metahead> publish_metaheads();
 };

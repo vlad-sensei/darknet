@@ -106,7 +106,7 @@ typedef uint32_t ip_t;
 #define DEAFULT_PEER_REQ_COUNT 10
 #define DEFAULT_AI_SLEEP 5
 #define DEFAULT_FILE_REQ_TIMEOUT 20 //in seconds
-#define DEFUALT_PERCENT_TO_DOWNLOAD 15
+#define DEFUALT_PER_THOUSAND_TO_DOWNLOAD 1
 
 
 #if __cplusplus <= 201103L
