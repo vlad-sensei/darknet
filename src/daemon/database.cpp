@@ -41,6 +41,12 @@ bool Database::get_metahead(const Id& mid, Metahead& metahead){
   return true;
 }
 
+bool Database::metahead_exits(const Id& mid){
+  Result_ptr res = exec_q(Q_METAHEAD_EXISTS,mid);
+  return res->next();
+}
+
+
 void Database::get_mids_by_tag_pattern(const string& pattern, vector<Id>& mids){
   Result_ptr res = exec_q(Q_MIDS_BY_TAG_PATTERN,pattern);
   while(res->next()) mids.emplace_back(res->get_id(0));
