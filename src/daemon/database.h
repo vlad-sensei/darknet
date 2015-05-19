@@ -64,7 +64,7 @@ private:
   Q_MIDS_BY_TAG_PATTERN = "SELECT mid FROM metaheads WHERE tags LIKE '%' || ? || '%';",
   Q_ALL_METAHEADS = "SELECT mid,tags,bid FROM metaheads;",
   Q_METAHEAD = "SELECT tags,bid FROM metaheads WHERE mid=?;",
-  Q_METAHEAD_EXISTS = "SELECT FROM metaheads WHERE mid=?;",
+  Q_METAHEAD_EXISTS = "SELECT 1 FROM metaheads WHERE mid=?;",
   Q_RANDOM_METAHEADS = "SELECT mid,tags,bid FROM metaheads ORDER BY RANDOM() LIMIT ?;",
   Q_CHUNK = "SELECT size,slot FROM chunks WHERE bid=? AND cid=?;",
 
