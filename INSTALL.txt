@@ -4,8 +4,7 @@ To install the noxnet, you need to compile it from source.
 
 Supported platforms
 -------------------
-Noxnet has been tested on windows and linux for x86 processors, and linux for
-arm-processors.
+Noxnet has been tested on windows and linux for x86 processors.
 
 Getting the source
 -------------
@@ -55,3 +54,26 @@ and select build.
 
 Copy the dlls from the *libs* folder to same directory as the exe file, for
 both client and daemon.
+
+Building the test version
+-------------------------
+There is also test version, which can be used with the test scripts in the
+noxnettest folder. To build this version you need to uncomment the line
+    
+    //#define TEST
+
+in the file 'glob.h'.
+
+Extra functionality
+-------------------
+Noxnet have an untested functionality. 
+This functionality is a more advanced downloading system where the nodes
+talks to one and another to see who has the chunks needed.
+If the node with the chunks is one friend a way from you,
+You will be merged with that one and start downloading from that one instead. 
+
+This extra functionality is on the branch Network_Ai_Beta. To use this you
+need to checkout that branch. This can be done by running this command in
+the terminal inside the git repository.
+
+checkout -b Network_Ai_Beta origin/Network_Ai_Beta
